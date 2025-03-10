@@ -48,7 +48,7 @@ const navigationConfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [
                     {
-                        key: 'apps.manajemenPengadaan.purchaseOrder',
+                        key: 'apps.purchaseOrder',
                         path: '/manajemen-pengadaan/purchase-order',
                         title: 'Purchase Order',
                         translateKey: 'nav.apps.manajemenPengadaan.item1',
@@ -58,7 +58,7 @@ const navigationConfig: NavigationTree[] = [
                         subMenu: [],
                     },
                     {
-                        key: 'apps.manajemenPengadaan.subkontraktor',
+                        key: 'apps.subkontraktor',
                         path: '/manajemen-pengadaan/subkontraktor',
                         title: 'Subkontraktor',
                         translateKey: 'nav.apps.manajemenPengadaan.item2',
@@ -80,20 +80,20 @@ const navigationConfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [
                     {
-                        key: 'apps.manajemenKeuangan.terminPembayaran',
+                        key: 'apps.terminPembayaran',
                         path: '/manajemen-keuangan/termin-pembayaran',
                         title: 'Termin Pembayaran',
-                        translateKey: 'nav.apps.manajemenPengadaan.item1',
+                        translateKey: 'nav.apps.manajemenKeuangan.item1',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
                         authority: [],
                         subMenu: [],
                     },
                     {
-                        key: 'apps.manajemenKeuangan.fakturPajak',
+                        key: 'apps.fakturPajak',
                         path: '/manajemen-keuangan/faktur-pajak',
                         title: 'Faktur Pajak',
-                        translateKey: 'nav.apps.manajemenPengadaan.item2',
+                        translateKey: 'nav.apps.manajemenKeuangan.item2',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
                         authority: [],

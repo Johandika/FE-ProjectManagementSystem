@@ -6,13 +6,13 @@ export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes = [
     {
-        key: 'dashboard',
+        key: 'apps.dashboard',
         path: '/dashboard',
         component: lazy(() => import('@/views/Dashboard')),
         authority: [],
     },
     {
-        key: 'manajemenProyek',
+        key: 'apps.manajemenProyek',
         path: '/manajemen-proyek',
         component: lazy(
             () => import('@/views/manajemenProyek/ManajemenProyek')
@@ -20,7 +20,7 @@ export const protectedRoutes = [
         authority: [],
     },
     {
-        key: 'manajemenPengadaan.purchaseOrder',
+        key: 'apps.purchaseOrder',
         path: '/manajemen-pengadaan/purchase-order',
         component: lazy(
             () => import('@/views/manajemenPengadaan/PurchaseOrder')
@@ -28,7 +28,7 @@ export const protectedRoutes = [
         authority: [],
     },
     {
-        key: 'manajemenPengadaan.subkontraktor',
+        key: 'apps.subkontraktor',
         path: '/manajemen-pengadaan/subkontraktor',
         component: lazy(
             () => import('@/views/manajemenPengadaan/Subkontraktor')
@@ -36,7 +36,7 @@ export const protectedRoutes = [
         authority: [],
     },
     {
-        key: 'manajemenKeuangan.terminPembayaran',
+        key: 'apps.terminPembayaran',
         path: '/manajemen-keuangan/termin-pembayaran',
         component: lazy(
             () => import('@/views/manajemenKeuangan/TerminPembayaran')
@@ -44,7 +44,7 @@ export const protectedRoutes = [
         authority: [],
     },
     {
-        key: 'manajemenKeuangan.fakturPajak',
+        key: 'apps.fakturPajak',
         path: '/manajemen-keuangan/faktur-pajak',
         component: lazy(() => import('@/views/manajemenKeuangan/FakturPajak')),
         authority: [],

@@ -5,14 +5,14 @@
             "dashboard": "Dashboard",
             "manajemenProyek": "Manajemen Proyek",
             "manajemenPengadaan": {
-                "collapse": "Group collapse menu",
-                "item1": "purchaseOrder",
-                "item2": "subkontaktor"
+                "collapse": "Manajemen Pengadaan",
+                "item1": "Purchase Order",
+                "item2": "Subkontraktor"
             },
             "manajemenKeuangan": {
-                "collapse": "Group collapse menu",
-                "item1": "terminPembayaran",
-                "item2": "fakturPajak"
+                "collapse": "Manajemen Keuangan",
+                "item1": "Termin Pembayaran",
+                "item2": "Faktur Pajak"
             }
         }
     }
