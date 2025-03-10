@@ -6,52 +6,47 @@ export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes = [
     {
-        key: 'home',
-        path: '/home',
-        component: lazy(() => import('@/views/Home')),
-        authority: [],
-    },
-    /** Example purpose only, please remove */
-    {
-        key: 'singleMenuItem',
-        path: '/single-menu-view',
-        component: lazy(() => import('@/views/demo/SingleMenuView')),
+        key: 'dashboard',
+        path: '/dashboard',
+        component: lazy(() => import('@/views/Dashboard')),
         authority: [],
     },
     {
-        key: 'collapseMenu.item1',
-        path: '/collapse-menu-item-view-1',
-        component: lazy(() => import('@/views/demo/CollapseMenuItemView1')),
-        authority: [],
-    },
-    {
-        key: 'collapseMenu.item2',
-        path: '/collapse-menu-item-view-2',
-        component: lazy(() => import('@/views/demo/CollapseMenuItemView2')),
-        authority: [],
-    },
-    {
-        key: 'groupMenu.single',
-        path: '/group-single-menu-item-view',
-        component: lazy(() =>
-            import('@/views/demo/GroupSingleMenuItemView')
+        key: 'manajemenProyek',
+        path: '/manajemen-proyek',
+        component: lazy(
+            () => import('@/views/manajemenProyek/ManajemenProyek')
         ),
         authority: [],
     },
     {
-        key: 'groupMenu.collapse.item1',
-        path: '/group-collapse-menu-item-view-1',
-        component: lazy(() =>
-            import('@/views/demo/GroupCollapseMenuItemView1')
+        key: 'manajemenPengadaan.purchaseOrder',
+        path: '/manajemen-pengadaan/purchase-order',
+        component: lazy(
+            () => import('@/views/manajemenPengadaan/PurchaseOrder')
         ),
         authority: [],
     },
     {
-        key: 'groupMenu.collapse.item2',
-        path: '/group-collapse-menu-item-view-2',
-        component: lazy(() =>
-            import('@/views/demo/GroupCollapseMenuItemView2')
+        key: 'manajemenPengadaan.subkontraktor',
+        path: '/manajemen-pengadaan/subkontraktor',
+        component: lazy(
+            () => import('@/views/manajemenPengadaan/Subkontraktor')
         ),
+        authority: [],
+    },
+    {
+        key: 'manajemenKeuangan.terminPembayaran',
+        path: '/manajemen-keuangan/termin-pembayaran',
+        component: lazy(
+            () => import('@/views/manajemenKeuangan/TerminPembayaran')
+        ),
+        authority: [],
+    },
+    {
+        key: 'manajemenKeuangan.fakturPajak',
+        path: '/manajemen-keuangan/faktur-pajak',
+        component: lazy(() => import('@/views/manajemenKeuangan/FakturPajak')),
         authority: [],
     },
 ]
