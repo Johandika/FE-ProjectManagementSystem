@@ -49,4 +49,30 @@ export const protectedRoutes = [
         component: lazy(() => import('@/views/manajemenKeuangan/FakturPajak')),
         authority: [],
     },
+    {
+        key: 'apps.beritaAcara',
+        path: '/manajemen-dokumen/berita-acara',
+        component: lazy(() => import('@/views/manajemenDokumen/BeritaAcara')),
+        authority: [],
+    },
+    {
+        key: 'apps.kelengkapanBerkas',
+        path: '/manajemen-dokumen/kelengkapan-berkas',
+        component: lazy(
+            () => import('@/views/manajemenDokumen/KelengkapanBerkas')
+        ),
+        authority: [],
+    },
+    {
+        key: 'apps.laporanProses',
+        path: '/laporan/laporan-proses',
+        component: lazy(() => import('@/views/laporan/LaporanProses')),
+        authority: [],
+    },
+    {
+        key: 'apps.laporanKeuangan',
+        path: '/laporan/laporan-keuangan',
+        component: lazy(() => import('@/views/laporan/LaporanKeuangan')),
+        authority: [],
+    },
 ]
