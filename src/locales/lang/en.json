@@ -13,6 +13,19 @@
                 "collapse": "Manajemen Keuangan",
                 "item1": "Termin Pembayaran",
                 "item2": "Faktur Pajak"
+            },
+            "laporan": {
+                "collapse": "Laporan",
+                "item1": "Laporan Proses",
+                "item2": "Laporan Keuangan"
+            }
+        },
+        "settings": {
+            "settings": "Settings",
+            "pengaturan": {
+                "collapse": "Pengaturan",
+                "item1": "Pengguna",
+                "item2": "Peran"
             }
         }
     }

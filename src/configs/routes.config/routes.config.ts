@@ -15,7 +15,10 @@ export const protectedRoutes = [
         key: 'apps.manajemenProyek',
         path: '/manajemen-proyek',
         component: lazy(
-            () => import('@/views/manajemenProyek/ManajemenProyek')
+            () =>
+                import(
+                    '@/views/manajemenProyek/ManajemenProyekList/ManajemenProyekList'
+                )
         ),
         authority: [],
     },
@@ -74,5 +77,28 @@ export const protectedRoutes = [
         path: '/laporan/laporan-keuangan',
         component: lazy(() => import('@/views/laporan/LaporanKeuangan')),
         authority: [],
+    },
+    {
+        key: 'settings.pengaturanPengguna',
+        path: '/pengaturan/pengguna',
+        component: lazy(() => import('@/views/pengaturan/Pengguna')),
+        authority: [],
+    },
+    {
+        key: 'settings.pengaturanPeran',
+        path: '/pengaturan/peran',
+        component: lazy(() => import('@/views/pengaturan/Peran')),
+        authority: [],
+    },
+    {
+        key: 'appsSales.productNew',
+        path: `manajemen-proyek/tambah-proyek`,
+        component: lazy(
+            () => import('@/views/manajemenProyek/TambahProyek/TambahProyek')
+        ),
+        authority: [],
+        meta: {
+            header: 'Tambah Proyek Baru',
+        },
     },
 ]
