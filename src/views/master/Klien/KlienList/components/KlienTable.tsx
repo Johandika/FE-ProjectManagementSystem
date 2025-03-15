@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react'
-import Avatar from '@/components/ui/Avatar'
-import Badge from '@/components/ui/Badge'
 import DataTable from '@/components/shared/DataTable'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-import { FiPackage } from 'react-icons/fi'
 import {
-    getProducts,
+    getKliens,
     setTableData,
     setSelectedProduct,
     toggleDeleteConfirmation,
@@ -13,7 +10,7 @@ import {
     useAppSelector,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
-import ProductDeleteConfirmation from './ProductDeleteConfirmation'
+import KlienDeleteConfirmation from './KlienDeleteConfirmation'
 import { useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
 import type {
@@ -24,48 +21,8 @@ import type {
 
 type Product = {
     id: string
-    pekerjaan: string
-    klien: string
-    pic: string
-    nomor_spk: string
-    nomor_spj: string
-    nomor_spo: string
-    tanggal_service_po: string
-    tanggal_delivery: string
-    nilai_kontrak: string
-    realisasi: string
-    progress: string
-    sisa_waktu: string
+    nama: string
     keterangan: string
-    status: string
-    idUser: string
-    idClient: string
-    idPIC: string
-}
-
-const inventoryStatusColor: Record<
-    number,
-    {
-        label: string
-        dotClass: string
-        textClass: string
-    }
-> = {
-    0: {
-        label: 'In Stock',
-        dotClass: 'bg-emerald-500',
-        textClass: 'text-emerald-500',
-    },
-    1: {
-        label: 'Limited',
-        dotClass: 'bg-amber-500',
-        textClass: 'text-amber-500',
-    },
-    2: {
-        label: 'Out of Stock',
-        dotClass: 'bg-red-500',
-        textClass: 'text-red-500',
-    },
 }
 
 const ActionColumn = ({ row }: { row: Product }) => {
@@ -74,7 +31,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
     const navigate = useNavigate()
 
     const onEdit = () => {
-        navigate(`/app/sales/product-edit/${row.id}`)
+        navigate(`/master/klien-edit/${row.id}`)
     }
 
     const onDelete = () => {
@@ -100,26 +57,22 @@ const ActionColumn = ({ row }: { row: Product }) => {
     )
 }
 
-const ProductTable = () => {
+const KlienTable = () => {
     const tableRef = useRef<DataTableResetHandle>(null)
 
     const dispatch = useAppDispatch()
 
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
-        (state) => state.salesProductList.data.tableData
+        (state) => state.klienList.data.tableData
     )
 
     const filterData = useAppSelector(
-        (state) => state.salesProductList.data.filterData
+        (state) => state.klienList.data.filterData
     )
 
-    const loading = useAppSelector(
-        (state) => state.salesProductList.data.loading
-    )
+    const loading = useAppSelector((state) => state.klienList.data.loading)
 
-    const data = useAppSelector(
-        (state) => state.salesProductList.data.productList
-    )
+    const data = useAppSelector((state) => state.klienList.data.productList)
 
     useEffect(() => {
         fetchData()
@@ -138,67 +91,26 @@ const ProductTable = () => {
     )
 
     const fetchData = () => {
-        dispatch(getProducts({ pageIndex, pageSize, sort, query, filterData }))
+        dispatch(getKliens({ pageIndex, pageSize, sort, query, filterData }))
     }
 
     const columns: ColumnDef<Product>[] = useMemo(
         () => [
             {
-                header: 'Pekerjaan',
-                accessorKey: 'pekerjaan',
+                header: 'Nama',
+                accessorKey: 'nama',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.pekerjaan}</span>
+                    return <span className="capitalize">{row.nama}</span>
                 },
             },
+
             {
-                header: 'Klien',
-                accessorKey: 'klien',
+                header: 'Keterangan',
+                accessorKey: 'keterangan',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.klien}</span>
-                },
-            },
-            {
-                header: 'PIC',
-                accessorKey: 'pic',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.pic}</span>
-                },
-            },
-            {
-                header: 'No_SPK',
-                accessorKey: 'nomor_spk',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spk}</span>
-                },
-            },
-            {
-                header: 'No_SPJ',
-                accessorKey: 'nomor_spj',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spj}</span>
-                },
-            },
-            {
-                header: 'No_SPO',
-                accessorKey: 'nomor_spo',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spo}</span>
-                },
-            },
-            {
-                header: 'Nilai Kontrak',
-                accessorKey: 'nilai_kontrak',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <span className="capitalize">{row.nilai_kontrak}</span>
-                    )
+                    return <span className="capitalize">{row.keterangan}</span>
                 },
             },
             {
@@ -247,9 +159,9 @@ const ProductTable = () => {
                 onSelectChange={onSelectChange}
                 onSort={onSort}
             />
-            <ProductDeleteConfirmation />
+            <KlienDeleteConfirmation />
         </>
     )
 }
 
-export default ProductTable
+export default KlienTable

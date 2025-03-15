@@ -67,15 +67,33 @@ export const protectedRoutes = [
         authority: [],
     },
     {
-        key: 'apps.laporanProses',
-        path: '/laporan/laporan-proses',
-        component: lazy(() => import('@/views/laporan/LaporanProses')),
+        key: 'apps.klien',
+        path: '/master/klien',
+        component: lazy(() => import('@/views/master/Klien/KlienList')),
         authority: [],
     },
     {
-        key: 'apps.laporanKeuangan',
-        path: '/laporan/laporan-keuangan',
-        component: lazy(() => import('@/views/laporan/LaporanKeuangan')),
+        key: 'apps.klien',
+        path: '/master/klien-edit/:klienId',
+        component: lazy(() => import('@/views/master/Klien/KlienEdit')),
+        authority: [],
+        meta: {
+            header: 'Ubah Klien',
+        },
+    },
+    {
+        key: 'apps.klien',
+        path: '/master/klien-new',
+        component: lazy(() => import('@/views/master/Klien/KlienNew')),
+        authority: [],
+        meta: {
+            header: 'Tambah Klien',
+        },
+    },
+    {
+        key: 'apps.berkas',
+        path: '/master/berkas',
+        component: lazy(() => import('@/views/master/Berkas/BerkasList/index')),
         authority: [],
     },
     {

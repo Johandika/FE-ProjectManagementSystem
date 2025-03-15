@@ -24,48 +24,11 @@ import type {
 
 type Product = {
     id: string
-    pekerjaan: string
-    klien: string
-    pic: string
-    nomor_spk: string
-    nomor_spj: string
-    nomor_spo: string
-    tanggal_service_po: string
-    tanggal_delivery: string
-    nilai_kontrak: string
-    realisasi: string
-    progress: string
-    sisa_waktu: string
+    nama: string
     keterangan: string
+    idProject: string
+    idBerkas: string
     status: string
-    idUser: string
-    idClient: string
-    idPIC: string
-}
-
-const inventoryStatusColor: Record<
-    number,
-    {
-        label: string
-        dotClass: string
-        textClass: string
-    }
-> = {
-    0: {
-        label: 'In Stock',
-        dotClass: 'bg-emerald-500',
-        textClass: 'text-emerald-500',
-    },
-    1: {
-        label: 'Limited',
-        dotClass: 'bg-amber-500',
-        textClass: 'text-amber-500',
-    },
-    2: {
-        label: 'Out of Stock',
-        dotClass: 'bg-red-500',
-        textClass: 'text-red-500',
-    },
 }
 
 const ActionColumn = ({ row }: { row: Product }) => {
@@ -144,63 +107,23 @@ const ProductTable = () => {
     const columns: ColumnDef<Product>[] = useMemo(
         () => [
             {
-                header: 'Pekerjaan',
-                accessorKey: 'pekerjaan',
+                header: 'Nama',
+                accessorKey: 'nama',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.pekerjaan}</span>
+                    return <span className="capitalize">{row.nama}</span>
                 },
             },
+
             {
-                header: 'Klien',
-                accessorKey: 'klien',
+                header: 'Keterangan',
+                accessorKey: 'keterangan',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.klien}</span>
+                    return <span className="capitalize">{row.keterangan}</span>
                 },
             },
-            {
-                header: 'PIC',
-                accessorKey: 'pic',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.pic}</span>
-                },
-            },
-            {
-                header: 'No_SPK',
-                accessorKey: 'nomor_spk',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spk}</span>
-                },
-            },
-            {
-                header: 'No_SPJ',
-                accessorKey: 'nomor_spj',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spj}</span>
-                },
-            },
-            {
-                header: 'No_SPO',
-                accessorKey: 'nomor_spo',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spo}</span>
-                },
-            },
-            {
-                header: 'Nilai Kontrak',
-                accessorKey: 'nilai_kontrak',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <span className="capitalize">{row.nilai_kontrak}</span>
-                    )
-                },
-            },
+
             {
                 header: '',
                 id: 'action',

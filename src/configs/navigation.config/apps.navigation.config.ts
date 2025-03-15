@@ -1,4 +1,3 @@
-import { APP_PREFIX_PATH } from '@/constants/route.constant'
 import {
     NAV_ITEM_TYPE_TITLE,
     NAV_ITEM_TYPE_COLLAPSE,
@@ -104,29 +103,29 @@ const appsNavigationConfig: NavigationTree[] = [
             },
             // Menu5
             {
-                key: 'apps.laporan',
-                path: '/laporan',
-                title: 'Laporan',
-                translateKey: 'nav.apps.laporan.collapse',
-                icon: 'laporan',
+                key: 'apps.master',
+                path: '/master',
+                title: 'Master',
+                translateKey: 'nav.apps.master.collapse',
+                icon: 'master',
                 type: NAV_ITEM_TYPE_COLLAPSE,
                 authority: [],
                 subMenu: [
                     {
-                        key: 'apps.laporanProses',
-                        path: '/laporan/laporan-proses',
-                        title: 'Laporan Proses',
-                        translateKey: 'nav.apps.laporan.item1',
+                        key: 'apps.klien',
+                        path: '/master/klien',
+                        title: 'Klien',
+                        translateKey: 'nav.apps.master.item1',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
                         authority: [],
                         subMenu: [],
                     },
                     {
-                        key: 'apps.laporanKeuangan',
-                        path: '/laporan/laporan-keuangan',
-                        title: 'Laporan Keuangan',
-                        translateKey: 'nav.apps.laporan.item2',
+                        key: 'apps.berkas',
+                        path: '/master/berkas',
+                        title: 'Berkas',
+                        translateKey: 'nav.apps.master.item2',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
                         authority: [],

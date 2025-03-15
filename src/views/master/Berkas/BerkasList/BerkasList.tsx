@@ -6,11 +6,11 @@ import ProductTableTools from './components/ProductTableTools'
 
 injectReducer('salesProductList', reducer)
 
-const ManajemenProyekList = () => {
+const BerkasList = () => {
     return (
         <AdaptableCard className="h-full" bodyClass="h-full">
             <div className="lg:flex items-center justify-between mb-4">
-                <h3 className="mb-4 lg:mb-0">Manajemen Proyek</h3>
+                <h3 className="mb-4 lg:mb-0">Daftar Berkas</h3>
                 <ProductTableTools />
             </div>
             <ProductTable />
@@ -18,4 +18,4 @@ const ManajemenProyekList = () => {
     )
 }
 
-export default ManajemenProyekList
+export default BerkasList

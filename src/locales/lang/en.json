@@ -14,10 +14,10 @@
                 "item1": "Termin Pembayaran",
                 "item2": "Faktur Pajak"
             },
-            "laporan": {
-                "collapse": "Laporan",
-                "item1": "Laporan Proses",
-                "item2": "Laporan Keuangan"
+            "master": {
+                "collapse": "Master",
+                "item1": "Klien",
+                "item2": "Berkas"
             }
         },
         "settings": {

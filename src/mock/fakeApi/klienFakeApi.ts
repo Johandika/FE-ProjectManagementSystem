@@ -3,12 +3,12 @@ import sortBy, { Primer } from '@/utils/sortBy'
 import paginate from '@/utils/paginate'
 import type { Server } from 'miragejs'
 
-export default function salesFakeApi(server: Server, apiPrefix: string) {
-    server.post(`${apiPrefix}/sales/products`, (schema, { requestBody }) => {
+export default function klienFakeApi(server: Server, apiPrefix: string) {
+    server.post(`${apiPrefix}/master/kliens`, (schema, { requestBody }) => {
         const body = JSON.parse(requestBody)
         const { pageIndex, pageSize, sort, query } = body
         const { order, key } = sort
-        const products = schema.db.productsData
+        const products = schema.db.kliensData
         const sanitizeProducts = products.filter(
             (elm) => typeof elm !== 'function'
         )
@@ -40,35 +40,35 @@ export default function salesFakeApi(server: Server, apiPrefix: string) {
     })
 
     server.del(
-        `${apiPrefix}/sales/products/delete`,
+        `${apiPrefix}/master/kliens/delete`,
         (schema, { requestBody }) => {
             const { id } = JSON.parse(requestBody)
-            schema.db.productsData.remove({ id })
+            schema.db.kliensData.remove({ id })
             return true
         }
     )
 
-    server.get(`${apiPrefix}/sales/product`, (schema, { queryParams }) => {
+    server.get(`${apiPrefix}/master/klien`, (schema, { queryParams }) => {
         const id = queryParams.id
-        const product = schema.db.productsData.find(id)
+        const product = schema.db.kliensData.find(id)
         return product
     })
 
     server.put(
-        `${apiPrefix}/sales/products/update`,
+        `${apiPrefix}/master/kliens/update`,
         (schema, { requestBody }) => {
             const data = JSON.parse(requestBody)
             const { id } = data
-            schema.db.productsData.update({ id }, data)
+            schema.db.kliensData.update({ id }, data)
             return true
         }
     )
 
     server.post(
-        `${apiPrefix}/sales/products/create`,
+        `${apiPrefix}/master/kliens/create`,
         (schema, { requestBody }) => {
             const data = JSON.parse(requestBody)
-            schema.db.productsData.insert(data)
+            schema.db.kliensData.insert(data)
             return true
         }
     )

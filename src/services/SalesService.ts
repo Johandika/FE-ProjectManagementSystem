@@ -1,3 +1,5 @@
+// File ini mengatur semua permintaan API yang berkaitan dengan produk dan pesanan di sistem penjualan. Semua fungsi API mengirimkan data ke server dan menerima respons untuk berbagai aksi terkait produk dan pesanan.
+
 import ApiService from './ApiService'
 
 export async function apiGetSalesProducts<T, U extends Record<string, unknown>>(

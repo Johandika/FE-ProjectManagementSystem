@@ -6,9 +6,6 @@ import StickyFooter from '@/components/shared/StickyFooter'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { Form, Formik, FormikProps } from 'formik'
 import BasicInformationFields from './BasicInformationFields'
-import PricingFields from './PricingFields'
-import OrganizationFields from './OrganizationFields'
-import ProductImages from './ProductImages'
 import cloneDeep from 'lodash/cloneDeep'
 import { HiOutlineTrash } from 'react-icons/hi'
 import { AiOutlineSave } from 'react-icons/ai'
@@ -19,25 +16,8 @@ type FormikRef = FormikProps<any>
 
 type InitialData = {
     id?: string
-    name?: string
-    productCode?: string
-    img?: string
-    imgList?: {
-        id: string
-        name: string
-        img: string
-    }[]
-    category?: string
-    price?: number
-    stock?: number
-    status?: number
-    costPerItem?: number
-    bulkDiscountPrice?: number
-    taxRate?: number
-    tags?: string[]
-    brand?: string
-    vendor?: string
-    description?: string
+    nama?: string
+    keterangan?: string
 }
 
 export type FormModel = Omit<InitialData, 'tags'> & {
@@ -50,7 +30,7 @@ export type OnDeleteCallback = React.Dispatch<React.SetStateAction<boolean>>
 
 type OnDelete = (callback: OnDeleteCallback) => void
 
-type ProductForm = {
+type KlienForm = {
     initialData?: InitialData
     type: 'edit' | 'new'
     onDiscard?: () => void
@@ -61,13 +41,11 @@ type ProductForm = {
 const { useUniqueId } = hooks
 
 const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Product Name Required'),
-    price: Yup.number().required('Price Required'),
-    stock: Yup.number().required('SKU Required'),
-    category: Yup.string().required('Category Required'),
+    nama: Yup.string().required('Nama wajib diisi'),
+    keterangan: Yup.string().required('Keterangan wajib diisi'),
 })
 
-const DeleteProductButton = ({ onDelete }: { onDelete: OnDelete }) => {
+const DeleteKlienButton = ({ onDelete }: { onDelete: OnDelete }) => {
     const [dialogOpen, setDialogOpen] = useState(false)
 
     const onConfirmDialogOpen = () => {
@@ -92,55 +70,38 @@ const DeleteProductButton = ({ onDelete }: { onDelete: OnDelete }) => {
                 type="button"
                 onClick={onConfirmDialogOpen}
             >
-                Delete
+                Hapus
             </Button>
             <ConfirmDialog
                 isOpen={dialogOpen}
                 type="danger"
-                title="Delete product"
+                title="Hapus klien"
                 confirmButtonColor="red-600"
                 onClose={onConfirmDialogClose}
                 onRequestClose={onConfirmDialogClose}
                 onCancel={onConfirmDialogClose}
                 onConfirm={handleConfirm}
             >
-                <p>
-                    Are you sure you want to delete this product? All record
-                    related to this product will be deleted as well. This action
-                    cannot be undone.
-                </p>
+                <p>Apakah Anda yakin ingin menghapus klien ini?</p>
             </ConfirmDialog>
         </>
     )
 }
 
-const ProductForm = forwardRef<FormikRef, ProductForm>((props, ref) => {
+const KlienForm = forwardRef<FormikRef, KlienForm>((props, ref) => {
     const {
         type,
         initialData = {
             id: '',
-            name: '',
-            productCode: '',
-            img: '',
-            imgList: [],
-            category: '',
-            price: 0,
-            stock: 0,
-            status: 0,
-            costPerItem: 0,
-            bulkDiscountPrice: 0,
-            taxRate: 6,
-            tags: [],
-            brand: '',
-            vendor: '',
-            description: '',
+            nama: '',
+            keterangan: '',
         },
         onFormSubmit,
         onDiscard,
         onDelete,
     } = props
 
-    const newId = useUniqueId('product-')
+    const newId = useUniqueId('klien-')
 
     return (
         <>
@@ -148,32 +109,29 @@ const ProductForm = forwardRef<FormikRef, ProductForm>((props, ref) => {
                 innerRef={ref}
                 initialValues={{
                     ...initialData,
-                    tags: initialData?.tags
-                        ? initialData.tags.map((value) => ({
-                              label: value,
-                              value,
-                          }))
-                        : [],
+                    // tags: initialData?.tags
+                    //     ? initialData.tags.map((value) => ({
+                    //           label: value,
+                    //           value,
+                    //       }))
+                    //     : [],
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
-                    formData.tags = formData.tags.map((tag) => {
-                        if (typeof tag !== 'string') {
-                            return tag.value
-                        }
-                        return tag
-                    })
+                    // formData.tags = formData.tags.map((tag) => {
+                    //     if (typeof tag !== 'string') {
+                    //         return tag.value
+                    //     }
+                    //     return tag
+                    // })
                     if (type === 'new') {
                         formData.id = newId
-                        if (formData.imgList && formData.imgList.length > 0) {
-                            formData.img = formData.imgList[0].img
-                        }
                     }
                     onFormSubmit?.(formData, setSubmitting)
                 }}
             >
-                {({ values, touched, errors, isSubmitting }) => (
+                {({ touched, errors, isSubmitting }) => (
                     <Form>
                         <FormContainer>
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -182,18 +140,6 @@ const ProductForm = forwardRef<FormikRef, ProductForm>((props, ref) => {
                                         touched={touched}
                                         errors={errors}
                                     />
-                                    <PricingFields
-                                        touched={touched}
-                                        errors={errors}
-                                    />
-                                    <OrganizationFields
-                                        touched={touched}
-                                        errors={errors}
-                                        values={values}
-                                    />
-                                </div>
-                                <div className="lg:col-span-1">
-                                    <ProductImages values={values} />
                                 </div>
                             </div>
                             <StickyFooter
@@ -202,7 +148,7 @@ const ProductForm = forwardRef<FormikRef, ProductForm>((props, ref) => {
                             >
                                 <div>
                                     {type === 'edit' && (
-                                        <DeleteProductButton
+                                        <DeleteKlienButton
                                             onDelete={onDelete as OnDelete}
                                         />
                                     )}
@@ -214,7 +160,7 @@ const ProductForm = forwardRef<FormikRef, ProductForm>((props, ref) => {
                                         type="button"
                                         onClick={() => onDiscard?.()}
                                     >
-                                        Discard
+                                        Batal
                                     </Button>
                                     <Button
                                         size="sm"
@@ -223,7 +169,7 @@ const ProductForm = forwardRef<FormikRef, ProductForm>((props, ref) => {
                                         icon={<AiOutlineSave />}
                                         type="submit"
                                     >
-                                        Save
+                                        Simpan
                                     </Button>
                                 </div>
                             </StickyFooter>
@@ -235,6 +181,6 @@ const ProductForm = forwardRef<FormikRef, ProductForm>((props, ref) => {
     )
 })
 
-ProductForm.displayName = 'ProductForm'
+KlienForm.displayName = 'KlienForm'
 
-export default ProductForm
+export default KlienForm

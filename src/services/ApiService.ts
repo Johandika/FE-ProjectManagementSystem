@@ -1,3 +1,5 @@
+// File ini adalah lapisan abstraksi untuk melakukan permintaan API dengan menggunakan Axios. Fungsi fetchData digunakan untuk menangani pengiriman permintaan HTTP.
+
 import BaseService from './BaseService'
 import type { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 
