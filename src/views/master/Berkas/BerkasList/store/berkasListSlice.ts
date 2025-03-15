@@ -1,25 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import {
-    apiGetSalesProducts,
-    apiDeleteSalesProducts,
-} from '@/services/SalesService'
-import type { TableQueries } from '@/@types/common'
+// File ini menangani operasi terkait daftar produk dalam aplikasi, termasuk memuat data produk, menghapus produk, dan mengelola status loading dan filter.
 
-type Product = {
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import type { TableQueries } from '@/@types/common'
+import { apiDeleteBerkases, apiGetBerkases } from '@/services/BerkasService'
+
+type Berkas = {
     id: string
-    name: string
-    productCode: string
-    img: string
-    category: string
-    price: number
-    stock: number
-    status: number
+    nama: string
+    keterangan: string
 }
 
-type Products = Product[]
+type Berkases = Berkas[]
 
-type GetSalesProductsResponse = {
-    data: Products
+type GetMasterBerkasResponse = {
+    data: Berkases
     total: number
 }
 
@@ -27,35 +21,35 @@ type FilterQueries = {
     name: string
     category: string[]
     status: number[]
-    productStatus: number
+    berkasStatus: number
 }
 
-export type SalesProductListState = {
+export type MasterBerkasListSlice = {
     loading: boolean
     deleteConfirmation: boolean
-    selectedProduct: string
+    selectedBerkas: string
     tableData: TableQueries
     filterData: FilterQueries
-    productList: Product[]
+    berkasList: Berkas[]
 }
 
-type GetSalesProductsRequest = TableQueries & { filterData?: FilterQueries }
+type GetMasterBerkasData = TableQueries & { filterData?: FilterQueries }
 
-export const SLICE_NAME = 'salesProductList'
+export const SLICE_NAME = 'berkasList'
 
-export const getProducts = createAsyncThunk(
-    SLICE_NAME + '/getProducts',
-    async (data: GetSalesProductsRequest) => {
-        const response = await apiGetSalesProducts<
-            GetSalesProductsResponse,
-            GetSalesProductsRequest
+export const getBerkases = createAsyncThunk(
+    SLICE_NAME + '/getBerkases',
+    async (data: GetMasterBerkasData) => {
+        const response = await apiGetBerkases<
+            GetMasterBerkasResponse,
+            GetMasterBerkasData
         >(data)
         return response.data
     }
 )
 
-export const deleteProduct = async (data: { id: string | string[] }) => {
-    const response = await apiDeleteSalesProducts<
+export const deleteBerkas = async (data: { id: string | string[] }) => {
+    const response = await apiDeleteBerkases<
         boolean,
         { id: string | string[] }
     >(data)
@@ -73,26 +67,26 @@ export const initialTableData: TableQueries = {
     },
 }
 
-const initialState: SalesProductListState = {
+const initialState: MasterBerkasListSlice = {
     loading: false,
     deleteConfirmation: false,
-    selectedProduct: '',
-    productList: [],
+    selectedBerkas: '',
+    berkasList: [],
     tableData: initialTableData,
     filterData: {
         name: '',
         category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
         status: [0, 1, 2],
-        productStatus: 0,
+        berkasStatus: 0,
     },
 }
 
-const productListSlice = createSlice({
+const berkasListSlice = createSlice({
     name: `${SLICE_NAME}/state`,
     initialState,
     reducers: {
-        updateProductList: (state, action) => {
-            state.productList = action.payload
+        updateBerkasList: (state, action) => {
+            state.berkasList = action.payload
         },
         setTableData: (state, action) => {
             state.tableData = action.payload
@@ -103,29 +97,29 @@ const productListSlice = createSlice({
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
         },
-        setSelectedProduct: (state, action) => {
-            state.selectedProduct = action.payload
+        setSelectedBerkas: (state, action) => {
+            state.selectedBerkas = action.payload
         },
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getProducts.fulfilled, (state, action) => {
-                state.productList = action.payload.data
+            .addCase(getBerkases.fulfilled, (state, action) => {
+                state.berkasList = action.payload.data
                 state.tableData.total = action.payload.total
                 state.loading = false
             })
-            .addCase(getProducts.pending, (state) => {
+            .addCase(getBerkases.pending, (state) => {
                 state.loading = true
             })
     },
 })
 
 export const {
-    updateProductList,
+    updateBerkasList,
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
-    setSelectedProduct,
-} = productListSlice.actions
+    setSelectedBerkas,
+} = berkasListSlice.actions
 
-export default productListSlice.reducer
+export default berkasListSlice.reducer

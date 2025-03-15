@@ -1,7 +1,7 @@
 import { useState, useRef, forwardRef } from 'react'
 import { HiOutlineFilter, HiOutlineSearch } from 'react-icons/hi'
 import {
-    getProducts,
+    getBerkases,
     setFilterData,
     initialTableData,
     useAppDispatch,
@@ -20,7 +20,7 @@ type FormModel = {
     name: string
     category: string[]
     status: number[]
-    productStatus: number
+    berkasStatus: number
 }
 
 type FilterFormProps = {
@@ -37,13 +37,13 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
         const dispatch = useAppDispatch()
 
         const filterData = useAppSelector(
-            (state) => state.salesProductList.data.filterData
+            (state) => state.berkasList.data.filterData
         )
 
         const handleSubmit = (values: FormModel) => {
             onSubmitComplete?.()
             dispatch(setFilterData(values))
-            dispatch(getProducts(initialTableData))
+            dispatch(getBerkases(initialTableData))
         }
 
         return (
@@ -177,17 +177,16 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                             </FormItem>
                             <FormItem
                                 invalid={
-                                    errors.productStatus &&
-                                    touched.productStatus
+                                    errors.berkasStatus && touched.berkasStatus
                                 }
-                                errorMessage={errors.productStatus}
+                                errorMessage={errors.berkasStatus}
                             >
                                 <h6 className="mb-4">Product Status</h6>
-                                <Field name="productStatus">
+                                <Field name="berkasStatus">
                                     {({ field, form }: FieldProps) => (
                                         <Radio.Group
                                             vertical
-                                            value={values.productStatus}
+                                            value={values.berkasStatus}
                                             onChange={(val) =>
                                                 form.setFieldValue(
                                                     field.name,
@@ -223,7 +222,7 @@ const DrawerFooter = ({ onSaveClick, onCancel }: DrawerFooterProps) => {
     )
 }
 
-const ProductFilter = () => {
+const BerkasFilter = () => {
     const formikRef = useRef<FormikProps<FormModel>>(null)
 
     const [isOpen, setIsOpen] = useState(false)
@@ -270,4 +269,4 @@ const ProductFilter = () => {
 
 FilterForm.displayName = 'FilterForm'
 
-export default ProductFilter
+export default BerkasFilter

@@ -1,19 +1,16 @@
 import { useEffect, useMemo, useRef } from 'react'
-import Avatar from '@/components/ui/Avatar'
-import Badge from '@/components/ui/Badge'
 import DataTable from '@/components/shared/DataTable'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-import { FiPackage } from 'react-icons/fi'
 import {
-    getProducts,
+    getBerkases,
     setTableData,
-    setSelectedProduct,
+    setSelectedBerkas,
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
-import ProductDeleteConfirmation from './ProductDeleteConfirmation'
+import BerkasDeleteConfirmation from './BerkasDeleteConfirmation'
 import { useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
 import type {
@@ -22,27 +19,24 @@ import type {
     ColumnDef,
 } from '@/components/shared/DataTable'
 
-type Product = {
+type Berkas = {
     id: string
     nama: string
     keterangan: string
-    idProject: string
-    idBerkas: string
-    status: string
 }
 
-const ActionColumn = ({ row }: { row: Product }) => {
+const ActionColumn = ({ row }: { row: Berkas }) => {
     const dispatch = useAppDispatch()
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
 
     const onEdit = () => {
-        navigate(`/app/sales/product-edit/${row.id}`)
+        navigate(`/master/berkas-edit/${row.id}`)
     }
 
     const onDelete = () => {
         dispatch(toggleDeleteConfirmation(true))
-        dispatch(setSelectedProduct(row.id))
+        dispatch(setSelectedBerkas(row.id))
     }
 
     return (
@@ -63,26 +57,22 @@ const ActionColumn = ({ row }: { row: Product }) => {
     )
 }
 
-const ProductTable = () => {
+const BerkasTable = () => {
     const tableRef = useRef<DataTableResetHandle>(null)
 
     const dispatch = useAppDispatch()
 
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
-        (state) => state.salesProductList.data.tableData
+        (state) => state.berkasList.data.tableData
     )
 
     const filterData = useAppSelector(
-        (state) => state.salesProductList.data.filterData
+        (state) => state.berkasList.data.filterData
     )
 
-    const loading = useAppSelector(
-        (state) => state.salesProductList.data.loading
-    )
+    const loading = useAppSelector((state) => state.berkasList.data.loading)
 
-    const data = useAppSelector(
-        (state) => state.salesProductList.data.productList
-    )
+    const data = useAppSelector((state) => state.berkasList.data.berkasList)
 
     useEffect(() => {
         fetchData()
@@ -101,10 +91,10 @@ const ProductTable = () => {
     )
 
     const fetchData = () => {
-        dispatch(getProducts({ pageIndex, pageSize, sort, query, filterData }))
+        dispatch(getBerkases({ pageIndex, pageSize, sort, query, filterData }))
     }
 
-    const columns: ColumnDef<Product>[] = useMemo(
+    const columns: ColumnDef<Berkas>[] = useMemo(
         () => [
             {
                 header: 'Nama',
@@ -123,7 +113,6 @@ const ProductTable = () => {
                     return <span className="capitalize">{row.keterangan}</span>
                 },
             },
-
             {
                 header: '',
                 id: 'action',
@@ -170,9 +159,9 @@ const ProductTable = () => {
                 onSelectChange={onSelectChange}
                 onSort={onSort}
             />
-            <ProductDeleteConfirmation />
+            <BerkasDeleteConfirmation />
         </>
     )
 }
 
-export default ProductTable
+export default BerkasTable

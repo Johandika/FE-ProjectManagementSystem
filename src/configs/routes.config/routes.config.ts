@@ -93,8 +93,26 @@ export const protectedRoutes = [
     {
         key: 'apps.berkas',
         path: '/master/berkas',
-        component: lazy(() => import('@/views/master/Berkas/BerkasList/index')),
+        component: lazy(() => import('@/views/master/Berkas/BerkasList')),
         authority: [],
+    },
+    {
+        key: 'apps.berkas',
+        path: '/master/berkas-edit/:berkasId',
+        component: lazy(() => import('@/views/master/Berkas/BerkasEdit')),
+        authority: [],
+        meta: {
+            header: 'Ubah Berkas',
+        },
+    },
+    {
+        key: 'apps.berkas',
+        path: '/master/berkas-new',
+        component: lazy(() => import('@/views/master/Berkas/BerkasNew')),
+        authority: [],
+        meta: {
+            header: 'Tambah Berkas',
+        },
     },
     {
         key: 'settings.pengaturanPengguna',

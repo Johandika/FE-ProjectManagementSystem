@@ -3,23 +3,21 @@ import Notification from '@/components/ui/Notification'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import {
     toggleDeleteConfirmation,
-    deleteProduct,
-    getProducts,
+    deleteBerkas,
+    getBerkases,
     useAppDispatch,
     useAppSelector,
 } from '../store'
 
-const ProductDeleteConfirmation = () => {
+const BerkasDeleteConfirmation = () => {
     const dispatch = useAppDispatch()
     const dialogOpen = useAppSelector(
-        (state) => state.salesProductList.data.deleteConfirmation
+        (state) => state.berkasList.data.deleteConfirmation
     )
-    const selectedProduct = useAppSelector(
-        (state) => state.salesProductList.data.selectedProduct
+    const selectedBerkas = useAppSelector(
+        (state) => state.berkasList.data.selectedBerkas
     )
-    const tableData = useAppSelector(
-        (state) => state.salesProductList.data.tableData
-    )
+    const tableData = useAppSelector((state) => state.berkasList.data.tableData)
 
     const onDialogClose = () => {
         dispatch(toggleDeleteConfirmation(false))
@@ -27,17 +25,17 @@ const ProductDeleteConfirmation = () => {
 
     const onDelete = async () => {
         dispatch(toggleDeleteConfirmation(false))
-        const success = await deleteProduct({ id: selectedProduct })
+        const success = await deleteBerkas({ id: selectedBerkas })
 
         if (success) {
-            dispatch(getProducts(tableData))
+            dispatch(getBerkases(tableData))
             toast.push(
                 <Notification
                     title={'Successfuly Deleted'}
                     type="success"
                     duration={2500}
                 >
-                    Product successfuly deleted
+                    Item berhasil dihapus
                 </Notification>,
                 {
                     placement: 'top-center',
@@ -50,20 +48,16 @@ const ProductDeleteConfirmation = () => {
         <ConfirmDialog
             isOpen={dialogOpen}
             type="danger"
-            title="Delete product"
+            title="Hapus Berkas"
             confirmButtonColor="red-600"
             onClose={onDialogClose}
             onRequestClose={onDialogClose}
             onCancel={onDialogClose}
             onConfirm={onDelete}
         >
-            <p>
-                Are you sure you want to delete this product? All record related
-                to this product will be deleted as well. This action cannot be
-                undone.
-            </p>
+            <p>Apakah kamu yakin ingin menghapus berkas ini?</p>
         </ConfirmDialog>
     )
 }
 
-export default ProductDeleteConfirmation
+export default BerkasDeleteConfirmation

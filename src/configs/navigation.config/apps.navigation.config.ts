@@ -114,7 +114,7 @@ const appsNavigationConfig: NavigationTree[] = [
                     {
                         key: 'apps.klien',
                         path: '/master/klien',
-                        title: 'Klien',
+                        title: 'Klien List',
                         translateKey: 'nav.apps.master.item1',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,

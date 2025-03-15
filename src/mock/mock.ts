@@ -40,6 +40,8 @@ import {
 import { signInUserData } from './data/authData'
 
 import { commonFakeApi, salesFakeApi, klienFakeApi } from './fakeApi'
+import { berkasesData } from './data/berkasData'
+import berkasFakeApi from './fakeApi/berkasFakeAPI'
 
 const { apiPrefix } = appConfig
 
@@ -78,6 +80,7 @@ export function mockServer({ environment = 'test' }) {
                 projectDashboardData,
                 cryptoDashboardData,
                 kliensData,
+                berkasesData,
             })
         },
         routes() {
@@ -99,6 +102,7 @@ export function mockServer({ environment = 'test' }) {
             // cryptoFakeApi(this, apiPrefix)
             // knowledgeBaseFakeApi(this, apiPrefix)
             klienFakeApi(this, apiPrefix)
+            berkasFakeApi(this, apiPrefix)
         },
     })
 }

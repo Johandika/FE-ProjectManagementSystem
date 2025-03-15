@@ -1,19 +1,19 @@
 import reducer from './store'
 import { injectReducer } from '@/store'
 import AdaptableCard from '@/components/shared/AdaptableCard'
-import ProductTable from './components/ProductTable'
-import ProductTableTools from './components/ProductTableTools'
+import BerkasTable from './components/BerkasTable'
+import BerkasTableTools from './components/BerkasTableTools'
 
-injectReducer('salesProductList', reducer)
+injectReducer('berkasList', reducer)
 
 const BerkasList = () => {
     return (
         <AdaptableCard className="h-full" bodyClass="h-full">
             <div className="lg:flex items-center justify-between mb-4">
                 <h3 className="mb-4 lg:mb-0">Daftar Berkas</h3>
-                <ProductTableTools />
+                <BerkasTableTools />
             </div>
-            <ProductTable />
+            <BerkasTable />
         </AdaptableCard>
     )
 }
