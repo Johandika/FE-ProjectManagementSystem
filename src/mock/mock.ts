@@ -5,9 +5,9 @@ import appConfig from '@/configs/app.config'
 import { notificationListData, searchQueryPoolData } from './data/commonData'
 import {
     projectList,
-    scrumboardData,
-    issueData,
-    projectDashboardData,
+    // scrumboardData,
+    // issueData,
+    // projectDashboardData,
 } from './data/projectData'
 import { usersData, userDetailData } from './data/usersData'
 import { eventsData, mailData, crmDashboardData } from './data/crmData'
@@ -39,9 +39,17 @@ import {
 } from './data/knowledgeBaseData'
 import { signInUserData } from './data/authData'
 
-import { commonFakeApi, salesFakeApi, klienFakeApi } from './fakeApi'
+import {
+    commonFakeApi,
+    salesFakeApi,
+    klienFakeApi,
+    fakturPajakFakeApi,
+    purchaseOrderFakeApi,
+} from './fakeApi'
 import { berkasesData } from './data/berkasData'
-import berkasFakeApi from './fakeApi/berkasFakeAPI'
+import berkasFakeApi from './fakeApi/berkasFakeApi'
+import { fakturPajaksData } from './data/fakturPajakData'
+import { purchaseOrdersData } from './data/purchaseOrderData'
 
 const { apiPrefix } = appConfig
 
@@ -53,8 +61,8 @@ export function mockServer({ environment = 'test' }) {
                 notificationListData,
                 searchQueryPoolData,
                 projectList,
-                scrumboardData,
-                issueData,
+                // scrumboardData,
+                // issueData,
                 usersData,
                 userDetailData,
                 eventsData,
@@ -77,10 +85,12 @@ export function mockServer({ environment = 'test' }) {
                 signInUserData,
                 salesDashboardData,
                 crmDashboardData,
-                projectDashboardData,
+                // projectDashboardData,
                 cryptoDashboardData,
                 kliensData,
                 berkasesData,
+                fakturPajaksData,
+                purchaseOrdersData,
             })
         },
         routes() {
@@ -103,6 +113,8 @@ export function mockServer({ environment = 'test' }) {
             // knowledgeBaseFakeApi(this, apiPrefix)
             klienFakeApi(this, apiPrefix)
             berkasFakeApi(this, apiPrefix)
+            fakturPajakFakeApi(this, apiPrefix)
+            purchaseOrderFakeApi(this, apiPrefix)
         },
     })
 }

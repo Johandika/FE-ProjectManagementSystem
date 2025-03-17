@@ -1,0 +1,42 @@
+export const fakturPajaksData = [
+    {
+        id: '1',
+        nomor: 'FP-20230001',
+        nominal: 8000000,
+        keterangan: '-',
+        tanggal: '2023-03-01',
+        status: 'Lunas',
+    },
+    {
+        id: '2',
+        nomor: 'FP-20230002',
+        nominal: 15000000,
+        keterangan: '-',
+        tanggal: '2023-03-01',
+        status: 'Belum Lunas',
+    },
+    {
+        id: '3',
+        nomor: 'FP-20230003',
+        nominal: 5000000,
+        keterangan: '-',
+        tanggal: '2023-03-01',
+        status: 'Lunas',
+    },
+    {
+        id: '4',
+        nomor: 'FP-20230004',
+        nominal: 12000000,
+        keterangan: '-',
+        tanggal: '2023-03-01',
+        status: 'Belum Lunas',
+    },
+    {
+        id: '5',
+        nomor: 'FP-20230005',
+        nominal: 3000000,
+        keterangan: '',
+        tanggal: '2023-03-01',
+        status: 'Lunas',
+    },
+]

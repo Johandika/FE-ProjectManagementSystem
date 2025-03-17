@@ -5,12 +5,14 @@ import type { Routes } from '@/@types/routes'
 export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes = [
+    // Dashboard
     {
         key: 'apps.dashboard',
         path: '/dashboard',
         component: lazy(() => import('@/views/Dashboard')),
         authority: [],
     },
+    // Manajemen Proyek
     {
         key: 'apps.manajemenProyek',
         path: '/manajemen-proyek',
@@ -22,50 +24,55 @@ export const protectedRoutes = [
         ),
         authority: [],
     },
+    // Purchase Order
     {
         key: 'apps.purchaseOrder',
-        path: '/manajemen-pengadaan/purchase-order',
+        path: '/purchase-order',
         component: lazy(
-            () => import('@/views/manajemenPengadaan/PurchaseOrder')
+            () => import('@/views/purchaseOrder/PurchaseOrderList')
         ),
         authority: [],
     },
     {
-        key: 'apps.subkontraktor',
-        path: '/manajemen-pengadaan/subkontraktor',
+        key: 'apps.purchaseOrder',
+        path: '/purchase-order-edit/:orderId',
         component: lazy(
-            () => import('@/views/manajemenPengadaan/Subkontraktor')
+            () => import('@/views/purchaseOrder/PurchaseOrderEdit')
         ),
         authority: [],
     },
     {
-        key: 'apps.terminPembayaran',
-        path: '/manajemen-keuangan/termin-pembayaran',
-        component: lazy(
-            () => import('@/views/manajemenKeuangan/TerminPembayaran')
-        ),
+        key: 'apps.purchaseOrder',
+        path: '/purchase-order-new',
+        component: lazy(() => import('@/views/purchaseOrder/PurchaseOrderNew')),
+        authority: [],
+    },
+    // Faktur Pajak
+    {
+        key: 'apps.fakturPajak',
+        path: '/faktur-pajak',
+        component: lazy(() => import('@/views/fakturPajak/FakturPajakList')),
         authority: [],
     },
     {
         key: 'apps.fakturPajak',
-        path: '/manajemen-keuangan/faktur-pajak',
-        component: lazy(() => import('@/views/manajemenKeuangan/FakturPajak')),
+        path: '/faktur-pajak-edit/:klienId',
+        component: lazy(() => import('@/views/fakturPajak/FakturPajakEdit')),
         authority: [],
+        meta: {
+            header: 'Ubah Faktur Pajak',
+        },
     },
     {
-        key: 'apps.beritaAcara',
-        path: '/manajemen-dokumen/berita-acara',
-        component: lazy(() => import('@/views/manajemenDokumen/BeritaAcara')),
+        key: 'apps.fakturPajak',
+        path: '/faktur-pajak-new',
+        component: lazy(() => import('@/views/fakturPajak/FakturPajakNew')),
         authority: [],
+        meta: {
+            header: 'Tambah Faktur Pajak',
+        },
     },
-    {
-        key: 'apps.kelengkapanBerkas',
-        path: '/manajemen-dokumen/kelengkapan-berkas',
-        component: lazy(
-            () => import('@/views/manajemenDokumen/KelengkapanBerkas')
-        ),
-        authority: [],
-    },
+    // Klien
     {
         key: 'apps.klien',
         path: '/master/klien',
@@ -90,6 +97,7 @@ export const protectedRoutes = [
             header: 'Tambah Klien',
         },
     },
+    // Berkas
     {
         key: 'apps.berkas',
         path: '/master/berkas',
@@ -114,6 +122,7 @@ export const protectedRoutes = [
             header: 'Tambah Berkas',
         },
     },
+    // Pengatuiran
     {
         key: 'settings.pengaturanPengguna',
         path: '/pengaturan/pengguna',
