@@ -1,4 +1,4 @@
-export const lokasiData = [
+export const lokasisData = [
     {
         id: 'lok-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         lokasi: 'Jalan Sudirman No. 123, Jakarta Pusat',

@@ -3,12 +3,6 @@
 import { createServer } from 'miragejs'
 import appConfig from '@/configs/app.config'
 import { notificationListData, searchQueryPoolData } from './data/commonData'
-import {
-    projectList,
-    // scrumboardData,
-    // issueData,
-    // projectDashboardData,
-} from './data/projectData'
 import { usersData, userDetailData } from './data/usersData'
 import { eventsData, mailData, crmDashboardData } from './data/crmData'
 import {
@@ -47,10 +41,12 @@ import {
     purchaseOrderFakeApi,
     berkasFakeApi,
     authFakeApi,
+    proyekFakeApi,
 } from './fakeApi'
 import { berkasesData } from './data/berkasData'
 import { fakturPajaksData } from './data/fakturPajakData'
 import { purchaseOrdersData } from './data/purchaseOrderData'
+import { proyeksData } from './data/proyekData'
 
 const { apiPrefix } = appConfig
 
@@ -61,7 +57,6 @@ export function mockServer({ environment = 'test' }) {
             server.db.loadData({
                 notificationListData,
                 searchQueryPoolData,
-                projectList,
                 // scrumboardData,
                 // issueData,
                 usersData,
@@ -92,6 +87,7 @@ export function mockServer({ environment = 'test' }) {
                 berkasesData,
                 fakturPajaksData,
                 purchaseOrdersData,
+                proyeksData,
             })
         },
         routes() {
@@ -116,6 +112,7 @@ export function mockServer({ environment = 'test' }) {
             berkasFakeApi(this, apiPrefix)
             fakturPajakFakeApi(this, apiPrefix)
             purchaseOrderFakeApi(this, apiPrefix)
+            proyekFakeApi(this, apiPrefix)
         },
     })
 }

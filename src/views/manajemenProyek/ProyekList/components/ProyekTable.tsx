@@ -1,19 +1,16 @@
 import { useEffect, useMemo, useRef } from 'react'
-import Avatar from '@/components/ui/Avatar'
-import Badge from '@/components/ui/Badge'
 import DataTable from '@/components/shared/DataTable'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-import { FiPackage } from 'react-icons/fi'
 import {
-    getProducts,
+    getProyeks,
     setTableData,
-    setSelectedProduct,
+    setSelectedProyek,
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
-import ProductDeleteConfirmation from './ProductDeleteConfirmation'
+import ProyekDeleteConfirmation from './ProyekDeleteConfirmation'
 import { useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
 import type {
@@ -22,64 +19,32 @@ import type {
     ColumnDef,
 } from '@/components/shared/DataTable'
 
-type Product = {
+type Proyek = {
     id: string
     pekerjaan: string
     klien: string
-    pic: string
-    nomor_spk: string
+    nomor_spk: number
     nomor_spj: string
-    nomor_spo: string
     tanggal_service_po: string
     tanggal_delivery: string
-    nilai_kontrak: string
-    realisasi: string
-    progress: string
-    sisa_waktu: string
-    keterangan: string
+    nilai_kontrak: number
+    realisasi: number
+    progress: number
     status: string
-    idUser: string
-    idClient: string
-    idPIC: string
 }
 
-const inventoryStatusColor: Record<
-    number,
-    {
-        label: string
-        dotClass: string
-        textClass: string
-    }
-> = {
-    0: {
-        label: 'In Stock',
-        dotClass: 'bg-emerald-500',
-        textClass: 'text-emerald-500',
-    },
-    1: {
-        label: 'Limited',
-        dotClass: 'bg-amber-500',
-        textClass: 'text-amber-500',
-    },
-    2: {
-        label: 'Out of Stock',
-        dotClass: 'bg-red-500',
-        textClass: 'text-red-500',
-    },
-}
-
-const ActionColumn = ({ row }: { row: Product }) => {
+const ActionColumn = ({ row }: { row: Proyek }) => {
     const dispatch = useAppDispatch()
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
 
     const onEdit = () => {
-        navigate(`/app/sales/product-edit/${row.id}`)
+        navigate(`/manajemen-proyek-edit/${row.id}`)
     }
 
     const onDelete = () => {
         dispatch(toggleDeleteConfirmation(true))
-        dispatch(setSelectedProduct(row.id))
+        dispatch(setSelectedProyek(row.id))
     }
 
     return (
@@ -100,26 +65,22 @@ const ActionColumn = ({ row }: { row: Product }) => {
     )
 }
 
-const ProductTable = () => {
+const ProyekTable = () => {
     const tableRef = useRef<DataTableResetHandle>(null)
 
     const dispatch = useAppDispatch()
 
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
-        (state) => state.salesProductList.data.tableData
+        (state) => state.proyekList.data.tableData
     )
 
     const filterData = useAppSelector(
-        (state) => state.salesProductList.data.filterData
+        (state) => state.proyekList.data.filterData
     )
 
-    const loading = useAppSelector(
-        (state) => state.salesProductList.data.loading
-    )
+    const loading = useAppSelector((state) => state.proyekList.data.loading)
 
-    const data = useAppSelector(
-        (state) => state.salesProductList.data.productList
-    )
+    const data = useAppSelector((state) => state.proyekList.data.proyekList)
 
     useEffect(() => {
         fetchData()
@@ -138,14 +99,15 @@ const ProductTable = () => {
     )
 
     const fetchData = () => {
-        dispatch(getProducts({ pageIndex, pageSize, sort, query, filterData }))
+        dispatch(getProyeks({ pageIndex, pageSize, sort, query, filterData }))
     }
 
-    const columns: ColumnDef<Product>[] = useMemo(
+    const columns: ColumnDef<Proyek>[] = useMemo(
         () => [
             {
                 header: 'Pekerjaan',
                 accessorKey: 'pekerjaan',
+                row: 100,
                 cell: (props) => {
                     const row = props.row.original
                     return <span className="capitalize">{row.pekerjaan}</span>
@@ -159,16 +121,9 @@ const ProductTable = () => {
                     return <span className="capitalize">{row.klien}</span>
                 },
             },
+
             {
-                header: 'PIC',
-                accessorKey: 'pic',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.pic}</span>
-                },
-            },
-            {
-                header: 'No_SPK',
+                header: 'Nomor SPK',
                 accessorKey: 'nomor_spk',
                 cell: (props) => {
                     const row = props.row.original
@@ -176,7 +131,7 @@ const ProductTable = () => {
                 },
             },
             {
-                header: 'No_SPJ',
+                header: 'Nomor SPJ',
                 accessorKey: 'nomor_spj',
                 cell: (props) => {
                     const row = props.row.original
@@ -184,11 +139,27 @@ const ProductTable = () => {
                 },
             },
             {
-                header: 'No_SPO',
-                accessorKey: 'nomor_spo',
+                header: 'Tangggal Servis PO',
+                accessorKey: 'tanggal_service_po',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spo}</span>
+                    return (
+                        <span className="capitalize">
+                            {row.tanggal_service_po}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Tangggal Delivery',
+                accessorKey: 'tanggal_delivery',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="capitalize">
+                            {row.tanggal_delivery}
+                        </span>
+                    )
                 },
             },
             {
@@ -197,8 +168,38 @@ const ProductTable = () => {
                 cell: (props) => {
                     const row = props.row.original
                     return (
-                        <span className="capitalize">{row.nilai_kontrak}</span>
+                        <span className="capitalize">
+                            {row.nilai_kontrak.toLocaleString('id-ID')}
+                        </span>
                     )
+                },
+            },
+            {
+                header: 'Realiasasi',
+                accessorKey: 'realisasi',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="capitalize">
+                            {row.realisasi.toLocaleString('id-ID')}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Progress',
+                accessorKey: 'progress',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="capitalize">{row.progress}%</span>
+                },
+            },
+            {
+                header: 'Status',
+                accessorKey: 'status',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="capitalize">{row.status}</span>
                 },
             },
             {
@@ -247,9 +248,9 @@ const ProductTable = () => {
                 onSelectChange={onSelectChange}
                 onSort={onSort}
             />
-            <ProductDeleteConfirmation />
+            <ProyekDeleteConfirmation />
         </>
     )
 }
 
-export default ProductTable
+export default ProyekTable

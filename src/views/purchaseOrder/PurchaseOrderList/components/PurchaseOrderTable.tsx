@@ -117,6 +117,14 @@ const PurchaseOrderTable = () => {
                 },
             },
             {
+                header: 'Nama',
+                accessorKey: 'nama', // Changed from 'keterangan'
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="capitalize">{row.nama}</span>
+                },
+            },
+            {
                 header: 'Nominal',
                 accessorKey: 'harga', // Changed from 'nominal'
                 cell: (props) => {
@@ -124,6 +132,18 @@ const PurchaseOrderTable = () => {
                     return (
                         <span className="capitalize">
                             {row.harga.toLocaleString('id-ID')}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Estimasi Pengerjaan',
+                accessorKey: 'estimasi_pengerjaan', // Changed from 'keterangan'
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="capitalize">
+                            {row.estimasi_pengerjaan}
                         </span>
                     )
                 },
@@ -144,14 +164,7 @@ const PurchaseOrderTable = () => {
                     return <span className="capitalize">{row.status}</span>
                 },
             },
-            {
-                header: 'Keterangan',
-                accessorKey: 'nama', // Changed from 'keterangan'
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nama}</span>
-                },
-            },
+
             {
                 header: '',
                 id: 'action',

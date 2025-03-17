@@ -53,7 +53,7 @@ const validationSchema = Yup.object().shape({
     harga: Yup.number().required('Nomor wajib diisi'),
     status: Yup.string().required('Status wajib diisi'),
     pabrik: Yup.string().required('Keterangan wajib diisi'),
-    estimasi_pengerjaan: Yup.string().required('Tanggal wajib diisi'),
+    estimasi_pengerjaan: Yup.string().required('Estimasi wajib diisi'),
     idProject: Yup.string().required('Tanggal wajib diisi'),
 })
 

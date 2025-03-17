@@ -16,13 +16,26 @@ export const protectedRoutes = [
     {
         key: 'apps.manajemenProyek',
         path: '/manajemen-proyek',
-        component: lazy(
-            () =>
-                import(
-                    '@/views/manajemenProyek/ManajemenProyekList/ManajemenProyekList'
-                )
-        ),
+        component: lazy(() => import('@/views/manajemenProyek/ProyekList')),
         authority: [],
+    },
+    {
+        key: 'apps.manajemenProyek',
+        path: '/manajemen-proyek-edit/:proyekId',
+        component: lazy(() => import('@/views/manajemenProyek/ProyekEdit')),
+        authority: [],
+        meta: {
+            header: 'Ubah Proyek',
+        },
+    },
+    {
+        key: 'apps.manajemenProyek',
+        path: '/manajemen-proyek-new',
+        component: lazy(() => import('@/views/manajemenProyek/ProyekNew')),
+        authority: [],
+        meta: {
+            header: 'Tambah Proyek',
+        },
     },
     // Purchase Order
     {
@@ -40,12 +53,18 @@ export const protectedRoutes = [
             () => import('@/views/purchaseOrder/PurchaseOrderEdit')
         ),
         authority: [],
+        meta: {
+            header: 'Ubah Purchase Order',
+        },
     },
     {
         key: 'apps.purchaseOrder',
         path: '/purchase-order-new',
         component: lazy(() => import('@/views/purchaseOrder/PurchaseOrderNew')),
         authority: [],
+        meta: {
+            header: 'Tambah Purchase Order',
+        },
     },
     // Faktur Pajak
     {
@@ -134,16 +153,5 @@ export const protectedRoutes = [
         path: '/pengaturan/peran',
         component: lazy(() => import('@/views/pengaturan/Peran')),
         authority: [],
-    },
-    {
-        key: 'appsSales.productNew',
-        path: `manajemen-proyek/tambah-proyek`,
-        component: lazy(
-            () => import('@/views/manajemenProyek/TambahProyek/TambahProyek')
-        ),
-        authority: [],
-        meta: {
-            header: 'Tambah Proyek Baru',
-        },
     },
 ]

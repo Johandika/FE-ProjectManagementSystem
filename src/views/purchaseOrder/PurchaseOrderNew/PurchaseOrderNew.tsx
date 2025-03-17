@@ -1,18 +1,18 @@
-import FakturPajakForm, {
+import PurchaseOrderForm, {
     FormModel,
     SetSubmitting,
-} from '@/views/fakturPajak/FakturPajakForm'
+} from '@/views/purchaseOrder/PurchaseOrderForm'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import { useNavigate } from 'react-router-dom'
-import { apiCreateFakturPajak } from '@/services/FakturPajakService'
+import { apiCreatePurchaseOrder } from '@/services/PurchaseOrderService'
 
 const PurchaseOrderNew = () => {
     const navigate = useNavigate()
 
-    const addFakturPajak = async (data: FormModel) => {
+    const addPurchaseOrder = async (data: FormModel) => {
         console.log('Data yang akan dikirim:', data)
-        const response = await apiCreateFakturPajak<boolean, FormModel>(data)
+        const response = await apiCreatePurchaseOrder<boolean, FormModel>(data)
         return response.data
     }
 
@@ -21,7 +21,7 @@ const PurchaseOrderNew = () => {
         setSubmitting: SetSubmitting
     ) => {
         setSubmitting(true)
-        const success = await addFakturPajak(values)
+        const success = await addPurchaseOrder(values)
         setSubmitting(false)
         if (success) {
             toast.push(
@@ -30,23 +30,23 @@ const PurchaseOrderNew = () => {
                     type="success"
                     duration={2500}
                 >
-                    Faktur pajak berhasil ditambahkan
+                    Purchase order berhasil ditambahkan
                 </Notification>,
                 {
                     placement: 'top-center',
                 }
             )
-            navigate('/faktur-pajak')
+            navigate('/purchase-order')
         }
     }
 
     const handleDiscard = () => {
-        navigate('/faktur-pajak')
+        navigate('/purchase-order')
     }
 
     return (
         <>
-            <FakturPajakForm
+            <PurchaseOrderForm
                 type="new"
                 onFormSubmit={handleFormSubmit}
                 onDiscard={handleDiscard}

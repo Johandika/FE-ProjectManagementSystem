@@ -1,17 +1,18 @@
-import ProductForm, {
+import FakturPajakForm, {
     FormModel,
     SetSubmitting,
-} from '@/views/manajemenProyek/ManajemenProyekForm'
+} from '@/views/fakturPajak/FakturPajakForm'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import { useNavigate } from 'react-router-dom'
-import { apiCreateSalesProduct } from '@/services/SalesService'
+import { apiCreateFakturPajak } from '@/services/FakturPajakService'
 
-const TambahProyek = () => {
+const FakturPajakNew = () => {
     const navigate = useNavigate()
 
-    const addProduct = async (data: FormModel) => {
-        const response = await apiCreateSalesProduct<boolean, FormModel>(data)
+    const addFakturPajak = async (data: FormModel) => {
+        console.log('Data yang akan dikirim:', data)
+        const response = await apiCreateFakturPajak<boolean, FormModel>(data)
         return response.data
     }
 
@@ -20,7 +21,7 @@ const TambahProyek = () => {
         setSubmitting: SetSubmitting
     ) => {
         setSubmitting(true)
-        const success = await addProduct(values)
+        const success = await addFakturPajak(values)
         setSubmitting(false)
         if (success) {
             toast.push(
@@ -29,23 +30,23 @@ const TambahProyek = () => {
                     type="success"
                     duration={2500}
                 >
-                    Product successfuly added
+                    Faktur pajak berhasil ditambahkan
                 </Notification>,
                 {
                     placement: 'top-center',
                 }
             )
-            navigate('/manajemen-proyek')
+            navigate('/faktur-pajak')
         }
     }
 
     const handleDiscard = () => {
-        navigate('/manajemen-proyek')
+        navigate('/faktur-pajak')
     }
 
     return (
         <>
-            <ProductForm
+            <FakturPajakForm
                 type="new"
                 onFormSubmit={handleFormSubmit}
                 onDiscard={handleDiscard}
@@ -54,4 +55,4 @@ const TambahProyek = () => {
     )
 }
 
-export default TambahProyek
+export default FakturPajakNew

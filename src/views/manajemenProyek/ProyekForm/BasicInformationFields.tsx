@@ -7,14 +7,11 @@ import { DatePicker, Select } from '@/components/ui'
 import dayjs from 'dayjs'
 
 type FormFieldsName = {
-    nomor_po: string
-    nama: string
-    tanggal_po: string
-    pabrik: string
-    harga: number
+    nomor: string
+    nominal: number
+    keterangan: string
+    tanggal: string
     status: string
-    estimasi_pengerjaan?: string
-    idProject: string
 }
 
 type BasicInformationFields = {
@@ -24,8 +21,8 @@ type BasicInformationFields = {
 }
 
 const statuses = [
-    { label: 'Selesai', value: 'Selesai' },
-    { label: 'Dalam Proses', value: 'Dalam Proses' },
+    { label: 'Lunas', value: 'Lunas' },
+    { label: 'Belum Lunas', value: 'Belum Lunas' },
 ]
 
 const BasicInformationFields = (props: BasicInformationFields) => {
@@ -38,37 +35,43 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 Sesi untuk mengatur informasi dasar faktur pajak
             </p>
             <FormItem
-                label="Nomor"
-                invalid={(errors.nomor_po && touched.nomor_po) as boolean}
-                errorMessage={errors.nomor_po}
+                label="Nomor faktur pajak"
+                invalid={(errors.nomor && touched.nomor) as boolean}
+                errorMessage={errors.nomor}
             >
                 <Field
                     type="text"
                     autoComplete="off"
-                    name="nomor_po"
-                    placeholder="Nomor purchase"
+                    name="nomor"
+                    placeholder="Nomor"
                     component={Input}
                 />
             </FormItem>
             <FormItem
-                label="Nama"
-                invalid={(errors.nama && touched.nama) as boolean}
-                errorMessage={errors.nama}
+                label="Nominal"
+                invalid={(errors.nominal && touched.nominal) as boolean}
+                errorMessage={errors.nominal}
             >
-                <Field
-                    type="text"
-                    autoComplete="off"
-                    name="nama"
-                    placeholder="Nama purchase"
-                    component={Input}
-                />
+                <Field name="nominal">
+                    {({ field, form }: FieldProps) => (
+                        <NumericFormat
+                            {...field}
+                            customInput={Input}
+                            placeholder="Nominal"
+                            onValueChange={(values) => {
+                                form.setFieldValue(field.name, values.value)
+                            }}
+                        />
+                    )}
+                </Field>
             </FormItem>
+
             <FormItem
                 label="Tanggal"
-                invalid={(errors.tanggal_po && touched.tanggal_po) as boolean}
-                errorMessage={errors.tanggal_po}
+                invalid={(errors.tanggal && touched.tanggal) as boolean}
+                errorMessage={errors.tanggal}
             >
-                <Field name="tanggal_po">
+                <Field name="tanggal">
                     {({ field, form }: FieldProps) => (
                         <DatePicker
                             placeholder="Pilih Tanggal"
@@ -84,55 +87,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     )}
                 </Field>
             </FormItem>
-            <FormItem
-                label="Pabrik"
-                invalid={(errors.pabrik && touched.pabrik) as boolean}
-                errorMessage={errors.pabrik}
-            >
-                <Field
-                    type="text"
-                    autoComplete="off"
-                    name="pabrik"
-                    placeholder="Pabrik"
-                    component={Input}
-                />
-            </FormItem>
-            <FormItem
-                label="Estimasi Pengerjaan(hari)"
-                invalid={
-                    (errors.estimasi_pengerjaan &&
-                        touched.estimasi_pengerjaan) as boolean
-                }
-                errorMessage={errors.estimasi_pengerjaan}
-            >
-                <Field
-                    type="text"
-                    autoComplete="off"
-                    name="estimasi_pengerjaan"
-                    placeholder="Estimasi pengerjaan"
-                    component={Input}
-                />
-            </FormItem>
-
-            <FormItem
-                label="Harga"
-                invalid={(errors.harga && touched.harga) as boolean}
-                errorMessage={errors.harga}
-            >
-                <Field name="harga">
-                    {({ field, form }: FieldProps) => (
-                        <NumericFormat
-                            {...field}
-                            customInput={Input}
-                            placeholder="Harga"
-                            onValueChange={(values) => {
-                                form.setFieldValue(field.name, values.value)
-                            }}
-                        />
-                    )}
-                </Field>
-            </FormItem>
-
             <FormItem
                 label="Status"
                 invalid={(errors.status && touched.status) as boolean}
@@ -163,15 +117,15 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </Field>
             </FormItem>
             <FormItem
-                label="Proyek"
-                invalid={(errors.idProject && touched.idProject) as boolean}
-                errorMessage={errors.idProject}
+                label="Keterangan"
+                labelClass="!justify-start"
+                invalid={(errors.keterangan && touched.keterangan) as boolean}
+                errorMessage={errors.keterangan}
             >
                 <Field
-                    type="text"
-                    autoComplete="off"
-                    name="idProject"
-                    placeholder="Proyek"
+                    textArea
+                    name="keterangan"
+                    placeholder="Masukkan keterangan"
                     component={Input}
                 />
             </FormItem>

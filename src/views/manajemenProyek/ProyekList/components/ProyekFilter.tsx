@@ -1,7 +1,7 @@
 import { useState, useRef, forwardRef } from 'react'
 import { HiOutlineFilter, HiOutlineSearch } from 'react-icons/hi'
 import {
-    getProducts,
+    getProyeks,
     setFilterData,
     initialTableData,
     useAppDispatch,
@@ -20,7 +20,7 @@ type FormModel = {
     name: string
     category: string[]
     status: number[]
-    productStatus: number
+    proyekStatus: number
 }
 
 type FilterFormProps = {
@@ -37,13 +37,13 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
         const dispatch = useAppDispatch()
 
         const filterData = useAppSelector(
-            (state) => state.salesProductList.data.filterData
+            (state) => state.proyekList.data.filterData
         )
 
         const handleSubmit = (values: FormModel) => {
             onSubmitComplete?.()
             dispatch(setFilterData(values))
-            dispatch(getProducts(initialTableData))
+            dispatch(getProyeks(initialTableData))
         }
 
         return (
@@ -78,7 +78,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                 invalid={errors.category && touched.category}
                                 errorMessage={errors.category as string}
                             >
-                                <h6 className="mb-4">Product Category</h6>
+                                <h6 className="mb-4">Berkas Pajak Category</h6>
                                 <Field name="category">
                                     {({ field, form }: FieldProps) => (
                                         <>
@@ -135,7 +135,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                 invalid={errors.status && touched.status}
                                 errorMessage={errors.status as string}
                             >
-                                <h6 className="mb-4">Product Category</h6>
+                                <h6 className="mb-4">Berkas Pajak Category</h6>
                                 <Field name="status">
                                     {({ field, form }: FieldProps) => (
                                         <>
@@ -177,17 +177,16 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                             </FormItem>
                             <FormItem
                                 invalid={
-                                    errors.productStatus &&
-                                    touched.productStatus
+                                    errors.proyekStatus && touched.proyekStatus
                                 }
-                                errorMessage={errors.productStatus}
+                                errorMessage={errors.proyekStatus}
                             >
-                                <h6 className="mb-4">Product Status</h6>
-                                <Field name="productStatus">
+                                <h6 className="mb-4">Berkas Pajak Status</h6>
+                                <Field name="proyekStatus">
                                     {({ field, form }: FieldProps) => (
                                         <Radio.Group
                                             vertical
-                                            value={values.productStatus}
+                                            value={values.proyekStatus}
                                             onChange={(val) =>
                                                 form.setFieldValue(
                                                     field.name,
@@ -223,7 +222,7 @@ const DrawerFooter = ({ onSaveClick, onCancel }: DrawerFooterProps) => {
     )
 }
 
-const ProductFilter = () => {
+const ProyekFilter = () => {
     const formikRef = useRef<FormikProps<FormModel>>(null)
 
     const [isOpen, setIsOpen] = useState(false)
@@ -270,4 +269,4 @@ const ProductFilter = () => {
 
 FilterForm.displayName = 'FilterForm'
 
-export default ProductFilter
+export default ProyekFilter
