@@ -4,23 +4,23 @@ import DoubleSidedImage from '@/components/shared/DoubleSidedImage'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import reducer, {
-    getFakturPajak,
-    updateFakturPajak,
-    deleteFakturPajak,
+    getPurchaseOrder,
+    updatePurchaseOrder,
+    deletePurchaseOrder,
     useAppSelector,
     useAppDispatch,
 } from './store'
 import { injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import FakturPajakForm, {
+import PurchaseOrderForm, {
     FormModel,
     SetSubmitting,
     OnDeleteCallback,
-} from '@/views/fakturPajak/FakturPajakForm'
+} from '@/views/purchaseOrder/PurchaseOrderForm'
 import isEmpty from 'lodash/isEmpty'
 
-injectReducer('fakturPajakEdit', reducer)
+injectReducer('purchaseOrderEdit', reducer)
 
 const PurchaseOrderEdit = () => {
     const dispatch = useAppDispatch()
@@ -28,15 +28,15 @@ const PurchaseOrderEdit = () => {
     const location = useLocation()
     const navigate = useNavigate()
 
-    const fakturPajakData = useAppSelector(
-        (state) => state.fakturPajakEdit.data.fakturPajakData
+    const purchaseOrderData = useAppSelector(
+        (state) => state.purchaseOrderEdit.data.purchaseOrderData
     )
     const loading = useAppSelector(
-        (state) => state.fakturPajakEdit.data.loading
+        (state) => state.purchaseOrderEdit.data.loading
     )
 
     const fetchData = (data: { id: string }) => {
-        dispatch(getFakturPajak(data))
+        dispatch(getPurchaseOrder(data))
     }
 
     const handleFormSubmit = async (
@@ -44,7 +44,7 @@ const PurchaseOrderEdit = () => {
         setSubmitting: SetSubmitting
     ) => {
         setSubmitting(true)
-        const success = await updateFakturPajak(values)
+        const success = await updatePurchaseOrder(values)
         setSubmitting(false)
         if (success) {
             popNotification('updated')
@@ -52,12 +52,12 @@ const PurchaseOrderEdit = () => {
     }
 
     const handleDiscard = () => {
-        navigate('/faktur-pajak')
+        navigate('/purchase-order')
     }
 
     const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
         setDialogOpen(false)
-        const success = await deleteFakturPajak({ id: fakturPajakData.id })
+        const success = await deletePurchaseOrder({ id: purchaseOrderData.id })
         if (success) {
             popNotification('deleted')
         }
@@ -76,7 +76,7 @@ const PurchaseOrderEdit = () => {
                 placement: 'top-center',
             }
         )
-        navigate('/faktur-pajak')
+        navigate('/purchase-order')
     }
 
     useEffect(() => {
@@ -91,11 +91,11 @@ const PurchaseOrderEdit = () => {
     return (
         <>
             <Loading loading={loading}>
-                {!isEmpty(fakturPajakData) && (
+                {!isEmpty(purchaseOrderData) && (
                     <>
-                        <FakturPajakForm
+                        <PurchaseOrderForm
                             type="edit"
-                            initialData={fakturPajakData}
+                            initialData={purchaseOrderData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}
@@ -103,7 +103,7 @@ const PurchaseOrderEdit = () => {
                     </>
                 )}
             </Loading>
-            {!loading && isEmpty(fakturPajakData) && (
+            {!loading && isEmpty(purchaseOrderData) && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <DoubleSidedImage
                         src="/img/others/img-2.png"

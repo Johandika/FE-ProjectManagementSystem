@@ -45,9 +45,10 @@ import {
     klienFakeApi,
     fakturPajakFakeApi,
     purchaseOrderFakeApi,
+    berkasFakeApi,
+    authFakeApi,
 } from './fakeApi'
 import { berkasesData } from './data/berkasData'
-import berkasFakeApi from './fakeApi/berkasFakeApi'
 import { fakturPajaksData } from './data/fakturPajakData'
 import { purchaseOrdersData } from './data/purchaseOrderData'
 
@@ -108,7 +109,7 @@ export function mockServer({ environment = 'test' }) {
             // crmFakeApi(this, apiPrefix)
             salesFakeApi(this, apiPrefix)
             // accountFakeApi(this, apiPrefix)
-            // authFakeApi(this, apiPrefix)
+            authFakeApi(this, apiPrefix)
             // cryptoFakeApi(this, apiPrefix)
             // knowledgeBaseFakeApi(this, apiPrefix)
             klienFakeApi(this, apiPrefix)

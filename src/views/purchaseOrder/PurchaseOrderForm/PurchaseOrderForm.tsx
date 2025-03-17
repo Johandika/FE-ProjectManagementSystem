@@ -16,11 +16,14 @@ type FormikRef = FormikProps<any>
 
 type InitialData = {
     id?: string
-    nomor?: string
-    nominal?: number
-    keterangan?: string
-    tanggal?: string
+    nomor_po?: string
+    nama?: string
+    tanggal_po?: string
+    pabrik?: string
+    harga?: number
     status?: string
+    estimasi_pengerjaan?: string
+    idProject?: string
 }
 
 export type FormModel = Omit<InitialData, 'tags'> & {
@@ -44,14 +47,17 @@ type PurchaseOrderForm = {
 const { useUniqueId } = hooks
 
 const validationSchema = Yup.object().shape({
-    nomor: Yup.string().required('Nomor wajib diisi'),
-    nominal: Yup.number().required('Nomor wajib diisi'),
-    keterangan: Yup.string().required('Keterangan wajib diisi'),
-    tanggal: Yup.string().required('Tanggal wajib diisi'),
+    nomor_po: Yup.string().required('Nomor wajib diisi'),
+    nama: Yup.string().required('Nomor wajib diisi'),
+    tanggal_po: Yup.string().required('Nomor wajib diisi'),
+    harga: Yup.number().required('Nomor wajib diisi'),
     status: Yup.string().required('Status wajib diisi'),
+    pabrik: Yup.string().required('Keterangan wajib diisi'),
+    estimasi_pengerjaan: Yup.string().required('Tanggal wajib diisi'),
+    idProject: Yup.string().required('Tanggal wajib diisi'),
 })
 
-const DeleteFakturPajakButton = ({ onDelete }: { onDelete: OnDelete }) => {
+const DeletePurchaseOrderButton = ({ onDelete }: { onDelete: OnDelete }) => {
     const [dialogOpen, setDialogOpen] = useState(false)
 
     const onConfirmDialogOpen = () => {
@@ -81,14 +87,16 @@ const DeleteFakturPajakButton = ({ onDelete }: { onDelete: OnDelete }) => {
             <ConfirmDialog
                 isOpen={dialogOpen}
                 type="danger"
-                title="Hapus faktur pajak"
+                title="Hapus purchase order pajak"
                 confirmButtonColor="red-600"
                 onClose={onConfirmDialogClose}
                 onRequestClose={onConfirmDialogClose}
                 onCancel={onConfirmDialogClose}
                 onConfirm={handleConfirm}
             >
-                <p>Apakah Anda yakin ingin menghapus faktur pajak ini?</p>
+                <p>
+                    Apakah Anda yakin ingin menghapus purchase order pajak ini?
+                </p>
             </ConfirmDialog>
         </>
     )
@@ -100,18 +108,21 @@ const PurchaseOrderForm = forwardRef<FormikRef, PurchaseOrderForm>(
             type,
             initialData = {
                 id: '',
-                nomor: '',
-                nominal: 0,
-                keterangan: '',
-                tanggal: '',
-                status: 'Belum Lunas',
+                nomor_po: '',
+                nama: '',
+                tanggal_po: '',
+                harga: 0,
+                status: '',
+                pabrik: '',
+                estimasi_pengerjaan: '',
+                idProject: '',
             },
             onFormSubmit,
             onDiscard,
             onDelete,
         } = props
 
-        const newId = useUniqueId('fakturPajak-')
+        const newId = useUniqueId('purchaseOrder-')
 
         return (
             <>
@@ -158,7 +169,7 @@ const PurchaseOrderForm = forwardRef<FormikRef, PurchaseOrderForm>(
                                 >
                                     <div>
                                         {type === 'edit' && (
-                                            <DeleteFakturPajakButton
+                                            <DeletePurchaseOrderButton
                                                 onDelete={onDelete as OnDelete}
                                             />
                                         )}

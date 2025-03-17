@@ -21,11 +21,14 @@ import type {
 
 type PurchaseOrder = {
     id: string
-    nomor: string
-    nominal: number
-    keterangan: string
-    tanggal: string
+    nomor_po: string
+    nama: string
+    tanggal_po: string
+    pabrik: string
+    harga: number
     status: string
+    estimasi_pengerjaan: string
+    idProject: string
 }
 
 const ActionColumn = ({ row }: { row: PurchaseOrder }) => {
@@ -107,28 +110,30 @@ const PurchaseOrderTable = () => {
         () => [
             {
                 header: 'Nomor',
-                accessorKey: 'nomor',
+                accessorKey: 'nomor_po', // Changed from 'nomor'
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.nomor}</span>
+                    return <span className="capitalize">{row.nomor_po}</span>
                 },
             },
-
             {
                 header: 'Nominal',
-                accessorKey: 'nominal',
+                accessorKey: 'harga', // Changed from 'nominal'
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.nominal}</span>
+                    return (
+                        <span className="capitalize">
+                            {row.harga.toLocaleString('id-ID')}
+                        </span>
+                    )
                 },
             },
-
             {
                 header: 'Tanggal',
-                accessorKey: 'tanggal',
+                accessorKey: 'tanggal_po', // Changed from 'tanggal'
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.tanggal}</span>
+                    return <span className="capitalize">{row.tanggal_po}</span>
                 },
             },
             {
@@ -141,10 +146,10 @@ const PurchaseOrderTable = () => {
             },
             {
                 header: 'Keterangan',
-                accessorKey: 'keterangan',
+                accessorKey: 'nama', // Changed from 'keterangan'
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.keterangan}</span>
+                    return <span className="capitalize">{row.nama}</span>
                 },
             },
             {
