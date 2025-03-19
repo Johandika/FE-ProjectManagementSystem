@@ -22,7 +22,6 @@ import type {
 type Berkas = {
     id: string
     nama: string
-    keterangan: string
 }
 
 const ActionColumn = ({ row }: { row: Berkas }) => {
@@ -105,14 +104,14 @@ const BerkasTable = () => {
                 },
             },
 
-            {
-                header: 'Keterangan',
-                accessorKey: 'keterangan',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.keterangan}</span>
-                },
-            },
+            // {
+            //     header: 'Keterangan',
+            //     accessorKey: 'keterangan',
+            //     cell: (props) => {
+            //         const row = props.row.original
+            //         return <span className="capitalize">{row.keterangan}</span>
+            //     },
+            // },
             {
                 header: '',
                 id: 'action',

@@ -17,7 +17,6 @@ type FormikRef = FormikProps<any>
 type InitialData = {
     id?: string
     nama?: string
-    keterangan?: string
 }
 
 export type FormModel = Omit<InitialData, 'tags'> & {
@@ -42,7 +41,6 @@ const { useUniqueId } = hooks
 
 const validationSchema = Yup.object().shape({
     nama: Yup.string().required('Nama wajib diisi'),
-    keterangan: Yup.string().required('Keterangan wajib diisi'),
 })
 
 const DeleteBerkasButton = ({ onDelete }: { onDelete: OnDelete }) => {
@@ -94,7 +92,6 @@ const BerkasForm = forwardRef<FormikRef, BerkasForm>((props, ref) => {
         initialData = {
             id: '',
             nama: '',
-            keterangan: '',
         },
         onFormSubmit,
         onDiscard,

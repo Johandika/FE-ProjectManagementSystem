@@ -5,7 +5,6 @@ import { Field, FormikErrors, FormikTouched } from 'formik'
 
 type FormFieldsName = {
     nama: string
-    keterangan: string
 }
 
 type BasicInformationFields = {
@@ -33,7 +32,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     component={Input}
                 />
             </FormItem>
-            <FormItem
+            {/* <FormItem
                 label="Keterangan"
                 labelClass="!justify-start"
                 invalid={(errors.keterangan && touched.keterangan) as boolean}
@@ -45,7 +44,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     placeholder="Masukkan keterangan"
                     component={Input}
                 />
-            </FormItem>
+            </FormItem> */}
         </AdaptableCard>
     )
 }
