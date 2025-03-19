@@ -8,6 +8,7 @@ import {
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
+    getKliens,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import ProyekDeleteConfirmation from './ProyekDeleteConfirmation'
@@ -31,6 +32,7 @@ type Proyek = {
     realisasi: number
     progress: number
     status: string
+    idKlien: string
 }
 
 const ActionColumn = ({ row }: { row: Proyek }) => {
@@ -80,10 +82,32 @@ const ProyekTable = () => {
 
     const loading = useAppSelector((state) => state.proyekList.data.loading)
 
-    const data = useAppSelector((state) => state.proyekList.data.proyekList)
+    const proyekData = useAppSelector(
+        (state) => state.proyekList.data.proyekList
+    )
+    const kliensList = useAppSelector(
+        (state) => state.proyekList.data.kliensList
+    )
+
+    // Process the data to include client names
+    const data = useMemo(() => {
+        return proyekData.map((proyek) => {
+            // Find the matching client
+            const client = kliensList.find(
+                (client) => client.id === proyek.idKlien
+            )
+
+            // Return proyek object with client name from kliensList
+            return {
+                ...proyek,
+                klien: client ? client.nama : 'Klien Tidak Ditemukan',
+            }
+        })
+    }, [proyekData, kliensList])
 
     useEffect(() => {
         fetchData()
+        dispatch(getKliens()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageIndex, pageSize, sort])
 
@@ -121,7 +145,6 @@ const ProyekTable = () => {
                     return <span className="capitalize">{row.klien}</span>
                 },
             },
-
             {
                 header: 'Nomor SPK',
                 accessorKey: 'nomor_spk',

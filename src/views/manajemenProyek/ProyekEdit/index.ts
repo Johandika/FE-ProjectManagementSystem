@@ -1,3 +1,3 @@
-import FakturPajakEdit from './FakturPajakEdit'
+import ProyekEdit from './ProyekEdit'
 
-export default FakturPajakEdit
+export default ProyekEdit

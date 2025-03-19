@@ -1,6 +1,6 @@
 import ApiService from './ApiService'
 
-// get all
+// get all proyeks
 export async function apiGetProyeks<T, U extends Record<string, unknown>>(
     data: U
 ) {
@@ -8,6 +8,14 @@ export async function apiGetProyeks<T, U extends Record<string, unknown>>(
         url: '/manajemen-proyek',
         method: 'post',
         data,
+    })
+}
+
+//get all kliens
+export async function apiGetKliens<T>() {
+    return ApiService.fetchData<T>({
+        url: '/kliens',
+        method: 'get',
     })
 }
 

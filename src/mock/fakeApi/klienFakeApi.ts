@@ -39,6 +39,21 @@ export default function klienFakeApi(server: Server, apiPrefix: string) {
         return responseData
     })
 
+    // New endpoint to get all kliens without pagination
+    server.get(`${apiPrefix}/kliens`, (schema) => {
+        const kliens = schema.db.kliensData
+        const sanitizeKliens = kliens.filter((elm) => typeof elm !== 'function')
+
+        // Sort by nama for convenience
+        sanitizeKliens.sort((a, b) => a.nama.localeCompare(b.nama))
+
+        const responseData = {
+            data: sanitizeKliens,
+            total: sanitizeKliens.length,
+        }
+        return responseData
+    })
+
     server.del(
         `${apiPrefix}/master/kliens/delete`,
         (schema, { requestBody }) => {

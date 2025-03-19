@@ -1,3 +1,3 @@
-import FakturPajakNew from './FaktuPajakNew'
+import ProyekNew from './ProyekNew'
 
-export default FakturPajakNew
+export default ProyekNew

@@ -16,16 +16,28 @@ type FormikRef = FormikProps<any>
 
 type InitialData = {
     id?: string
-    nomor?: string
-    nominal?: number
+    pekerjaan?: string
+    klien?: string
+    idKlien?: string
+    pic?: string
+    nomor_spk?: string
+    nomor_spj?: string
+    nomor_spo?: string
+    tanggal_service_po?: string
+    tanggal_delivery?: string
+    nilai_kontrak?: number
+    realisasi?: number
+    progress?: number
+    sisa_waktu?: number
     keterangan?: string
-    tanggal?: string
     status?: string
+    idUser?: string
+    berkas?: string[]
+    lokasi?: string[]
+    termin?: { keterangan: string; persen: number }[]
 }
 
-export type FormModel = Omit<InitialData, 'tags'> & {
-    tags: { label: string; value: string }[] | string[]
-}
+export type FormModel = InitialData
 
 export type SetSubmitting = (isSubmitting: boolean) => void
 
@@ -33,25 +45,24 @@ export type OnDeleteCallback = React.Dispatch<React.SetStateAction<boolean>>
 
 type OnDelete = (callback: OnDeleteCallback) => void
 
-type FakturPajakForm = {
+type ProyekForm = {
     initialData?: InitialData
     type: 'edit' | 'new'
     onDiscard?: () => void
     onDelete?: OnDelete
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
+    kliensList?: { id: string; nama: string; keterangan: string }[]
 }
 
 const { useUniqueId } = hooks
 
 const validationSchema = Yup.object().shape({
-    nomor: Yup.string().required('Nomor wajib diisi'),
-    nominal: Yup.number().required('Nomor wajib diisi'),
-    keterangan: Yup.string().required('Keterangan wajib diisi'),
-    tanggal: Yup.string().required('Tanggal wajib diisi'),
-    status: Yup.string().required('Status wajib diisi'),
+    pekerjaan: Yup.string().required('Pekerjaan wajib diisi'),
+    idKlien: Yup.string().required('Klien wajib diisi'),
+    pic: Yup.string().required('PIC wajib diisi'),
 })
 
-const DeleteFakturPajakButton = ({ onDelete }: { onDelete: OnDelete }) => {
+const DeleteProyekButton = ({ onDelete }: { onDelete: OnDelete }) => {
     const [dialogOpen, setDialogOpen] = useState(false)
 
     const onConfirmDialogOpen = () => {
@@ -81,36 +92,50 @@ const DeleteFakturPajakButton = ({ onDelete }: { onDelete: OnDelete }) => {
             <ConfirmDialog
                 isOpen={dialogOpen}
                 type="danger"
-                title="Hapus faktur pajak"
+                title="Hapus proyek"
                 confirmButtonColor="red-600"
                 onClose={onConfirmDialogClose}
                 onRequestClose={onConfirmDialogClose}
                 onCancel={onConfirmDialogClose}
                 onConfirm={handleConfirm}
             >
-                <p>Apakah Anda yakin ingin menghapus faktur pajak ini?</p>
+                <p>Apakah Anda yakin ingin menghapus proyek ini?</p>
             </ConfirmDialog>
         </>
     )
 }
 
-const FakturPajakForm = forwardRef<FormikRef, FakturPajakForm>((props, ref) => {
+const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
     const {
         type,
         initialData = {
             id: '',
-            nomor: '',
-            nominal: 0,
+            pekerjaan: '',
+            klien: '',
+            idKlien: '',
+            pic: '',
+            nomor_spk: '',
+            nomor_spj: '',
+            nomor_spo: '',
+            tanggal_service_po: '',
+            tanggal_delivery: '',
+            nilai_kontrak: 0,
+            realisasi: 0,
+            progress: 0,
+            sisa_waktu: 0,
             keterangan: '',
-            tanggal: '',
-            status: 'Belum Lunas',
+            status: 'Dalam Pengerjaan',
+            berkas: [],
+            lokasi: [],
+            termin: [],
         },
         onFormSubmit,
         onDiscard,
         onDelete,
+        kliensList = [],
     } = props
 
-    const newId = useUniqueId('fakturPajak-')
+    const newId = useUniqueId('proyek-')
 
     return (
         <>
@@ -118,24 +143,20 @@ const FakturPajakForm = forwardRef<FormikRef, FakturPajakForm>((props, ref) => {
                 innerRef={ref}
                 initialValues={{
                     ...initialData,
-                    // tags: initialData?.tags
-                    //     ? initialData.tags.map((value) => ({
-                    //           label: value,
-                    //           value,
-                    //       }))
-                    //     : [],
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
-                    // formData.tags = formData.tags.map((tag) => {
-                    //     if (typeof tag !== 'string') {
-                    //         return tag.value
-                    //     }
-                    //     return tag
-                    // })
                     if (type === 'new') {
                         formData.id = newId
+                    }
+
+                    // Ensure client name is updated from the selected client ID
+                    const selectedClient = kliensList.find(
+                        (client) => client.id === formData.idKlien
+                    )
+                    if (selectedClient) {
+                        formData.klien = selectedClient.nama
                     }
                     onFormSubmit?.(formData, setSubmitting)
                 }}
@@ -148,6 +169,7 @@ const FakturPajakForm = forwardRef<FormikRef, FakturPajakForm>((props, ref) => {
                                     <BasicInformationFields
                                         touched={touched}
                                         errors={errors}
+                                        kliensList={kliensList}
                                     />
                                 </div>
                             </div>
@@ -157,7 +179,7 @@ const FakturPajakForm = forwardRef<FormikRef, FakturPajakForm>((props, ref) => {
                             >
                                 <div>
                                     {type === 'edit' && (
-                                        <DeleteFakturPajakButton
+                                        <DeleteProyekButton
                                             onDelete={onDelete as OnDelete}
                                         />
                                     )}
@@ -190,6 +212,6 @@ const FakturPajakForm = forwardRef<FormikRef, FakturPajakForm>((props, ref) => {
     )
 })
 
-FakturPajakForm.displayName = 'FakturPajakForm'
+ProyekForm.displayName = 'ProyekForm'
 
-export default FakturPajakForm
+export default ProyekForm

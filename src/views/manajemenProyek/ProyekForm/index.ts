@@ -1,4 +1,4 @@
-import FakturPajakForm from './FakturPajakForm'
+import ProyekForm from './ProyekForm'
 
-export * from './FakturPajakForm'
-export default FakturPajakForm
+export * from './ProyekForm'
+export default ProyekForm

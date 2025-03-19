@@ -2,21 +2,50 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
-import { apiDeleteProyeks, apiGetProyeks } from '@/services/ProyekService'
+import {
+    apiDeleteProyeks,
+    apiGetProyeks,
+    apiGetKliens,
+} from '@/services/ProyekService'
 
 type Proyek = {
     id: string
-    nomor: string
-    nominal: number
-    keterangan: string
-    tanggal: string
+    pekerjaan: string
+    pic: string
+    idKlien: string
+    nomor_spk: string
+    nomor_spj: string
+    nomor_spo: string
+    tanggal_service_po: string
+    tanggal_delivery: string
+    nilai_kontrak: number
+    realisasi: number
+    progress: number
     status: string
+    sisa_waktu?: number
+    keterangan?: string
+    idUser?: string
+    berkas?: string[]
+    lokasi?: string[]
+    termin?: { keterangan: string; persen: number }[]
+}
+
+type Klien = {
+    id?: string
+    nama?: string
+    keterangan?: string
 }
 
 type Proyeks = Proyek[]
+type Kliens = Klien[]
 
 type GetMasterProyekResponse = {
     data: Proyeks
+    total: number
+}
+
+type GetKliensResponse = {
+    data: Kliens
     total: number
 }
 
@@ -29,11 +58,13 @@ type FilterQueries = {
 
 export type ProyekListSlice = {
     loading: boolean
+    kliensLoading: boolean
     deleteConfirmation: boolean
     selectedProyek: string
     tableData: TableQueries
     filterData: FilterQueries
     proyekList: Proyek[]
+    kliensList: Klien[]
 }
 
 type GetMasterProyekData = TableQueries & { filterData?: FilterQueries }
@@ -47,6 +78,14 @@ export const getProyeks = createAsyncThunk(
             GetMasterProyekResponse,
             GetMasterProyekData
         >(data)
+        return response.data
+    }
+)
+
+export const getKliens = createAsyncThunk(
+    SLICE_NAME + '/getKliens',
+    async () => {
+        const response = await apiGetKliens<GetKliensResponse>()
         return response.data
     }
 )
@@ -71,9 +110,11 @@ export const initialTableData: TableQueries = {
 
 const initialState: ProyekListSlice = {
     loading: false,
+    kliensLoading: false,
     deleteConfirmation: false,
     selectedProyek: '',
     proyekList: [],
+    kliensList: [],
     tableData: initialTableData,
     filterData: {
         name: '',
@@ -89,6 +130,9 @@ const proyekListSlice = createSlice({
     reducers: {
         updateProyekList: (state, action) => {
             state.proyekList = action.payload
+        },
+        updateKliensList: (state, action) => {
+            state.kliensList = action.payload
         },
         setTableData: (state, action) => {
             state.tableData = action.payload
@@ -113,6 +157,13 @@ const proyekListSlice = createSlice({
             .addCase(getProyeks.pending, (state) => {
                 state.loading = true
             })
+            .addCase(getKliens.fulfilled, (state, action) => {
+                state.kliensList = action.payload.data
+                state.kliensLoading = false
+            })
+            .addCase(getKliens.pending, (state) => {
+                state.kliensLoading = true
+            })
     },
 })
 
@@ -122,6 +173,7 @@ export const {
     setFilterData,
     toggleDeleteConfirmation,
     setSelectedProyek,
+    updateKliensList,
 } = proyekListSlice.actions
 
 export default proyekListSlice.reducer

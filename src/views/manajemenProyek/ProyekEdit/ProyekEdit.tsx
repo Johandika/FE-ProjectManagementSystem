@@ -4,39 +4,47 @@ import DoubleSidedImage from '@/components/shared/DoubleSidedImage'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import reducer, {
-    getFakturPajak,
-    updateFakturPajak,
-    deleteFakturPajak,
+    getProyek,
+    updateProyek,
+    deleteProyek,
     useAppSelector,
     useAppDispatch,
+    getKliens,
 } from './store'
 import { injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import FakturPajakForm, {
+import ProyekForm, {
     FormModel,
     SetSubmitting,
     OnDeleteCallback,
-} from '@/views/fakturPajak/FakturPajakForm'
+} from '@/views/manajemenProyek/ProyekForm'
 import isEmpty from 'lodash/isEmpty'
 
-injectReducer('fakturPajakEdit', reducer)
+injectReducer('proyekEdit', reducer)
 
-const FakturPajakEdit = () => {
+const ProyekEdit = () => {
     const dispatch = useAppDispatch()
 
     const location = useLocation()
     const navigate = useNavigate()
 
-    const fakturPajakData = useAppSelector(
-        (state) => state.fakturPajakEdit.data.fakturPajakData
+    const proyekData = useAppSelector(
+        (state) => state.proyekEdit.data.proyekData
     )
-    const loading = useAppSelector(
-        (state) => state.fakturPajakEdit.data.loading
+
+    // kliens data
+    const kliensData = useAppSelector(
+        (state) => state.proyekEdit.data.kliensData?.data || []
+    )
+
+    const loading = useAppSelector((state) => state.proyekEdit.data.loading)
+    const loadingKliens = useAppSelector(
+        (state) => state.proyekEdit.data.loadingKliens
     )
 
     const fetchData = (data: { id: string }) => {
-        dispatch(getFakturPajak(data))
+        dispatch(getProyek(data))
     }
 
     const handleFormSubmit = async (
@@ -44,7 +52,10 @@ const FakturPajakEdit = () => {
         setSubmitting: SetSubmitting
     ) => {
         setSubmitting(true)
-        const success = await updateFakturPajak(values)
+
+        console.log('values', values)
+
+        const success = await updateProyek(values)
         setSubmitting(false)
         if (success) {
             popNotification('updated')
@@ -52,12 +63,12 @@ const FakturPajakEdit = () => {
     }
 
     const handleDiscard = () => {
-        navigate('/faktur-pajak')
+        navigate('/manajemen-proyek')
     }
 
     const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
         setDialogOpen(false)
-        const success = await deleteFakturPajak({ id: fakturPajakData.id })
+        const success = await deleteProyek({ id: proyekData.id })
         if (success) {
             popNotification('deleted')
         }
@@ -70,13 +81,13 @@ const FakturPajakEdit = () => {
                 type="success"
                 duration={2500}
             >
-                Product successfuly {keyword}
+                Proyek successfuly {keyword}
             </Notification>,
             {
                 placement: 'top-center',
             }
         )
-        navigate('/faktur-pajak')
+        navigate('/manajemen-proyek')
     }
 
     useEffect(() => {
@@ -85,17 +96,20 @@ const FakturPajakEdit = () => {
         )
         const rquestParam = { id: path }
         fetchData(rquestParam)
+
+        dispatch(getKliens()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
     return (
         <>
-            <Loading loading={loading}>
-                {!isEmpty(fakturPajakData) && (
+            <Loading loading={loading || loadingKliens}>
+                {!isEmpty(proyekData) && (
                     <>
-                        <FakturPajakForm
+                        <ProyekForm
                             type="edit"
-                            initialData={fakturPajakData}
+                            initialData={proyekData}
+                            kliensList={kliensData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}
@@ -103,18 +117,18 @@ const FakturPajakEdit = () => {
                     </>
                 )}
             </Loading>
-            {!loading && isEmpty(fakturPajakData) && (
+            {!loading && isEmpty(proyekData) && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <DoubleSidedImage
                         src="/img/others/img-2.png"
                         darkModeSrc="/img/others/img-2-dark.png"
                         alt="No product found!"
                     />
-                    <h3 className="mt-8">No product found!</h3>
+                    <h3 className="mt-8">No proyek found!</h3>
                 </div>
             )}
         </>
     )
 }
 
-export default FakturPajakEdit
+export default ProyekEdit
