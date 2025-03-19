@@ -6,7 +6,7 @@ import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import { useNavigate } from 'react-router-dom'
 import { apiCreateProyek } from '@/services/ProyekService'
-import reducer, { getKliens } from './store'
+import reducer, { getBerkases, getKliens } from './store'
 import { useEffect } from 'react'
 import { injectReducer, useAppDispatch, useAppSelector } from '@/store'
 import isEmpty from 'lodash/isEmpty'
@@ -26,6 +26,15 @@ const ProyekNew = () => {
 
     const loadingKliens = useAppSelector(
         (state: any) => state.proyekNew.data.loadingKliens
+    )
+
+    // berkases data
+    const berkasesData = useAppSelector(
+        (state: any) => state.proyekNew.data.berkasesData?.data || []
+    )
+
+    const loadingBerkases = useAppSelector(
+        (state: any) => state.proyekNew.data.loadingBerkases
     )
 
     const addProyek = async (data: FormModel) => {
@@ -80,17 +89,19 @@ const ProyekNew = () => {
 
     useEffect(() => {
         dispatch(getKliens()) // kliens
+        dispatch(getBerkases()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
     return (
         <>
-            <Loading loading={loadingKliens}>
-                {!isEmpty(kliensData) && (
+            <Loading loading={loadingKliens || loadingBerkases}>
+                {!isEmpty(kliensData && berkasesData) && (
                     <>
                         <ProyekForm
                             type="new"
                             kliensList={kliensData}
+                            berkasesList={berkasesData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                         />

@@ -10,6 +10,8 @@ import cloneDeep from 'lodash/cloneDeep'
 import { HiOutlineTrash } from 'react-icons/hi'
 import { AiOutlineSave } from 'react-icons/ai'
 import * as Yup from 'yup'
+import LocationFields from './LocationFields'
+import TerminFields from './TerminFields'
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type FormikRef = FormikProps<any>
@@ -52,6 +54,7 @@ type ProyekForm = {
     onDelete?: OnDelete
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
     kliensList?: { id: string; nama: string; keterangan: string }[]
+    berkasesList?: { id: string; nama: string }[]
 }
 
 const { useUniqueId } = hooks
@@ -133,6 +136,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
         onDiscard,
         onDelete,
         kliensList = [],
+        berkasesList = [],
     } = props
 
     const newId = useUniqueId('proyek-')
@@ -152,12 +156,15 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                     }
 
                     // Ensure client name is updated from the selected client ID
-                    const selectedClient = kliensList.find(
+                    const selectedKlien = kliensList.find(
                         (client) => client.id === formData.idKlien
                     )
-                    if (selectedClient) {
-                        formData.klien = selectedClient.nama
+                    if (selectedKlien) {
+                        formData.klien = selectedKlien.nama
                     }
+
+                    //OCOKKAN DATA PADA BERKAS DENGAN DATA PADA PROYEK.BERKAS
+
                     onFormSubmit?.(formData, setSubmitting)
                 }}
             >
@@ -170,6 +177,18 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                         touched={touched}
                                         errors={errors}
                                         kliensList={kliensList}
+                                        berkasesList={berkasesList}
+                                    />
+                                    {/* Location Fields */}
+                                    <LocationFields
+                                        touched={touched}
+                                        errors={errors}
+                                    />
+
+                                    {/* Payment Terms Fields */}
+                                    <TerminFields
+                                        touched={touched}
+                                        errors={errors}
                                     />
                                 </div>
                             </div>

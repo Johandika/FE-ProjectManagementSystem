@@ -14,4 +14,9 @@ export const kliensData = [
         nama: 'Pertamina',
         keterangan: 'Perusahaan energi nasional Indonesia',
     },
+    {
+        id: 'klien-c3d4e5f6-a7b8-9012-cdef-123456789000',
+        nama: 'PT Djarum',
+        keterangan: 'Perusahaan energi nasional Indonesia',
+    },
 ]

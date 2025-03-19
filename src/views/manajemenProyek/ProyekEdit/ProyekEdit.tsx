@@ -10,6 +10,7 @@ import reducer, {
     useAppSelector,
     useAppDispatch,
     getKliens,
+    getBerkases,
 } from './store'
 import { injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -38,9 +39,17 @@ const ProyekEdit = () => {
         (state) => state.proyekEdit.data.kliensData?.data || []
     )
 
+    // kliens data
+    const berkasesData = useAppSelector(
+        (state) => state.proyekEdit.data.berkasesData?.data || []
+    )
+
     const loading = useAppSelector((state) => state.proyekEdit.data.loading)
     const loadingKliens = useAppSelector(
         (state) => state.proyekEdit.data.loadingKliens
+    )
+    const loadingBerkases = useAppSelector(
+        (state) => state.proyekEdit.data.loadingBerkases
     )
 
     const fetchData = (data: { id: string }) => {
@@ -98,18 +107,20 @@ const ProyekEdit = () => {
         fetchData(rquestParam)
 
         dispatch(getKliens()) // kliens
+        dispatch(getBerkases()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
     return (
         <>
-            <Loading loading={loading || loadingKliens}>
+            <Loading loading={loading || loadingKliens || loadingBerkases}>
                 {!isEmpty(proyekData) && (
                     <>
                         <ProyekForm
                             type="edit"
                             initialData={proyekData}
                             kliensList={kliensData}
+                            berkasesList={berkasesData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}

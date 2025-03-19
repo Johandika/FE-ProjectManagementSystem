@@ -4,6 +4,7 @@ import {
     apiPutProyek,
     apiDeleteProyeks,
     apiGetKliens,
+    apiGetBerkases,
 } from '@/services/ProyekService'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 
@@ -42,20 +43,32 @@ type Klien = {
     nama: string
     keterangan: string
 }
+type Berkas = {
+    id: string
+    nama: string
+}
 
 type GetProyekResponse = ProyekData
 type Kliens = Klien[]
+type Berkases = Berkas[]
 
 type GetKliensResponse = {
     data: Kliens
     total: number
 }
 
+type GetBerkasesResponse = {
+    data: Berkases
+    total: number
+}
+
 export type MasterProyekEditState = {
     loading: boolean
     loadingKliens: boolean
+    loadingBerkases: boolean
     proyekData: ProyekData
     kliensData?: GetKliensResponse
+    berkasesData?: GetBerkasesResponse
 }
 
 export const getProyek = createAsyncThunk(
@@ -73,6 +86,15 @@ export const getKliens = createAsyncThunk(
     SLICE_NAME + '/getKliens',
     async () => {
         const response = await apiGetKliens<GetKliensResponse>()
+        return response.data
+    }
+)
+
+//berkases get
+export const getBerkases = createAsyncThunk(
+    SLICE_NAME + '/getBerkases',
+    async () => {
+        const response = await apiGetBerkases<GetBerkasesResponse>()
         return response.data
     }
 )
@@ -106,6 +128,7 @@ export const deleteProyek = async <T, U extends Record<string, unknown>>(
 const initialState: MasterProyekEditState = {
     loading: true,
     loadingKliens: true,
+    loadingBerkases: true,
     proyekData: {},
 }
 
@@ -128,6 +151,13 @@ const proyekEditSlice = createSlice({
             })
             .addCase(getKliens.pending, (state) => {
                 state.loadingKliens = true
+            })
+            .addCase(getBerkases.fulfilled, (state, action) => {
+                state.berkasesData = action.payload
+                state.loadingBerkases = false
+            })
+            .addCase(getBerkases.pending, (state) => {
+                state.loadingBerkases = true
             })
     },
 })

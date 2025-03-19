@@ -18,7 +18,7 @@ export const proyeksData = [
         status: 'Dalam Pengerjaan',
         idUser: 'user-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         idKlien: 'klien-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        berkas: ['ktp', 'skck'],
+        berkas: ['KTP', 'SKCK'],
         lokasi: ['jakarta', 'medan'],
         termin: [
             { keterangan: 'Termin 1', persen: 30 },
@@ -65,7 +65,7 @@ export const proyeksData = [
         status: 'Dalam Pengerjaan',
         idUser: 'user-c3d4e5f6-a7b8-9012-cdef-123456789012',
         idKlien: 'klien-c3d4e5f6-a7b8-9012-cdef-123456789012',
-        berkas: ['ktp', 'skck'],
+        berkas: ['KTP', 'Kartu Keluarga'],
         lokasi: ['jakarta', 'medan'],
         termin: [
             { keterangan: 'Termin 1', persen: 30 },

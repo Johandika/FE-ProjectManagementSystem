@@ -19,6 +19,14 @@ export async function apiGetKliens<T>() {
     })
 }
 
+//get all berkases
+export async function apiGetBerkases<T>() {
+    return ApiService.fetchData<T>({
+        url: '/berkases',
+        method: 'get',
+    })
+}
+
 // delete
 export async function apiDeleteProyeks<T, U extends Record<string, unknown>>(
     data: U

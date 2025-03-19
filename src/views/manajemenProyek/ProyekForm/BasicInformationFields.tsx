@@ -37,6 +37,7 @@ type BasicInformationFields = {
     errors: FormikErrors<FormFieldsName>
     values?: FormFieldsName
     kliensList?: { id: string; nama: string; keterangan: string }[]
+    berkasesList?: { id: string; nama: string }[]
 }
 
 const statuses = [
@@ -47,7 +48,7 @@ const statuses = [
 ]
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const { touched, errors, kliensList = [] } = props
+    const { touched, errors, kliensList = [], berkasesList = [] } = props
 
     return (
         <AdaptableCard divider className="mb-4">
@@ -338,6 +339,56 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                         option?.value
                                     )
                                 }
+                            />
+                        )
+                    }}
+                </Field>
+            </FormItem>
+            <FormItem
+                label="Berkas"
+                invalid={(errors.berkas && touched.berkas) as boolean}
+                errorMessage={errors.berkas}
+            >
+                <Field name="berkas">
+                    {({ field, form }: FieldProps) => {
+                        // Convert berkas array values to options format
+                        const selectedOptions = field.value
+                            ? berkasesList
+                                  .filter((berkas) =>
+                                      field.value.includes(berkas.nama)
+                                  )
+                                  .map((berkas) => ({
+                                      value: berkas.nama,
+                                      label: berkas.nama,
+                                  }))
+                            : []
+
+                        // Map berkasesList to options format required by Select
+                        const berkasOptions = berkasesList.map((berkas) => ({
+                            value: berkas.nama,
+                            label: berkas.nama,
+                        }))
+
+                        return (
+                            <Select
+                                isMulti
+                                field={field}
+                                form={form}
+                                options={berkasOptions}
+                                value={selectedOptions}
+                                placeholder="Pilih berkas"
+                                onChange={(options) => {
+                                    // Extract just the values (berkas names) for saving to formik
+                                    const selectedValues = options
+                                        ? options.map(
+                                              (option: any) => option.value
+                                          )
+                                        : []
+                                    form.setFieldValue(
+                                        field.name,
+                                        selectedValues
+                                    )
+                                }}
                             />
                         )
                     }}

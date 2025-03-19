@@ -39,6 +39,23 @@ export default function berkasFakeApi(server: Server, apiPrefix: string) {
         return responseData
     })
 
+    // New endpoint to get all berkases without pagination
+    server.get(`${apiPrefix}/berkases`, (schema) => {
+        const berkases = schema.db.berkasesData
+        const sanitizeBerkases = berkases.filter(
+            (elm) => typeof elm !== 'function'
+        )
+
+        // Sort by nama for convenience
+        sanitizeBerkases.sort((a, b) => a.nama.localeCompare(b.nama))
+
+        const responseData = {
+            data: sanitizeBerkases,
+            total: sanitizeBerkases.length,
+        }
+        return responseData
+    })
+
     server.del(
         `${apiPrefix}/master/berkases/delete`,
         (schema, { requestBody }) => {
