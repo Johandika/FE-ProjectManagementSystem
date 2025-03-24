@@ -82,7 +82,7 @@ const appsNavigationConfig: NavigationTree[] = [
                     {
                         key: 'apps.berkas',
                         path: '/master/berkas',
-                        title: 'Berkas',
+                        title: 'Berkas BASTP',
                         translateKey: 'nav.apps.master.item2',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,

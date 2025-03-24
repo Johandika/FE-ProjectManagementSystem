@@ -21,6 +21,15 @@ export const protectedRoutes = [
     },
     {
         key: 'apps.manajemenProyek',
+        path: '/manajemen-proyek-detail/:proyekId',
+        component: lazy(() => import('@/views/manajemenProyek/ProyekDetail')),
+        authority: [],
+        meta: {
+            header: 'Detail Proyek',
+        },
+    },
+    {
+        key: 'apps.manajemenProyek',
         path: '/manajemen-proyek-edit/:proyekId',
         component: lazy(() => import('@/views/manajemenProyek/ProyekEdit')),
         authority: [],
@@ -129,7 +138,7 @@ export const protectedRoutes = [
         component: lazy(() => import('@/views/master/Berkas/BerkasEdit')),
         authority: [],
         meta: {
-            header: 'Ubah Berkas',
+            header: 'Ubah Berkas BASTP',
         },
     },
     {
@@ -138,7 +147,7 @@ export const protectedRoutes = [
         component: lazy(() => import('@/views/master/Berkas/BerkasNew')),
         authority: [],
         meta: {
-            header: 'Tambah Berkas',
+            header: 'Tambah Berkas BASTP',
         },
     },
     // Pengatuiran

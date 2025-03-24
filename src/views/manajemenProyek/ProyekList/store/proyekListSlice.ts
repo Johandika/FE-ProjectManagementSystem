@@ -14,7 +14,6 @@ type Proyek = {
     pic: string
     idKlien: string
     nomor_spk: string
-    nomor_spj: string
     nomor_spo: string
     tanggal_service_po: string
     tanggal_delivery: string

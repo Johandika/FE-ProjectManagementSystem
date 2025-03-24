@@ -23,9 +23,9 @@ type InitialData = {
     idKlien?: string
     pic?: string
     nomor_spk?: string
-    nomor_spj?: string
     nomor_spo?: string
     tanggal_service_po?: string
+    tanggal_kontrak?: string
     tanggal_delivery?: string
     nilai_kontrak?: number
     realisasi?: number
@@ -35,7 +35,7 @@ type InitialData = {
     status?: string
     idUser?: string
     berkas?: string[]
-    lokasi?: string[]
+    lokasi?: { nama: string; longitude: number; latitude: number }[]
     termin?: { keterangan: string; persen: number }[]
 }
 
@@ -118,9 +118,9 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             idKlien: '',
             pic: '',
             nomor_spk: '',
-            nomor_spj: '',
             nomor_spo: '',
             tanggal_service_po: '',
+            tanggal_kontrak: '',
             tanggal_delivery: '',
             nilai_kontrak: 0,
             realisasi: 0,

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import DataTable from '@/components/shared/DataTable'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
+import { TbReportSearch } from 'react-icons/tb'
 import {
     getProyeks,
     setTableData,
@@ -25,7 +26,6 @@ type Proyek = {
     pekerjaan: string
     klien: string
     nomor_spk: number
-    nomor_spj: string
     tanggal_service_po: string
     tanggal_delivery: string
     nilai_kontrak: number
@@ -40,6 +40,10 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
 
+    const onDetail = () => {
+        navigate(`/manajemen-proyek-detail/${row.id}`)
+    }
+
     const onEdit = () => {
         navigate(`/manajemen-proyek-edit/${row.id}`)
     }
@@ -51,6 +55,12 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
 
     return (
         <div className="flex justify-end text-lg">
+            <span
+                className={`cursor-pointer p-2 hover:${textTheme}`}
+                onClick={onDetail}
+            >
+                <TbReportSearch />
+            </span>
             <span
                 className={`cursor-pointer p-2 hover:${textTheme}`}
                 onClick={onEdit}
@@ -153,14 +163,7 @@ const ProyekTable = () => {
                     return <span className="capitalize">{row.nomor_spk}</span>
                 },
             },
-            {
-                header: 'Nomor SPJ',
-                accessorKey: 'nomor_spj',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spj}</span>
-                },
-            },
+
             {
                 header: 'Tangggal Servis PO',
                 accessorKey: 'tanggal_service_po',

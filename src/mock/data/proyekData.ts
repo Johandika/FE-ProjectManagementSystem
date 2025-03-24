@@ -5,9 +5,9 @@ export const proyeksData = [
         klien: 'PT Maju Bersama',
         pic: 'Budi Santoso',
         nomor_spk: 'SPK/2025/001',
-        nomor_spj: 'SPJ/2025/001',
         nomor_spo: 'SPO/2025/001',
         tanggal_service_po: '2025-02-15',
+        tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2025-08-15',
         nilai_kontrak: 5500000000,
         realisasi: 2250000000,
@@ -19,7 +19,19 @@ export const proyeksData = [
         idUser: 'user-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         idKlien: 'klien-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         berkas: ['KTP', 'SKCK'],
-        lokasi: ['jakarta', 'medan'],
+        // lokasi: ['jakarta', 'medan'],
+        lokasi: [
+            {
+                nama: 'Lokasi 1',
+                latitude: -6.2088,
+                longitude: 106.8456,
+            },
+            {
+                nama: 'Lokasi 2',
+                latitude: -7.2504,
+                longitude: 112.7688,
+            },
+        ],
         termin: [
             { keterangan: 'Termin 1', persen: 30 },
             { keterangan: 'Termin 2', persen: 40 },
@@ -32,9 +44,9 @@ export const proyeksData = [
         klien: 'Bank Makmur',
         pic: 'Siti Nuraini',
         nomor_spk: 'SPK/2025/002',
-        nomor_spj: 'SPJ/2025/002',
         nomor_spo: 'SPO/2025/002',
         tanggal_service_po: '2025-03-01',
+        tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2025-05-30',
         nilai_kontrak: 1250000000,
         realisasi: 875000000,
@@ -45,6 +57,24 @@ export const proyeksData = [
         status: 'Dalam Pengerjaan',
         idUser: 'user-b2c3d4e5-f6a7-8901-bcde-f12345678901',
         idKlien: 'klien-b2c3d4e5-f6a7-8901-bcde-f12345678901',
+        berkas: ['KTP', 'Kartu Keluarga'],
+        lokasi: [
+            {
+                nama: 'Lokasi 1',
+                latitude: -6.2088,
+                longitude: 106.8456,
+            },
+            {
+                nama: 'Lokasi 2',
+                latitude: -7.2504,
+                longitude: 112.7688,
+            },
+        ],
+        termin: [
+            { keterangan: 'Termin 1', persen: 30 },
+            { keterangan: 'Termin 2', persen: 40 },
+            { keterangan: 'Termin 3', persen: 30 },
+        ],
     },
     {
         id: 'proj-c3d4e5f6-a7b8-9012-cdef-123456789012',
@@ -52,9 +82,9 @@ export const proyeksData = [
         klien: 'PT Infrastruktur Negara',
         pic: 'Hendra Wijaya',
         nomor_spk: 'SPK/2025/003',
-        nomor_spj: 'SPJ/2025/003',
         nomor_spo: 'SPO/2025/003',
         tanggal_service_po: '2025-01-10',
+        tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2026-01-10',
         nilai_kontrak: 125000000000,
         realisasi: 37500000000,
@@ -66,7 +96,18 @@ export const proyeksData = [
         idUser: 'user-c3d4e5f6-a7b8-9012-cdef-123456789012',
         idKlien: 'klien-c3d4e5f6-a7b8-9012-cdef-123456789012',
         berkas: ['KTP', 'Kartu Keluarga'],
-        lokasi: ['jakarta', 'medan'],
+        lokasi: [
+            {
+                nama: 'Lokasi 1',
+                latitude: -6.2088,
+                longitude: 106.8456,
+            },
+            {
+                nama: 'Lokasi 2',
+                latitude: -7.2504,
+                longitude: 112.7688,
+            },
+        ],
         termin: [
             { keterangan: 'Termin 1', persen: 30 },
             { keterangan: 'Termin 2', persen: 40 },

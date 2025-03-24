@@ -1,3 +1,3 @@
-export const APP_NAME = 'PMS'
+export const APP_NAME = 'QIFMEDIA'
 export const PERSIST_STORE_NAME = 'admin'
 export const REDIRECT_URL_KEY = 'redirectUrl'
