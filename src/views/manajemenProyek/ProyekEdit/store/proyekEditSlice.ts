@@ -24,6 +24,7 @@ interface ProyekData {
     nomor_spo?: string
     tanggal_service_po?: string
     tanggal_delivery?: string
+    tanggal_kontrak?: string
     nilai_kontrak?: number
     realisasi?: number
     progress?: number

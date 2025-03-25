@@ -8,8 +8,12 @@ import Termin from './components/Termin'
 import Bastp from './components/Bastp'
 import Subkontraktor from './components/Subkontraktor'
 import Adendum from './components/Adendum'
+import { injectReducer } from '@/store'
+import reducer from '../ProyekEdit/store'
 
 const { TabNav, TabList, TabContent } = Tabs
+
+injectReducer('proyekEdit', reducer)
 
 export default function ProyekDetail() {
     // const dispatch = useAppDispatch()
