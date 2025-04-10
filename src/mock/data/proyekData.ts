@@ -19,7 +19,6 @@ export const proyeksData = [
         idUser: 'user-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         idKlien: 'klien-a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         berkas: ['KTP', 'SKCK'],
-        // lokasi: ['jakarta', 'medan'],
         lokasi: [
             {
                 nama: 'Lokasi 1',
@@ -36,6 +35,22 @@ export const proyeksData = [
             { keterangan: 'Termin 1', persen: 30 },
             { keterangan: 'Termin 2', persen: 40 },
             { keterangan: 'Termin 3', persen: 30 },
+        ],
+        subkontraktor: [
+            {
+                nomor_surat: 'SPS/KT/XI/2025/001',
+                nama_vendor_subkon: 'PT. Sejahtera',
+                nilai_subkon: 500000000,
+                waktu_pelaksanaan_kerja: ['2025-05-01', '2025-06-30'],
+                keterangan: 'Pekerjaan pembangunan gedung A',
+            },
+            {
+                nomor_surat: 'SPS/KT/XI/2025/002',
+                nama_vendor_subkon: 'PT. Maju Bersama',
+                nilai_subkon: 350000000,
+                waktu_pelaksanaan_kerja: ['2025-05-01', '2025-06-30'],
+                keterangan: 'Pekerjaan pemasangan sistem kelistrikan',
+            },
         ],
     },
     {
@@ -75,6 +90,22 @@ export const proyeksData = [
             { keterangan: 'Termin 2', persen: 40 },
             { keterangan: 'Termin 3', persen: 30 },
         ],
+        subkontraktor: [
+            {
+                nomor_surat: 'SPS/KT/X/2025/512',
+                nama_vendor_subkon: 'PT. Sejahtera',
+                nilai_subkon: 500000000,
+                waktu_pelaksanaan_kerja: ['2025-05-01', '2025-06-30'],
+                keterangan: 'Pekerjaan pembangunan gedung A',
+            },
+            {
+                nomor_surat: 'SPS/KT/X/2025/513',
+                nama_vendor_subkon: 'PT. Sukses Selalu',
+                nilai_subkon: 350000000,
+                waktu_pelaksanaan_kerja: ['2025-05-01', '2025-06-30'],
+                keterangan: 'Pekerjaan pemasangan sistem kelistrikan',
+            },
+        ],
     },
     {
         id: 'proj-c3d4e5f6-a7b8-9012-cdef-123456789012',
@@ -112,6 +143,22 @@ export const proyeksData = [
             { keterangan: 'Termin 1', persen: 30 },
             { keterangan: 'Termin 2', persen: 40 },
             { keterangan: 'Termin 3', persen: 30 },
+        ],
+        subkontraktor: [
+            {
+                nomor_surat: 'SPS/KT/IV/2025/101',
+                nama_vendor_subkon: 'PT. Sukses Selalu',
+                nilai_subkon: 500000000,
+                waktu_pelaksanaan_kerja: ['2025-05-01', '2025-06-30'],
+                keterangan: 'Pekerjaan pembangunan gedung A',
+            },
+            {
+                nomor_surat: 'SPS/KT/IV/2025/102',
+                nama_vendor_subkon: 'PT. Sukses Selalu',
+                nilai_subkon: 350000000,
+                waktu_pelaksanaan_kerja: ['2025-05-01', '2025-06-30'],
+                keterangan: 'Pekerjaan pemasangan sistem kelistrikan',
+            },
         ],
     },
 ]

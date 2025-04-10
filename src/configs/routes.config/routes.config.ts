@@ -150,6 +150,37 @@ export const protectedRoutes = [
             header: 'Tambah Berkas BASTP',
         },
     },
+    // Subkontraktor
+    {
+        key: 'apps.subkontraktor',
+        path: '/master/subkontraktor',
+        component: lazy(
+            () => import('@/views/master/Subkontraktor/SubkontraktorList')
+        ),
+        authority: [],
+    },
+    {
+        key: 'apps.subkontraktor',
+        path: '/master/subkontraktor-edit/:subkontraktorId',
+        component: lazy(
+            () => import('@/views/master/Subkontraktor/SubkontraktorEdit')
+        ),
+        authority: [],
+        meta: {
+            header: 'Ubah Subkontraktor',
+        },
+    },
+    {
+        key: 'apps.subkontraktor',
+        path: '/master/subkontraktor-new',
+        component: lazy(
+            () => import('@/views/master/Subkontraktor/SubkontraktorNew')
+        ),
+        authority: [],
+        meta: {
+            header: 'Tambah Subkontraktor',
+        },
+    },
     // Pengatuiran
     {
         key: 'settings.pengaturanPengguna',

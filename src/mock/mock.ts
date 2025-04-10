@@ -42,11 +42,13 @@ import {
     berkasFakeApi,
     authFakeApi,
     proyekFakeApi,
+    subkontraktorFakeApi,
 } from './fakeApi'
 import { berkasesData } from './data/berkasData'
 import { fakturPajaksData } from './data/fakturPajakData'
 import { purchaseOrdersData } from './data/purchaseOrderData'
 import { proyeksData } from './data/proyekData'
+import { subkontraktorsData } from './data/subkontraktorData'
 
 const { apiPrefix } = appConfig
 
@@ -88,6 +90,7 @@ export function mockServer({ environment = 'test' }) {
                 fakturPajaksData,
                 purchaseOrdersData,
                 proyeksData,
+                subkontraktorsData,
             })
         },
         routes() {
@@ -113,6 +116,7 @@ export function mockServer({ environment = 'test' }) {
             fakturPajakFakeApi(this, apiPrefix)
             purchaseOrderFakeApi(this, apiPrefix)
             proyekFakeApi(this, apiPrefix)
+            subkontraktorFakeApi(this, apiPrefix)
         },
     })
 }

@@ -4,65 +4,39 @@ import DoubleSidedImage from '@/components/shared/DoubleSidedImage'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import reducer, {
-    getProyek,
-    updateProyek,
-    deleteProyek,
+    getSubkontraktor,
+    updateSubkontraktor,
+    deleteSubkontraktor,
     useAppSelector,
     useAppDispatch,
-    getKliens,
-    getBerkases,
-    getSubkontraktors,
 } from './store'
 import { injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import ProyekForm, {
+import SubkontraktorForm, {
     FormModel,
     SetSubmitting,
     OnDeleteCallback,
-} from '@/views/manajemenProyek/ProyekForm'
+} from '@/views/master/Subkontraktor/SubkontraktorForm'
 import isEmpty from 'lodash/isEmpty'
 
-injectReducer('proyekEdit', reducer)
+injectReducer('subkontraktorEdit', reducer)
 
-const ProyekEdit = () => {
+const SubkontraktorEdit = () => {
     const dispatch = useAppDispatch()
 
     const location = useLocation()
     const navigate = useNavigate()
 
-    const proyekData = useAppSelector(
-        (state) => state.proyekEdit.data.proyekData
+    const subkontraktorData = useAppSelector(
+        (state) => state.subkontraktorEdit.data.subkontraktorData
     )
-
-    // kliens data
-    const kliensData = useAppSelector(
-        (state) => state.proyekEdit.data.kliensData?.data || []
-    )
-
-    // berkases data
-    const berkasesData = useAppSelector(
-        (state) => state.proyekEdit.data.berkasesData?.data || []
-    )
-
-    // berkases data
-    const subkontraktorsData = useAppSelector(
-        (state) => state.proyekEdit.data.subkontraktorsData?.data || []
-    )
-
-    const loading = useAppSelector((state) => state.proyekEdit.data.loading)
-    const loadingKliens = useAppSelector(
-        (state) => state.proyekEdit.data.loadingKliens
-    )
-    const loadingBerkases = useAppSelector(
-        (state) => state.proyekEdit.data.loadingBerkases
-    )
-    const loadingSubkontraktors = useAppSelector(
-        (state) => state.proyekEdit.data.loadingSubkontraktors
+    const loading = useAppSelector(
+        (state) => state.subkontraktorEdit.data.loading
     )
 
     const fetchData = (data: { id: string }) => {
-        dispatch(getProyek(data))
+        dispatch(getSubkontraktor(data))
     }
 
     const handleFormSubmit = async (
@@ -70,10 +44,7 @@ const ProyekEdit = () => {
         setSubmitting: SetSubmitting
     ) => {
         setSubmitting(true)
-
-        console.log('values', values)
-
-        const success = await updateProyek(values)
+        const success = await updateSubkontraktor(values)
         setSubmitting(false)
         if (success) {
             popNotification('updated')
@@ -81,12 +52,12 @@ const ProyekEdit = () => {
     }
 
     const handleDiscard = () => {
-        navigate('/manajemen-proyek')
+        navigate('/master/subkontraktor')
     }
 
     const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
         setDialogOpen(false)
-        const success = await deleteProyek({ id: proyekData.id })
+        const success = await deleteSubkontraktor({ id: subkontraktorData.id })
         if (success) {
             popNotification('deleted')
         }
@@ -99,13 +70,13 @@ const ProyekEdit = () => {
                 type="success"
                 duration={2500}
             >
-                Proyek successfuly {keyword}
+                Product successfuly {keyword}
             </Notification>,
             {
                 placement: 'top-center',
             }
         )
-        navigate('/manajemen-proyek')
+        navigate('/master/subkontraktor')
     }
 
     useEffect(() => {
@@ -114,31 +85,17 @@ const ProyekEdit = () => {
         )
         const rquestParam = { id: path }
         fetchData(rquestParam)
-
-        dispatch(getKliens()) // kliens
-        dispatch(getBerkases()) // kliens
-        dispatch(getSubkontraktors()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
     return (
         <>
-            <Loading
-                loading={
-                    loading ||
-                    loadingKliens ||
-                    loadingBerkases ||
-                    loadingSubkontraktors
-                }
-            >
-                {!isEmpty(proyekData) && (
+            <Loading loading={loading}>
+                {!isEmpty(subkontraktorData) && (
                     <>
-                        <ProyekForm
+                        <SubkontraktorForm
                             type="edit"
-                            initialData={proyekData}
-                            kliensList={kliensData}
-                            berkasesList={berkasesData}
-                            subkontraktorsList={subkontraktorsData}
+                            initialData={subkontraktorData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}
@@ -146,18 +103,18 @@ const ProyekEdit = () => {
                     </>
                 )}
             </Loading>
-            {!loading && isEmpty(proyekData) && (
+            {!loading && isEmpty(subkontraktorData) && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <DoubleSidedImage
                         src="/img/others/img-2.png"
                         darkModeSrc="/img/others/img-2-dark.png"
                         alt="No product found!"
                     />
-                    <h3 className="mt-8">No proyek found!</h3>
+                    <h3 className="mt-8">No product found!</h3>
                 </div>
             )}
         </>
     )
 }
 
-export default ProyekEdit
+export default SubkontraktorEdit

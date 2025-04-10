@@ -12,6 +12,7 @@ import { AiOutlineSave } from 'react-icons/ai'
 import * as Yup from 'yup'
 import LocationFields from './LocationFields'
 import TerminFields from './TerminFields'
+import SubkontraktorFields from './SubkontraktorFields'
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type FormikRef = FormikProps<any>
@@ -55,6 +56,13 @@ type ProyekForm = {
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
     kliensList?: { id: string; nama: string; keterangan: string }[]
     berkasesList?: { id: string; nama: string }[]
+    subkontraktorsList?: {
+        nomor_surat: string
+        nama_vendor_subkon: string
+        nilai_subkon: number
+        waktu_pelaksanaan_kerja: string[]
+        keterangan: string
+    }[]
 }
 
 const { useUniqueId } = hooks
@@ -137,6 +145,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
         onDelete,
         kliensList = [],
         berkasesList = [],
+        subkontraktorsList = [],
     } = props
 
     const newId = useUniqueId('proyek-')
@@ -163,7 +172,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                         formData.klien = selectedKlien.nama
                     }
 
-                    //OCOKKAN DATA PADA BERKAS DENGAN DATA PADA PROYEK.BERKAS
+                    //COCOKKAN DATA PADA BERKAS DENGAN DATA PADA PROYEK.BERKAS
 
                     onFormSubmit?.(formData, setSubmitting)
                 }}
@@ -189,6 +198,13 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                     <TerminFields
                                         touched={touched}
                                         errors={errors}
+                                    />
+
+                                    {/* Payment Terms Fields */}
+                                    <SubkontraktorFields
+                                        touched={touched}
+                                        errors={errors}
+                                        subkontraktorsList={subkontraktorsList}
                                     />
                                 </div>
                             </div>

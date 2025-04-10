@@ -40,10 +40,9 @@ export default function ProyekDetail() {
                     <TabNav value="tab2">Purchase Order</TabNav>
                     <TabNav value="tab3">Termin</TabNav>
                     <TabNav value="tab4">BASTP</TabNav>
-                    <TabNav value="tab5">Subkontraktor</TabNav>
                     <TabNav value="tab6">Adendum</TabNav>
                 </TabList>
-                <div className="p-4">
+                <div className="px-4">
                     <TabContent value="tab1">
                         <Detail />
                     </TabContent>
@@ -57,9 +56,6 @@ export default function ProyekDetail() {
                         <Bastp />
                     </TabContent>
                     <TabContent value="tab5">
-                        <Subkontraktor />
-                    </TabContent>
-                    <TabContent value="tab6">
                         <Adendum />
                     </TabContent>
                 </div>

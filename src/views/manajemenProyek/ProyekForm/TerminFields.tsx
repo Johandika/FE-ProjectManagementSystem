@@ -6,7 +6,7 @@ import { HiMinus, HiPlus } from 'react-icons/hi'
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import { NumericFormat } from 'react-number-format'
 import type { FormikErrors, FormikTouched, FieldProps } from 'formik'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 interface Termin {
     keterangan: string
@@ -40,7 +40,7 @@ const TerminFields = (props: TerminFieldsProps) => {
 
     return (
         <AdaptableCard divider className="mb-4">
-            <h5>Data Termin Pembayaran</h5>
+            <h5>Termin Pembayaran</h5>
             <p className="mb-6">
                 Tambahkan data termin pembayaran beserta persentasenya
             </p>

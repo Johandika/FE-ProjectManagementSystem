@@ -5,6 +5,7 @@ import {
     apiDeleteProyeks,
     apiGetKliens,
     apiGetBerkases,
+    apiGetSubkontraktors,
 } from '@/services/ProyekService'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 
@@ -13,6 +14,20 @@ export const SLICE_NAME = 'proyekEdit'
 interface Termin {
     keterangan: string
     persen: number
+}
+
+interface Lokasi {
+    nama: string
+    longitude: number
+    latitude: number
+}
+
+interface Subkontraktor {
+    nomor_surat: string
+    nama_vendor_subkon: string
+    nilai_subkon: number
+    waktu_pelaksanaan_kerja: string[]
+    keterangan: string
 }
 
 interface ProyekData {
@@ -34,8 +49,9 @@ interface ProyekData {
     idUser?: string
     idKlien?: string
     berkas?: string[]
-    lokasi?: string[]
+    lokasi?: Lokasi[]
     termin?: Termin[]
+    subkontraktor?: Subkontraktor[]
 }
 
 type Klien = {
@@ -51,6 +67,7 @@ type Berkas = {
 type GetProyekResponse = ProyekData
 type Kliens = Klien[]
 type Berkases = Berkas[]
+type Subkontraktors = Subkontraktor[]
 
 type GetKliensResponse = {
     data: Kliens
@@ -62,13 +79,20 @@ type GetBerkasesResponse = {
     total: number
 }
 
+type GetSubkontraktorsResponse = {
+    data: Subkontraktors
+    total: number
+}
+
 export type MasterProyekEditState = {
     loading: boolean
     loadingKliens: boolean
     loadingBerkases: boolean
+    loadingSubkontraktors: boolean
     proyekData: ProyekData
     kliensData?: GetKliensResponse
     berkasesData?: GetBerkasesResponse
+    subkontraktorsData?: GetSubkontraktorsResponse
 }
 
 export const getProyek = createAsyncThunk(
@@ -95,6 +119,15 @@ export const getBerkases = createAsyncThunk(
     SLICE_NAME + '/getBerkases',
     async () => {
         const response = await apiGetBerkases<GetBerkasesResponse>()
+        return response.data
+    }
+)
+
+//berkases get
+export const getSubkontraktors = createAsyncThunk(
+    SLICE_NAME + '/getSubkontraktors',
+    async () => {
+        const response = await apiGetSubkontraktors<GetSubkontraktorsResponse>()
         return response.data
     }
 )
@@ -129,6 +162,7 @@ const initialState: MasterProyekEditState = {
     loading: true,
     loadingKliens: true,
     loadingBerkases: true,
+    loadingSubkontraktors: true,
     proyekData: {},
 }
 
@@ -158,6 +192,13 @@ const proyekEditSlice = createSlice({
             })
             .addCase(getBerkases.pending, (state) => {
                 state.loadingBerkases = true
+            })
+            .addCase(getSubkontraktors.fulfilled, (state, action) => {
+                state.subkontraktorsData = action.payload
+                state.loadingSubkontraktors = false
+            })
+            .addCase(getSubkontraktors.pending, (state) => {
+                state.loadingSubkontraktors = true
             })
     },
 })

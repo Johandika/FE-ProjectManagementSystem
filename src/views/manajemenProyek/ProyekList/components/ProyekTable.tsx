@@ -20,19 +20,34 @@ import type {
     OnSortParam,
     ColumnDef,
 } from '@/components/shared/DataTable'
+import { IoLocationSharp } from 'react-icons/io5'
+import { AiFillCreditCard } from 'react-icons/ai'
 
 type Proyek = {
     id: string
     pekerjaan: string
+    pic: string
     klien: string
     nomor_spk: number
     tanggal_service_po: string
     tanggal_delivery: string
+    tanggal_kontrak: string
     nilai_kontrak: number
     realisasi: number
     progress: number
     status: string
     idKlien: string
+    subkontraktor?: Array<{
+        keterangan: string
+        nama_vendor_subkon: string
+        nilai_subkon: number
+        nomor_surat: string
+    }>
+    lokasi?: Array<{
+        nama: string
+        latitude: number
+        longitude: number
+    }>
 }
 
 const ActionColumn = ({ row }: { row: Proyek }) => {
@@ -142,82 +157,197 @@ const ProyekTable = () => {
                 header: 'Pekerjaan',
                 accessorKey: 'pekerjaan',
                 row: 100,
+                minWidth: 350,
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.pekerjaan}</span>
-                },
-            },
-            {
-                header: 'Klien',
-                accessorKey: 'klien',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.klien}</span>
+                    return (
+                        <div className="flex flex-col gap-1">
+                            <div className="text-blue-600 text-xs font-semibold capitalize">
+                                {row.klien}
+                            </div>
+                            <div className="text-base font-medium text-neutral-800 ">
+                                {row.pekerjaan}
+                            </div>
+                            <div className="text-blue-600 text-xs font-semibold">
+                                {row.pic}
+                            </div>
+                        </div>
+                    )
                 },
             },
             {
                 header: 'Nomor SPK',
                 accessorKey: 'nomor_spk',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.nomor_spk}</span>
-                },
-            },
-
-            {
-                header: 'Tangggal Servis PO',
-                accessorKey: 'tanggal_service_po',
+                minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
                     return (
-                        <span className="capitalize">
-                            {row.tanggal_service_po}
-                        </span>
+                        <div>
+                            <div className="capitalize mb-1">
+                                {row.nomor_spk}
+                            </div>
+                            <div className="bg-blue-600 text-xs rounded-md px-3 py-[3px] text-center text-white w-fit">
+                                {row.tanggal_kontrak}
+                            </div>
+                        </div>
                     )
                 },
             },
             {
-                header: 'Tangggal Delivery',
-                accessorKey: 'tanggal_delivery',
+                header: 'Lokasi',
+                accessorKey: 'lokasi',
+                minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
                     return (
-                        <span className="capitalize">
-                            {row.tanggal_delivery}
-                        </span>
+                        <div className="flex flex-col gap-1">
+                            {row.lokasi && row.lokasi.length > 0 ? (
+                                row.lokasi.map((loc, index) => (
+                                    <a
+                                        key={index}
+                                        href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group"
+                                    >
+                                        <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
+                                            <div className="text-lg">
+                                                <IoLocationSharp className="group-hover:text-blue-600 transition" />
+                                            </div>
+                                            {loc.nama}
+                                        </div>
+                                    </a>
+                                ))
+                            ) : (
+                                <span className="text-gray-400">
+                                    Tidak ada lokasi
+                                </span>
+                            )}
+                        </div>
                     )
                 },
             },
+            {
+                header: 'Subkontraktor',
+                accessorKey: 'subkontraktor',
+                minWidth: 200,
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <div className="flex flex-col gap-1">
+                            {row.subkontraktor &&
+                            row.subkontraktor.length > 0 ? (
+                                row.subkontraktor.map((subkon, index) => (
+                                    <a key={index}>
+                                        <div className="text-sm font-medium flex gap-1 items-center text-blue-600 truncate">
+                                            {subkon.nomor_surat}
+                                        </div>
+                                    </a>
+                                ))
+                            ) : (
+                                <span className="text-gray-400">
+                                    Tidak ada lokasi
+                                </span>
+                            )}
+                        </div>
+                    )
+                },
+            },
+            // {
+            //     header: 'Tangggal Delivery',
+            //     accessorKey: 'tanggal_delivery',
+            //     minWidth: 150,
+            //     cell: (props) => {
+            //         const row = props.row.original
+            //         return (
+            //             <span className="capitalize">
+            //                 {row.tanggal_delivery}
+            //             </span>
+            //         )
+            //     },
+            // },
             {
                 header: 'Nilai Kontrak',
                 accessorKey: 'nilai_kontrak',
+                minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
                     return (
-                        <span className="capitalize">
-                            {row.nilai_kontrak.toLocaleString('id-ID')}
-                        </span>
+                        <div className="flex flex-col">
+                            <div className="text-sm font-semibold text-neutral-700">
+                                Rp {row.nilai_kontrak.toLocaleString('id-ID')}
+                            </div>
+                            <div className="text-xs font-semibold text-yellow-600  gap-1 flex items-center ">
+                                <div className="text-lg">
+                                    <AiFillCreditCard className="group-hover:text-blue-600 transition " />
+                                </div>
+                                <span>
+                                    Rp {row.realisasi.toLocaleString('id-ID')}
+                                </span>
+                            </div>
+                        </div>
                     )
                 },
             },
-            {
-                header: 'Realiasasi',
-                accessorKey: 'realisasi',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <span className="capitalize">
-                            {row.realisasi.toLocaleString('id-ID')}
-                        </span>
-                    )
-                },
-            },
+            // {
+            //     header: 'Realiasasi',
+            //     accessorKey: 'realisasi',
+            //     cell: (props) => {
+            //         const row = props.row.original
+            //         return (
+            //             <span className="capitalize">
+            //                 {row.realisasi.toLocaleString('id-ID')}
+            //             </span>
+            //         )
+            //     },
+            // },
             {
                 header: 'Progress',
                 accessorKey: 'progress',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.progress}%</span>
+                    const progress = row.progress || 0 // Default to 0 if undefined
+
+                    return (
+                        <div className="flex items-center justify-center">
+                            <div className="relative w-16 h-16">
+                                {/* Background circle */}
+                                <svg
+                                    className="w-full h-full"
+                                    viewBox="0 0 100 100"
+                                >
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="40"
+                                        fill="none"
+                                        stroke="#a8e6d5"
+                                        strokeWidth="15"
+                                    />
+                                    {/* Progress circle */}
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="40"
+                                        fill="none"
+                                        stroke="#3cbfa6"
+                                        strokeWidth="15"
+                                        strokeDasharray={`${
+                                            progress * 2.51
+                                        } 251`}
+                                        strokeDashoffset="0"
+                                        transform="rotate(-90 50 50)"
+                                    />
+                                </svg>
+                                {/* Percentage text in the middle */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-xs font-medium text-teal-500">
+                                        {progress}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )
                 },
             },
             {

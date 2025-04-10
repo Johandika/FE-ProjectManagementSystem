@@ -259,6 +259,14 @@ function _DataTable<T>(
                                     <Th
                                         key={header.id}
                                         colSpan={header.colSpan}
+                                        // tambahan style lebar kolom
+                                        style={{
+                                            width: header.column.columnDef
+                                                .width,
+                                            minWidth:
+                                                header.column.columnDef
+                                                    .minWidth,
+                                        }}
                                     >
                                         {header.isPlaceholder ? null : (
                                             <div
@@ -306,7 +314,17 @@ function _DataTable<T>(
                                     <Tr key={row.id}>
                                         {row.getVisibleCells().map((cell) => {
                                             return (
-                                                <Td key={cell.id}>
+                                                <Td
+                                                    key={cell.id}
+                                                    style={{
+                                                        width: cell.column
+                                                            .columnDef.width,
+                                                        minWidth:
+                                                            cell.column
+                                                                .columnDef
+                                                                .minWidth,
+                                                    }}
+                                                >
                                                     {flexRender(
                                                         cell.column.columnDef
                                                             .cell,
