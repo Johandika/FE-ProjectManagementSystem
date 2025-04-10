@@ -211,10 +211,12 @@ const ProyekTable = () => {
                                         className="group"
                                     >
                                         <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
-                                            <div className="text-lg">
+                                            <div className="text-lg group-hover:scale-110 transition">
                                                 <IoLocationSharp className="group-hover:text-blue-600 transition" />
                                             </div>
-                                            {loc.nama}
+                                            <div className="text-blue-600">
+                                                {loc.nama}
+                                            </div>
                                         </div>
                                     </a>
                                 ))
@@ -239,7 +241,7 @@ const ProyekTable = () => {
                             row.subkontraktor.length > 0 ? (
                                 row.subkontraktor.map((subkon, index) => (
                                     <a key={index}>
-                                        <div className="text-sm font-medium flex gap-1 items-center text-blue-600 truncate">
+                                        <div className="text-sm font-medium flex gap-1 items-center  truncate">
                                             {subkon.nomor_surat}
                                         </div>
                                     </a>
@@ -272,14 +274,26 @@ const ProyekTable = () => {
                 minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
+
+                    // Determine the color based on conditions
+                    let textColorClass = 'text-yellow-600' // Default color
+
+                    if (row.realisasi === 0) {
+                        textColorClass = 'text-red-500' // Red when realization is 0
+                    } else if (row.realisasi === row.nilai_kontrak) {
+                        textColorClass = 'text-green-500' // Green when realization equals contract value
+                    }
+
                     return (
                         <div className="flex flex-col">
                             <div className="text-sm font-semibold text-neutral-700">
                                 Rp {row.nilai_kontrak.toLocaleString('id-ID')}
                             </div>
-                            <div className="text-xs font-semibold text-yellow-600  gap-1 flex items-center ">
+                            <div
+                                className={`text-xs font-semibold ${textColorClass} gap-1 flex items-center`}
+                            >
                                 <div className="text-lg">
-                                    <AiFillCreditCard className="group-hover:text-blue-600 transition " />
+                                    <AiFillCreditCard className="group-hover:text-blue-600 transition" />
                                 </div>
                                 <span>
                                     Rp {row.realisasi.toLocaleString('id-ID')}

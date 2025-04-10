@@ -45,12 +45,13 @@ const ProyekEdit = () => {
         (state) => state.proyekEdit.data.berkasesData?.data || []
     )
 
-    // berkases data
+    // subkontraktors data
     const subkontraktorsData = useAppSelector(
         (state) => state.proyekEdit.data.subkontraktorsData?.data || []
     )
 
     const loading = useAppSelector((state) => state.proyekEdit.data.loading)
+
     const loadingKliens = useAppSelector(
         (state) => state.proyekEdit.data.loadingKliens
     )

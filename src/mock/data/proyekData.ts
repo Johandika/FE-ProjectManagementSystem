@@ -10,7 +10,7 @@ export const proyeksData = [
         tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2025-08-15',
         nilai_kontrak: 5500000000,
-        realisasi: 2250000000,
+        realisasi: 0,
         progress: 45,
         sisa_waktu: 120,
         keterangan:
@@ -21,12 +21,12 @@ export const proyeksData = [
         berkas: ['KTP', 'SKCK'],
         lokasi: [
             {
-                nama: 'Lokasi 1',
+                nama: 'GI Bukit Tinggi',
                 latitude: -6.2088,
                 longitude: 106.8456,
             },
             {
-                nama: 'Lokasi 2',
+                nama: 'GI Pariaman',
                 latitude: -7.2504,
                 longitude: 112.7688,
             },
@@ -75,12 +75,12 @@ export const proyeksData = [
         berkas: ['KTP', 'Kartu Keluarga'],
         lokasi: [
             {
-                nama: 'Lokasi 1',
+                nama: 'GI Pekanbaru',
                 latitude: -6.2088,
                 longitude: 106.8456,
             },
             {
-                nama: 'Lokasi 2',
+                nama: 'GI Medan',
                 latitude: -7.2504,
                 longitude: 112.7688,
             },
@@ -118,7 +118,7 @@ export const proyeksData = [
         tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2026-01-10',
         nilai_kontrak: 125000000000,
-        realisasi: 37500000000,
+        realisasi: 125000000000,
         progress: 30,
         sisa_waktu: 290,
         keterangan:
@@ -129,12 +129,12 @@ export const proyeksData = [
         berkas: ['KTP', 'Kartu Keluarga'],
         lokasi: [
             {
-                nama: 'Lokasi 1',
+                nama: 'GI Rokan Hulu',
                 latitude: -6.2088,
                 longitude: 106.8456,
             },
             {
-                nama: 'Lokasi 2',
+                nama: 'GI Dumai',
                 latitude: -7.2504,
                 longitude: 112.7688,
             },
