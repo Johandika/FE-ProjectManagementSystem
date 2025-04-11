@@ -176,7 +176,7 @@ const ProyekTable = () => {
                 },
             },
             {
-                header: 'Nomor SPK',
+                header: 'Nomor Kontrak',
                 accessorKey: 'nomor_spk',
                 minWidth: 200,
                 cell: (props) => {

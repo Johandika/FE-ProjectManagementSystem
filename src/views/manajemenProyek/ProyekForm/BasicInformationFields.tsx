@@ -16,7 +16,7 @@ type FormFieldsName = {
     klien: string
     pic: string
     nomor_spk: string
-    nomor_spo: string
+    // nomor_spo: string
     tanggal_service_po: string
     tanggal_kontrak: string
     tanggal_delivery: string
@@ -166,7 +166,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         />
                     </FormItem>
                 </div>
-                <div className="col-span-1">
+                {/* <div className="col-span-1">
                     <FormItem
                         label="Nomor SPO"
                         invalid={
@@ -182,7 +182,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                             component={Input}
                         />
                     </FormItem>
-                </div>
+                </div> */}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 <div className="col-span-1">
@@ -255,7 +255,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 <div className="col-span-1">
                     <FormItem
-                        label="Tanggal Service PO"
+                        label="Tanggal PO"
                         invalid={
                             (errors.tanggal_service_po &&
                                 touched.tanggal_service_po) as boolean
@@ -352,7 +352,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </div>
                 <div className="col-span-1">
                     <FormItem
-                        label="Realisasi"
+                        label="Uang Muka"
                         invalid={
                             (errors.realisasi && touched.realisasi) as boolean
                         }
@@ -407,7 +407,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </div>
                 <div className="col-span-1">
                     <FormItem
-                        label="Sisa Waktu (hari)"
+                        label="Waktu Pengerjaan (hari)"
                         invalid={
                             (errors.sisa_waktu && touched.sisa_waktu) as boolean
                         }
@@ -434,7 +434,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             </div>
 
             <FormItem
-                label="Berkas"
+                label="Berkas BASTP"
                 invalid={(errors.berkas && touched.berkas) as boolean}
                 errorMessage={errors.berkas}
             >

@@ -21,6 +21,7 @@ export default function Detail() {
         (state) => state.proyekEdit.data.proyekData
     )
 
+    console.log('proyekData', proyekData.berkas)
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
     }
@@ -48,7 +49,9 @@ export default function Detail() {
                     />
                     <div className="space-y-0">
                         <div className="flex flex-col sm:flex-row gap-0 sm:gap-2">
-                            <div className="font-semibold flex-0">Nama :</div>
+                            <div className="font-semibold flex-0">
+                                Nama Pekerjaan :
+                            </div>
                             <div className="flex-1">{proyekData.pekerjaan}</div>
                         </div>
                         <div className="flex flex-row gap-2">
@@ -72,9 +75,7 @@ export default function Detail() {
                             <div>{proyekData.tanggal_kontrak}</div>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <div className="font-semibold">
-                                Tgl. Service PO :
-                            </div>
+                            <div className="font-semibold">Tgl. PO :</div>
                             <div>{proyekData.tanggal_service_po}</div>
                         </div>
                         <div className="flex flex-row gap-2">
@@ -111,7 +112,18 @@ export default function Detail() {
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Berkas :</div>
-                            <div>{proyekData.berkas}</div>
+                            <div>
+                                {proyekData.berkas &&
+                                    proyekData.berkas.map((berkas, index) => (
+                                        <span key={index}>
+                                            {berkas}
+                                            {index <
+                                            proyekData.berkas.length - 1
+                                                ? ', '
+                                                : ''}
+                                        </span>
+                                    ))}
+                            </div>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-0 sm:gap-2">
                             <div className="font-semibold flex-0">
