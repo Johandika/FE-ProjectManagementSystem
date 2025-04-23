@@ -1,7 +1,6 @@
 import { forwardRef, useState } from 'react'
 import { FormContainer } from '@/components/ui/Form'
 import Button from '@/components/ui/Button'
-import hooks from '@/components/ui/hooks'
 import StickyFooter from '@/components/shared/StickyFooter'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { Form, Formik, FormikProps } from 'formik'
@@ -15,7 +14,6 @@ import * as Yup from 'yup'
 type FormikRef = FormikProps<any>
 
 type InitialData = {
-    id?: string
     nama?: string
 }
 
@@ -36,8 +34,6 @@ type BerkasForm = {
     onDelete?: OnDelete
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
 }
-
-const { useUniqueId } = hooks
 
 const validationSchema = Yup.object().shape({
     nama: Yup.string().required('Nama wajib diisi'),
@@ -90,15 +86,12 @@ const BerkasForm = forwardRef<FormikRef, BerkasForm>((props, ref) => {
     const {
         type,
         initialData = {
-            id: '',
             nama: '',
         },
         onFormSubmit,
         onDiscard,
         onDelete,
     } = props
-
-    const newId = useUniqueId('berkas-')
 
     return (
         <>
@@ -122,9 +115,7 @@ const BerkasForm = forwardRef<FormikRef, BerkasForm>((props, ref) => {
                     //     }
                     //     return tag
                     // })
-                    if (type === 'new') {
-                        formData.id = newId
-                    }
+
                     onFormSubmit?.(formData, setSubmitting)
                 }}
             >
@@ -141,7 +132,7 @@ const BerkasForm = forwardRef<FormikRef, BerkasForm>((props, ref) => {
                             </div>
                             <StickyFooter
                                 className="-mx-8 px-8 flex items-center justify-between py-4"
-                                stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                                stickyClass="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                             >
                                 <div>
                                     {type === 'edit' && (

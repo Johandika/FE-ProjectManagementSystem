@@ -1,4 +1,4 @@
-import KlienForm from './KlienForm'
+import BerkasForm from './BerkasForm'
 
-export * from './KlienForm'
-export default KlienForm
+export * from './BerkasForm'
+export default BerkasForm

@@ -4,6 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
 import {
     apiDeleteFakturPajaks,
+    apiGetFakturPajak,
     apiGetFakturPajaks,
 } from '@/services/FakturPajakService'
 

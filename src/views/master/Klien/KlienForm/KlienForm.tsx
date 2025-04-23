@@ -38,8 +38,6 @@ type KlienForm = {
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
 }
 
-const { useUniqueId } = hooks
-
 const validationSchema = Yup.object().shape({
     nama: Yup.string().required('Nama wajib diisi'),
     keterangan: Yup.string().required('Keterangan wajib diisi'),
@@ -92,7 +90,6 @@ const KlienForm = forwardRef<FormikRef, KlienForm>((props, ref) => {
     const {
         type,
         initialData = {
-            id: '',
             nama: '',
             keterangan: '',
         },
@@ -100,8 +97,6 @@ const KlienForm = forwardRef<FormikRef, KlienForm>((props, ref) => {
         onDiscard,
         onDelete,
     } = props
-
-    const newId = useUniqueId('klien-')
 
     return (
         <>
@@ -125,9 +120,7 @@ const KlienForm = forwardRef<FormikRef, KlienForm>((props, ref) => {
                     //     }
                     //     return tag
                     // })
-                    if (type === 'new') {
-                        formData.id = newId
-                    }
+
                     onFormSubmit?.(formData, setSubmitting)
                 }}
             >

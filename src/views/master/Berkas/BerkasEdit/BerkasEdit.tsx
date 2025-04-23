@@ -37,15 +37,50 @@ const BerkasEdit = () => {
         dispatch(getBerkas(data))
     }
 
+    const popNotification = (keyword: string) => {
+        toast.push(
+            <Notification
+                title={`Successfuly ${keyword}`}
+                type="success"
+                duration={2500}
+            >
+                Berkas successfuly {keyword}
+            </Notification>,
+            {
+                placement: 'top-center',
+            }
+        )
+        navigate('/master/berkas')
+    }
+
     const handleFormSubmit = async (
         values: FormModel,
         setSubmitting: SetSubmitting
     ) => {
-        setSubmitting(true)
-        const success = await updateBerkas(values)
-        setSubmitting(false)
-        if (success) {
-            popNotification('updated')
+        try {
+            setSubmitting(true)
+            const result: any = await updateBerkas(values)
+
+            if (result.statusCode === 200) {
+                popNotification('updated')
+            } else {
+                // Menampilkan notifikasi error
+                toast.push(
+                    <Notification
+                        title={'Gagal menambahkan'}
+                        type="danger"
+                        duration={3500}
+                    >
+                        {result.message}
+                    </Notification>,
+                    {
+                        placement: 'top-center',
+                    }
+                )
+            }
+        } finally {
+            // Pastikan setSubmitting selalu dipanggil di akhir proses
+            setSubmitting(false)
         }
     }
 
@@ -55,26 +90,24 @@ const BerkasEdit = () => {
 
     const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
         setDialogOpen(false)
-        const success = await deleteBerkas({ id: berkasData.id })
-        if (success) {
+        const result: any = await deleteBerkas({ id: berkasData.id })
+        if (result.statusCode === 200) {
             popNotification('deleted')
+        } else {
+            // Menampilkan notifikasi error
+            toast.push(
+                <Notification
+                    title={'Gagal menghapus'}
+                    type="danger"
+                    duration={3500}
+                >
+                    {result.message}
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
         }
-    }
-
-    const popNotification = (keyword: string) => {
-        toast.push(
-            <Notification
-                title={`Successfuly ${keyword}`}
-                type="success"
-                duration={2500}
-            >
-                Product successfuly {keyword}
-            </Notification>,
-            {
-                placement: 'top-center',
-            }
-        )
-        navigate('/master/berkas')
     }
 
     useEffect(() => {

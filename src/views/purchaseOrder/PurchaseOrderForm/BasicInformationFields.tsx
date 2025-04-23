@@ -23,11 +23,6 @@ type BasicInformationFields = {
     values?: FormFieldsName
 }
 
-const statuses = [
-    { label: 'Selesai', value: 'Selesai' },
-    { label: 'Dalam Proses', value: 'Dalam Proses' },
-]
-
 const BasicInformationFields = (props: BasicInformationFields) => {
     const { touched, errors } = props
 
@@ -133,35 +128,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </Field>
             </FormItem>
 
-            <FormItem
-                label="Status"
-                invalid={(errors.status && touched.status) as boolean}
-                errorMessage={errors.status}
-            >
-                <Field name="status">
-                    {({ field, form }: FieldProps) => {
-                        // Cari status yang sesuai dengan nilai saat ini
-                        const selectedStatus = field.value
-                            ? statuses.find((s) => s.value === field.value)
-                            : null
-
-                        return (
-                            <Select
-                                field={field}
-                                form={form}
-                                options={statuses}
-                                value={selectedStatus}
-                                onChange={(option) =>
-                                    form.setFieldValue(
-                                        field.name,
-                                        option?.value
-                                    )
-                                }
-                            />
-                        )
-                    }}
-                </Field>
-            </FormItem>
             <FormItem
                 label="Proyek"
                 invalid={(errors.idProject && touched.idProject) as boolean}

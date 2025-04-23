@@ -9,9 +9,9 @@ import dayjs from 'dayjs'
 type FormFieldsName = {
     nomor: string
     nominal: number
-    keterangan: string
+    // keterangan: string
     tanggal: string
-    status: string
+    // status: string
 }
 
 type BasicInformationFields = {
@@ -20,10 +20,10 @@ type BasicInformationFields = {
     values?: FormFieldsName
 }
 
-const statuses = [
-    { label: 'Lunas', value: 'Lunas' },
-    { label: 'Belum Lunas', value: 'Belum Lunas' },
-]
+// const statuses = [
+//     { label: 'Lunas', value: 'Lunas' },
+//     { label: 'Belum Lunas', value: 'Belum Lunas' },
+// ]
 
 const BasicInformationFields = (props: BasicInformationFields) => {
     const { touched, errors } = props
@@ -35,7 +35,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 Sesi untuk mengatur informasi dasar faktur pajak
             </p>
             <FormItem
-                label="Nomor faktur pajak"
+                label="Nomor Faktur Pajak"
                 invalid={(errors.nomor && touched.nomor) as boolean}
                 errorMessage={errors.nomor}
             >
@@ -87,7 +87,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     )}
                 </Field>
             </FormItem>
-            <FormItem
+            {/* <FormItem
                 label="Status"
                 invalid={(errors.status && touched.status) as boolean}
                 errorMessage={errors.status}
@@ -115,8 +115,8 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         )
                     }}
                 </Field>
-            </FormItem>
-            <FormItem
+            </FormItem> */}
+            {/* <FormItem
                 label="Keterangan"
                 labelClass="!justify-start"
                 invalid={(errors.keterangan && touched.keterangan) as boolean}
@@ -128,7 +128,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     placeholder="Masukkan keterangan"
                     component={Input}
                 />
-            </FormItem>
+            </FormItem> */}
         </AdaptableCard>
     )
 }

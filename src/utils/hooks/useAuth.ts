@@ -35,20 +35,20 @@ function useAuth() {
         try {
             const resp = await apiSignIn(values)
             if (resp.data) {
-                const { token } = resp.data
+                // Mengambil token dari field "authorization" di respons API
+                const token = resp.data.authorization
                 dispatch(signInSuccess(token))
-                if (resp.data.user) {
-                    dispatch(
-                        setUser(
-                            resp.data.user || {
-                                avatar: '',
-                                userName: 'Anonymous',
-                                authority: ['USER'],
-                                email: '',
-                            }
-                        )
-                    )
+
+                // Menyiapkan data user dari respons
+                const userData = {
+                    avatar: '',
+                    userName: resp.data.email || 'Anonymous',
+                    authority: ['USER'],
+                    email: resp.data.email || '',
                 }
+
+                dispatch(setUser(userData))
+
                 const redirectUrl = query.get(REDIRECT_URL_KEY)
                 navigate(
                     redirectUrl ? redirectUrl : appConfig.authenticatedEntryPath
@@ -58,7 +58,6 @@ function useAuth() {
                     message: '',
                 }
             }
-            // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         } catch (errors: any) {
             return {
                 status: 'failed',
@@ -103,8 +102,12 @@ function useAuth() {
         }
     }
 
-    const handleSignOut = () => {
+    const signOut = async () => {
+        // await apiSignOut()
+        // Hapus token dari Redux store
         dispatch(signOutSuccess())
+
+        // Hapus data user dari Redux store
         dispatch(
             setUser({
                 avatar: '',
@@ -113,12 +116,8 @@ function useAuth() {
                 authority: [],
             })
         )
+        // handleSignOut()
         navigate(appConfig.unAuthenticatedEntryPath)
-    }
-
-    const signOut = async () => {
-        await apiSignOut()
-        handleSignOut()
     }
 
     return {

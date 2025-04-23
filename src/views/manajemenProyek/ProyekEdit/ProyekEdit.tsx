@@ -12,6 +12,7 @@ import reducer, {
     getKliens,
     getBerkases,
     getSubkontraktors,
+    getTermins,
 } from './store'
 import { injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -50,6 +51,11 @@ const ProyekEdit = () => {
         (state) => state.proyekEdit.data.subkontraktorsData?.data || []
     )
 
+    // termins data by id
+    const terminsData = useAppSelector(
+        (state) => state.proyekEdit.data.terminsData || []
+    )
+
     const loading = useAppSelector((state) => state.proyekEdit.data.loading)
 
     const loadingKliens = useAppSelector(
@@ -61,9 +67,13 @@ const ProyekEdit = () => {
     const loadingSubkontraktors = useAppSelector(
         (state) => state.proyekEdit.data.loadingSubkontraktors
     )
+    const loadingTermins = useAppSelector(
+        (state) => state.proyekEdit.data.loadingTermins
+    )
 
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
+        dispatch(getTermins(data))
     }
 
     const handleFormSubmit = async (
@@ -71,8 +81,6 @@ const ProyekEdit = () => {
         setSubmitting: SetSubmitting
     ) => {
         setSubmitting(true)
-
-        console.log('values', values)
 
         const success = await updateProyek(values)
         setSubmitting(false)
@@ -117,7 +125,7 @@ const ProyekEdit = () => {
         fetchData(rquestParam)
 
         dispatch(getKliens()) // kliens
-        dispatch(getBerkases()) // kliens
+        dispatch(getBerkases()) // berkases
         dispatch(getSubkontraktors()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
@@ -129,7 +137,8 @@ const ProyekEdit = () => {
                     loading ||
                     loadingKliens ||
                     loadingBerkases ||
-                    loadingSubkontraktors
+                    loadingSubkontraktors ||
+                    loadingTermins
                 }
             >
                 {!isEmpty(proyekData) && (
@@ -140,6 +149,7 @@ const ProyekEdit = () => {
                             kliensList={kliensData}
                             berkasesList={berkasesData}
                             subkontraktorsList={subkontraktorsData}
+                            terminsList={terminsData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}

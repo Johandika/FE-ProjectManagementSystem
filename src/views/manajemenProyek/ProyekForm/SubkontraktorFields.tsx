@@ -1,36 +1,39 @@
-import { Field, FieldArray } from 'formik'
+import { Field, FieldArray, FieldProps } from 'formik'
 import { FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import DatePicker from '@/components/ui/DatePicker'
 import { HiMinus, HiPlus } from 'react-icons/hi'
 import AdaptableCard from '@/components/shared/AdaptableCard'
-import type { FieldProps, FormikErrors, FormikTouched } from 'formik'
+import type { FormikErrors, FormikTouched } from 'formik'
 import dayjs from 'dayjs'
 import { Select } from '@/components/ui'
+import { NumericFormat } from 'react-number-format'
 
 const { DatePickerRange } = DatePicker
 
-type Subcontractor = {
+interface Subcontractor {
+    id: string
     nomor_surat: string
-    nama_vendor_subkon: string
-    nilai_subkon: number
-    waktu_pelaksanaan_kerja: [Date | null, Date | null]
+    nilai_subkontrak: number
+    waktu_mulai_pelaksanaan: string
+    waktu_selesai_pelaksanaan: string
     keterangan: string
 }
 
+type FormFieldsName = {
+    subkontraktor: Subcontractor[]
+}
+
 type SubcontractorFieldsProps = {
-    touched: FormikTouched<{
-        subkontraktor: Subcontractor[]
-    }>
-    errors: FormikErrors<{
-        subkontraktor: Subcontractor[]
-    }>
+    touched: FormikTouched<FormFieldsName>
+    errors: FormikErrors<FormFieldsName>
     subkontraktorsList?: {
+        nilai_subkontrak: number
         nomor_surat: string
-        nama_vendor_subkon: string
-        nilai_subkon: number
-        waktu_pelaksanaan_kerja: string[]
+        id: string
+        waktu_mulai_pelaksanaan: string
+        waktu_selesai_pelaksanaan: string
         keterangan: string
     }[]
 }
@@ -46,9 +49,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
             <FieldArray name="subkontraktor">
                 {({ push, remove, form }) => {
                     const { values } = form
-                    const { subkontraktor = [] } = values as {
-                        subkontraktor: Subcontractor[]
-                    }
+                    const { subkontraktor = [] } = values as FormFieldsName
 
                     return (
                         <div>
@@ -62,23 +63,6 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                     .subkontraktor?.[index] as
                                     | FormikTouched<Subcontractor>
                                     | undefined
-
-                                // Error checking for each field
-                                const nomorSuratError =
-                                    subcontractorErrors?.nomor_surat &&
-                                    subcontractorTouched?.nomor_surat
-                                const namaVendorError =
-                                    subcontractorErrors?.nama_vendor_subkon &&
-                                    subcontractorTouched?.nama_vendor_subkon
-                                const nilaiSubkonError =
-                                    subcontractorErrors?.nilai_subkon &&
-                                    subcontractorTouched?.nilai_subkon
-                                const waktuPelaksanaanError =
-                                    subcontractorErrors?.waktu_pelaksanaan_kerja &&
-                                    subcontractorTouched?.waktu_pelaksanaan_kerja
-                                const keteranganError =
-                                    subcontractorErrors?.keterangan &&
-                                    subcontractorTouched?.keterangan
 
                                 return (
                                     <div
@@ -105,19 +89,12 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                             <FormItem
                                                 className="w-full mb-0"
                                                 label="Nomor Surat"
-                                                invalid={Boolean(
-                                                    nomorSuratError
-                                                )}
+                                                invalid={
+                                                    (subcontractorErrors?.nomor_surat &&
+                                                        subcontractorTouched?.nomor_surat) as boolean
+                                                }
                                                 errorMessage={
-                                                    typeof errors
-                                                        .subkontraktor?.[index]
-                                                        ?.nomor_surat ===
-                                                    'string'
-                                                        ? errors
-                                                              .subkontraktor?.[
-                                                              index
-                                                          ]?.nomor_surat
-                                                        : ''
+                                                    subcontractorErrors?.nomor_surat
                                                 }
                                             >
                                                 <Field
@@ -129,81 +106,40 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                                 />
                                             </FormItem>
 
-                                            {/* <FormItem
-                                                className="w-full mb-0"
-                                                label="Nama Vendor Subkon"
-                                                invalid={Boolean(
-                                                    namaVendorError
-                                                )}
-                                                errorMessage={
-                                                    typeof errors
-                                                        .subkontraktor?.[index]
-                                                        ?.nama_vendor_subkon ===
-                                                    'string'
-                                                        ? errors
-                                                              .subkontraktor?.[
-                                                              index
-                                                          ]?.nama_vendor_subkon
-                                                        : ''
-                                                }
-                                            >
-                                                <Field
-                                                    type="text"
-                                                    autoComplete="off"
-                                                    name={`subkontraktor[${index}].nama_vendor_subkon`}
-                                                    placeholder="Nama vendor subkontraktor"
-                                                    component={Input}
-                                                />
-                                            </FormItem> */}
-                                            {/* subkon */}
                                             <FormItem
-                                                className="w-full mb-0"
                                                 label="Nama Vendor Subkon"
-                                                invalid={Boolean(
-                                                    namaVendorError
-                                                )}
+                                                className="w-full mb-0"
+                                                invalid={
+                                                    (subcontractorErrors?.id &&
+                                                        subcontractorTouched?.id) as boolean
+                                                }
                                                 errorMessage={
-                                                    typeof errors
-                                                        .subkontraktor?.[index]
-                                                        ?.nama_vendor_subkon ===
-                                                    'string'
-                                                        ? errors
-                                                              .subkontraktor?.[
-                                                              index
-                                                          ]?.nama_vendor_subkon
-                                                        : ''
+                                                    subcontractorErrors?.id
                                                 }
                                             >
                                                 <Field
-                                                    name={`subkontraktor[${index}].nama_vendor_subkon`}
+                                                    name={`subkontraktor[${index}].id`}
                                                 >
                                                     {({
                                                         field,
                                                         form,
                                                     }: FieldProps) => {
-                                                        // Convert selected value to option format
-                                                        const selectedOption =
+                                                        const selectedSubkon =
                                                             field.value
                                                                 ? subkontraktorsList.find(
                                                                       (
-                                                                          vendor
+                                                                          subkon
                                                                       ) =>
-                                                                          vendor.nama ===
+                                                                          subkon.id ===
                                                                           field.value
                                                                   )
-                                                                    ? {
-                                                                          value: field.value,
-                                                                          label: field.value,
-                                                                      }
-                                                                    : null
                                                                 : null
 
-                                                        // Map vendor list to options format required by Select
-                                                        const vendorOptions =
+                                                        const subkonOptions =
                                                             subkontraktorsList.map(
-                                                                (vendor) => ({
-                                                                    value: vendor.nama,
-                                                                    label: vendor.nama,
+                                                                (subkon) => ({
+                                                                    value: subkon.id,
+                                                                    label: `${subkon.nama}`,
                                                                 })
                                                             )
 
@@ -212,16 +148,20 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                                                 field={field}
                                                                 form={form}
                                                                 options={
-                                                                    vendorOptions
+                                                                    subkonOptions
                                                                 }
                                                                 value={
-                                                                    selectedOption
+                                                                    selectedSubkon
+                                                                        ? {
+                                                                              value: selectedSubkon.id,
+                                                                              label: `${selectedSubkon.nama}`,
+                                                                          }
+                                                                        : null
                                                                 }
-                                                                placeholder="Pilih vendor subkontraktor"
+                                                                placeholder="Pilih subkontraktor"
                                                                 onChange={(
                                                                     option
                                                                 ) => {
-                                                                    // Extract just the value (vendor name) for saving to formik
                                                                     const selectedValue =
                                                                         option
                                                                             ? option.value
@@ -230,6 +170,8 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                                                         field.name,
                                                                         selectedValue
                                                                     )
+
+                                                                    // Simpan nama vendor dalam field terpisah jika diperlukan
                                                                 }}
                                                             />
                                                         )
@@ -242,125 +184,112 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                             <FormItem
                                                 className="mb-0"
                                                 label="Nilai Subkon"
-                                                invalid={Boolean(
-                                                    nilaiSubkonError
-                                                )}
+                                                invalid={
+                                                    (subcontractorErrors?.nilai_subkontrak &&
+                                                        subcontractorTouched?.nilai_subkontrak) as boolean
+                                                }
                                                 errorMessage={
-                                                    typeof errors
-                                                        .subkontraktor?.[index]
-                                                        ?.nilai_subkon ===
-                                                    'string'
-                                                        ? errors
-                                                              .subkontraktor?.[
-                                                              index
-                                                          ]?.nilai_subkon
-                                                        : ''
+                                                    subcontractorErrors?.nilai_subkontrak
                                                 }
                                             >
                                                 <Field
-                                                    type="number"
-                                                    autoComplete="off"
-                                                    name={`subkontraktor[${index}].nilai_subkon`}
-                                                    placeholder="Nilai kontrak subkontraktor"
-                                                    component={Input}
-                                                />
+                                                    name={`subkontraktor[${index}].nilai_subkontrak`}
+                                                >
+                                                    {({
+                                                        field,
+                                                        form,
+                                                    }: FieldProps) => (
+                                                        <NumericFormat
+                                                            {...field}
+                                                            customInput={Input}
+                                                            placeholder="Nilai kontrak subkontraktor"
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                form.setFieldValue(
+                                                                    field.name,
+                                                                    values.value
+                                                                )
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Field>
                                             </FormItem>
 
                                             <FormItem
                                                 className="mb-0"
                                                 label="Waktu Pelaksanaan Kerja"
-                                                invalid={Boolean(
-                                                    waktuPelaksanaanError
-                                                )}
+                                                invalid={
+                                                    ((subcontractorErrors?.waktu_mulai_pelaksanaan &&
+                                                        subcontractorTouched?.waktu_mulai_pelaksanaan) ||
+                                                        (subcontractorErrors?.waktu_selesai_pelaksanaan &&
+                                                            subcontractorTouched?.waktu_selesai_pelaksanaan)) as boolean
+                                                }
                                                 errorMessage={
-                                                    typeof errors
-                                                        .subkontraktor?.[index]
-                                                        ?.waktu_pelaksanaan_kerja ===
-                                                    'string'
-                                                        ? errors
-                                                              .subkontraktor?.[
-                                                              index
-                                                          ]
-                                                              ?.waktu_pelaksanaan_kerja
-                                                        : ''
+                                                    subcontractorErrors?.waktu_mulai_pelaksanaan ||
+                                                    subcontractorErrors?.waktu_selesai_pelaksanaan
                                                 }
                                             >
-                                                <Field
-                                                    name={`subkontraktor[${index}].waktu_pelaksanaan_kerja`}
-                                                    component={({
-                                                        field,
-                                                        form,
-                                                    }) => (
-                                                        <DatePickerRange
-                                                            placeholder="Pilih rentang waktu"
-                                                            value={
-                                                                Array.isArray(
-                                                                    field.value
+                                                {/* Using DatePickerRange but updating separate fields */}
+                                                <DatePickerRange
+                                                    placeholder="Pilih rentang waktu"
+                                                    value={[
+                                                        subkontraktor[index]
+                                                            .waktu_mulai_pelaksanaan
+                                                            ? new Date(
+                                                                  subkontraktor[
+                                                                      index
+                                                                  ].waktu_mulai_pelaksanaan
+                                                              )
+                                                            : null,
+                                                        subkontraktor[index]
+                                                            .waktu_selesai_pelaksanaan
+                                                            ? new Date(
+                                                                  subkontraktor[
+                                                                      index
+                                                                  ].waktu_selesai_pelaksanaan
+                                                              )
+                                                            : null,
+                                                    ]}
+                                                    singleDate={false}
+                                                    closePickerOnChange={false}
+                                                    onChange={(
+                                                        selectedDates
+                                                    ) => {
+                                                        // Only update if both dates are selected
+                                                        if (
+                                                            selectedDates[0] !==
+                                                                null &&
+                                                            selectedDates[1] !==
+                                                                null
+                                                        ) {
+                                                            // Format dates to YYYY-MM-DD strings
+                                                            const startDate =
+                                                                dayjs(
+                                                                    selectedDates[0]
+                                                                ).format(
+                                                                    'YYYY-MM-DD'
                                                                 )
-                                                                    ? field.value.map(
-                                                                          (
-                                                                              dateStr
-                                                                          ) =>
-                                                                              dateStr
-                                                                                  ? new Date(
-                                                                                        dateStr
-                                                                                    )
-                                                                                  : null
-                                                                      )
-                                                                    : [
-                                                                          null,
-                                                                          null,
-                                                                      ]
-                                                            }
-                                                            singleDate={false}
-                                                            closePickerOnChange={
-                                                                false
-                                                            }
-                                                            onChange={(
-                                                                selectedDates
-                                                            ) => {
-                                                                // Pastikan kedua tanggal terisi
-                                                                const isFirstDateSet =
-                                                                    selectedDates[0] !==
-                                                                    null
-                                                                const isSecondDateSet =
-                                                                    selectedDates[1] !==
-                                                                    null
+                                                            const endDate =
+                                                                dayjs(
+                                                                    selectedDates[1]
+                                                                ).format(
+                                                                    'YYYY-MM-DD'
+                                                                )
 
-                                                                // Hanya update jika kedua tanggal sudah dipilih
-                                                                if (
-                                                                    isFirstDateSet &&
-                                                                    isSecondDateSet
-                                                                ) {
-                                                                    // Format tanggal ke string YYYY-MM-DD
-                                                                    const formattedDates =
-                                                                        selectedDates.map(
-                                                                            (
-                                                                                date
-                                                                            ) =>
-                                                                                date
-                                                                                    ? dayjs(
-                                                                                          date
-                                                                                      ).format(
-                                                                                          'YYYY-MM-DD'
-                                                                                      )
-                                                                                    : null
-                                                                        )
-
-                                                                    // Update field value di Formik dengan format yang diinginkan
-                                                                    form.setFieldValue(
-                                                                        `subkontraktor[${index}].waktu_pelaksanaan_kerja`,
-                                                                        formattedDates
-                                                                    )
-
-                                                                    console.log(
-                                                                        'Formatted Dates:',
-                                                                        formattedDates
-                                                                    )
-                                                                }
-                                                            }}
-                                                        />
-                                                    )}
+                                                            // Update both fields separately
+                                                            form.setFieldValue(
+                                                                `subkontraktor[${index}].waktu_mulai_pelaksanaan`,
+                                                                startDate
+                                                            )
+                                                            form.setFieldValue(
+                                                                `subkontraktor[${index}].waktu_selesai_pelaksanaan`,
+                                                                endDate
+                                                            )
+                                                        }
+                                                    }}
                                                 />
                                             </FormItem>
                                         </div>
@@ -368,15 +297,12 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                         <FormItem
                                             className="mb-0"
                                             label="Keterangan"
-                                            invalid={Boolean(keteranganError)}
+                                            invalid={
+                                                (subcontractorErrors?.keterangan &&
+                                                    subcontractorTouched?.keterangan) as boolean
+                                            }
                                             errorMessage={
-                                                typeof errors.subkontraktor?.[
-                                                    index
-                                                ]?.keterangan === 'string'
-                                                    ? errors.subkontraktor?.[
-                                                          index
-                                                      ]?.keterangan
-                                                    : ''
+                                                subcontractorErrors?.keterangan
                                             }
                                         >
                                             <Field
@@ -396,10 +322,11 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                 icon={<HiPlus />}
                                 onClick={() =>
                                     push({
+                                        id: '',
                                         nomor_surat: '',
-                                        nama_vendor_subkon: '',
-                                        nilai_subkon: '',
-                                        waktu_pelaksanaan_kerja: [null, null],
+                                        nilai_subkontrak: '',
+                                        waktu_mulai_pelaksanaan: '',
+                                        waktu_selesai_pelaksanaan: '',
                                         keterangan: '',
                                     })
                                 }

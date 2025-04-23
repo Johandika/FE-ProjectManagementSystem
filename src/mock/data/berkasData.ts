@@ -1,18 +1,18 @@
 export const berkasesData = [
     {
-        id: '1',
+        id: 'berkas-b2c3d4e5-f6a7-8901-bcde-f12345670000',
         nama: 'KTP',
     },
     {
-        id: '2',
+        id: 'berkas-b2c3d4e5-f6a7-8901-bcde-f12345670987',
         nama: 'SIM',
     },
     {
-        id: '3',
+        id: 'berkas-b2c3d4e5-f6a7-8901-bcde-f12345677876',
         nama: 'STNK',
     },
     {
-        id: '4',
+        id: 'berkas-b2c3d4e5-f6a7-8901-bcde-f12345675361',
         nama: 'Kartu Keluarga',
     },
 ]

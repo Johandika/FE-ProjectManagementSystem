@@ -18,6 +18,7 @@ import type {
     OnSortParam,
     ColumnDef,
 } from '@/components/shared/DataTable'
+import { formatDate } from '@/utils/formatDate'
 
 type PurchaseOrder = {
     id: string
@@ -153,15 +154,11 @@ const PurchaseOrderTable = () => {
                 accessorKey: 'tanggal_po', // Changed from 'tanggal'
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.tanggal_po}</span>
-                },
-            },
-            {
-                header: 'Status',
-                accessorKey: 'status',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.status}</span>
+                    return (
+                        <span className="capitalize">
+                            {formatDate(row.tanggal_po)}
+                        </span>
+                    )
                 },
             },
 

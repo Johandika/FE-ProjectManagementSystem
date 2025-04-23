@@ -34,19 +34,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     component={Input}
                 />
             </FormItem>
-            {/* <FormItem
-                label="Keterangan"
-                labelClass="!justify-start"
-                invalid={(errors.keterangan && touched.keterangan) as boolean}
-                errorMessage={errors.keterangan}
-            >
-                <Field
-                    textArea
-                    name="keterangan"
-                    placeholder="Masukkan keterangan"
-                    component={Input}
-                />
-            </FormItem> */}
         </AdaptableCard>
     )
 }

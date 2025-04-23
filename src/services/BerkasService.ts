@@ -5,8 +5,8 @@ export async function apiGetBerkases<T, U extends Record<string, unknown>>(
     data: U
 ) {
     return ApiService.fetchData<T>({
-        url: '/master/berkases',
-        method: 'post',
+        url: '/berkas',
+        method: 'get',
         data,
     })
 }
@@ -15,22 +15,32 @@ export async function apiGetBerkases<T, U extends Record<string, unknown>>(
 export async function apiDeleteBerkases<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    return ApiService.fetchData<T>({
-        url: '/master/berkases/delete',
-        method: 'delete',
-        data,
-    })
+    if (Array.isArray(data.id)) {
+        // jika ada penghapusan multiple
+        return ApiService.fetchData<T>({
+            url: '/berkas',
+            method: 'delete',
+            data,
+        })
+    } else {
+        // Untuk id tunggal
+        return ApiService.fetchData<T>({
+            url: `/berkas/softDeleted/${data.id}`,
+            method: 'delete',
+        })
+    }
 }
 
 // get by id
 export async function apiGetBerkas<T, U extends Record<string, unknown>>(
     params: U
 ) {
-    return ApiService.fetchData<T>({
-        url: '/master/berkas',
+    const res = await ApiService.fetchData<T>({
+        url: `/berkas/${params.id}`,
         method: 'get',
         params,
     })
+    return res.data
 }
 
 // edit
@@ -38,8 +48,8 @@ export async function apiPutBerkas<T, U extends Record<string, unknown>>(
     data: U
 ) {
     return ApiService.fetchData<T>({
-        url: '/master/berkases/update',
-        method: 'put',
+        url: `/berkas/${data.id}`,
+        method: 'patch',
         data,
     })
 }
@@ -49,7 +59,7 @@ export async function apiCreateBerkas<T, U extends Record<string, unknown>>(
     data: U
 ) {
     return ApiService.fetchData<T>({
-        url: '/master/berkases/create',
+        url: '/berkas',
         method: 'post',
         data,
     })

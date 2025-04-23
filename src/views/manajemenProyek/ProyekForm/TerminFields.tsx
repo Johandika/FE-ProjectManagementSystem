@@ -1,3 +1,4 @@
+// export default TerminFields
 import { Field, FieldArray, useFormikContext } from 'formik'
 import { FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
@@ -6,7 +7,7 @@ import { HiMinus, HiPlus } from 'react-icons/hi'
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import { NumericFormat } from 'react-number-format'
 import type { FormikErrors, FormikTouched, FieldProps } from 'formik'
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 
 interface Termin {
     keterangan: string
@@ -20,11 +21,31 @@ type TerminFieldsProps = {
     errors: FormikErrors<{
         termin: Termin[]
     }>
+    terminsList?: {
+        id: string
+        persen: number
+        tanggal: string
+        status: string
+        idProject: string
+        idFakturPajak: string
+        keterangan: string
+    }[]
 }
 
 const TerminFields = (props: TerminFieldsProps) => {
-    const { touched, errors } = props
-    const { values } = useFormikContext<{ termin: Termin[] }>()
+    const { touched, errors, terminsList = [] } = props
+    const { values, setFieldValue } = useFormikContext<{ termin: Termin[] }>()
+
+    // Mengisi formik values dengan data dari terminsList saat komponen dimount
+    useEffect(() => {
+        if (terminsList && terminsList.length > 0) {
+            const formattedTermin = terminsList.map((item) => ({
+                keterangan: item.keterangan,
+                persen: item.persen,
+            }))
+            setFieldValue('termin', formattedTermin)
+        }
+    }, [terminsList, setFieldValue])
 
     // Menghitung total persentase secara langsung saat render menggunakan useMemo
     const totalPersen = useMemo(() => {
@@ -140,16 +161,17 @@ const TerminFields = (props: TerminFieldsProps) => {
                                                     )}
                                                 </Field>
                                             </FormItem>
+
                                             <div className="flex items-center h-10">
                                                 <Button
-                                                    type="button" // Mencegah submit form
+                                                    type="button"
                                                     shape="circle"
                                                     variant="plain"
                                                     size="sm"
                                                     icon={<HiMinus />}
                                                     onClick={(e) => {
-                                                        e.preventDefault() // Mencegah event default
-                                                        e.stopPropagation() // Mencegah event bubbling
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
                                                         remove(index)
                                                     }}
                                                 />

@@ -39,30 +39,6 @@ const PurchaseOrderEdit = () => {
         dispatch(getPurchaseOrder(data))
     }
 
-    const handleFormSubmit = async (
-        values: FormModel,
-        setSubmitting: SetSubmitting
-    ) => {
-        setSubmitting(true)
-        const success = await updatePurchaseOrder(values)
-        setSubmitting(false)
-        if (success) {
-            popNotification('updated')
-        }
-    }
-
-    const handleDiscard = () => {
-        navigate('/purchase-order')
-    }
-
-    const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
-        setDialogOpen(false)
-        const success = await deletePurchaseOrder({ id: purchaseOrderData.id })
-        if (success) {
-            popNotification('deleted')
-        }
-    }
-
     const popNotification = (keyword: string) => {
         toast.push(
             <Notification
@@ -77,6 +53,64 @@ const PurchaseOrderEdit = () => {
             }
         )
         navigate('/purchase-order')
+    }
+
+    const handleFormSubmit = async (
+        values: FormModel,
+        setSubmitting: SetSubmitting
+    ) => {
+        try {
+            setSubmitting(true)
+            const result: any = await updatePurchaseOrder(values)
+            if (result.statusCode === 200) {
+                popNotification('updated')
+            } else {
+                // Menampilkan notifikasi error
+                toast.push(
+                    <Notification
+                        title={'Gagal menambahkan'}
+                        type="danger"
+                        duration={3500}
+                    >
+                        {result.message}
+                    </Notification>,
+                    {
+                        placement: 'top-center',
+                    }
+                )
+            }
+        } finally {
+            setSubmitting(false)
+        }
+    }
+
+    const handleDiscard = () => {
+        navigate('/purchase-order')
+    }
+
+    const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
+        setDialogOpen(false)
+        const result: any = await deletePurchaseOrder({
+            id: purchaseOrderData.id,
+        })
+
+        if (result.statusCode === 200) {
+            popNotification('deleted')
+        } else {
+            // Menampilkan notifikasi error
+            toast.push(
+                <Notification
+                    title={'Gagal menghapus'}
+                    type="danger"
+                    duration={3500}
+                >
+                    {result.message}
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
+        }
     }
 
     useEffect(() => {

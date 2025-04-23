@@ -46,6 +46,16 @@ export const protectedRoutes = [
             header: 'Tambah Proyek',
         },
     },
+    // edit detail menus
+    // {
+    //     key: 'apps.manajemenProyek',
+    //     path: '/manajemen-proyek-edit/:proyekId',
+    //     component: lazy(() => import('@/views/manajemenProyek/ProyekEdit')),
+    //     authority: [],
+    //     meta: {
+    //         header: 'Ubah Proyek',
+    //     },
+    // },
     // Purchase Order
     {
         key: 'apps.purchaseOrder',

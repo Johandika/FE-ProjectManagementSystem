@@ -1,17 +1,19 @@
-import {
+import reducer, {
     useAppDispatch,
     getProyek,
     useAppSelector,
+    getTermins,
 } from '../../ProyekEdit/store'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import DescriptionSection from './DesriptionSection'
 import { IoLocationSharp } from 'react-icons/io5'
 import { BiHardHat } from 'react-icons/bi'
-import dayjs from 'dayjs'
-import { Tag } from '@/components/ui'
 import isLastChild from '@/utils/isLastChild'
 import classNames from 'classnames'
+import { injectReducer } from '@/store'
+
+injectReducer('proyekEdit', reducer)
 
 export default function Detail() {
     const dispatch = useAppDispatch()
@@ -21,9 +23,13 @@ export default function Detail() {
         (state) => state.proyekEdit.data.proyekData
     )
 
-    console.log('proyekData', proyekData.berkas)
+    const terminsData = useAppSelector(
+        (state) => state.proyekEdit.data.terminsData
+    )
+
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
+        dispatch(getTermins(data))
     }
 
     useEffect(() => {
@@ -63,12 +69,8 @@ export default function Detail() {
                             <div>{proyekData.pic}</div>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Nomor SPK :</div>
-                            <div>{proyekData.nomor_spk}</div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Nomor SPO :</div>
-                            <div>{proyekData.nomor_spo}</div>
+                            <div className="font-semibold">Nomor Kontrak :</div>
+                            <div>{proyekData.nomor_kontrak}</div>
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Tgl. Kontrak :</div>
@@ -106,12 +108,12 @@ export default function Detail() {
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">
-                                Sisa Waktu (hari) :
+                                Waktu Pengerjaan (hari) :
                             </div>
                             <div>{proyekData.sisa_waktu}</div>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Berkas :</div>
+                            <div className="font-semibold">Berkas BAST :</div>
                             <div>
                                 {proyekData.berkas &&
                                     proyekData.berkas.map((berkas, index) => (
@@ -186,7 +188,7 @@ export default function Detail() {
                         desc="Informasi termin pembayaran proyek"
                     />
                     <div className="space-y-2">
-                        {proyekData.termin?.map((termin, index) => (
+                        {terminsData?.map((termin, index) => (
                             <div
                                 key={index}
                                 className="bg-slate-50 rounded-md flex flex-row items-center gap-3 p-6 w-full"

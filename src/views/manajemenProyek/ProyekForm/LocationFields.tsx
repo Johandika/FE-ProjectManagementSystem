@@ -7,7 +7,7 @@ import AdaptableCard from '@/components/shared/AdaptableCard'
 import type { FormikErrors, FormikTouched } from 'formik'
 
 type Location = {
-    nama: string
+    lokasi: string
     latitude: number
     longitude: number
 }
@@ -48,8 +48,8 @@ const LocationFields = (props: LocationFieldsProps) => {
                                 ] as FormikTouched<Location> | undefined
 
                                 const nameError =
-                                    locationErrors?.nama &&
-                                    locationTouched?.nama
+                                    locationErrors?.lokasi &&
+                                    locationTouched?.lokasi
                                 const latitudeError =
                                     locationErrors?.latitude &&
                                     locationTouched?.latitude
@@ -85,16 +85,16 @@ const LocationFields = (props: LocationFieldsProps) => {
                                                 errorMessage={
                                                     typeof errors.lokasi?.[
                                                         index
-                                                    ]?.nama === 'string'
+                                                    ]?.lokasi === 'string'
                                                         ? errors.lokasi?.[index]
-                                                              ?.nama
+                                                              ?.lokasi
                                                         : ''
                                                 }
                                             >
                                                 <Field
                                                     type="text"
                                                     autoComplete="off"
-                                                    name={`lokasi[${index}].nama`}
+                                                    name={`lokasi[${index}].lokasi`}
                                                     placeholder="Nama lokasi"
                                                     component={Input}
                                                 />
@@ -157,9 +157,9 @@ const LocationFields = (props: LocationFieldsProps) => {
                                 icon={<HiPlus />}
                                 onClick={() =>
                                     push({
-                                        name: '',
-                                        latitude: '',
-                                        longitude: '',
+                                        lokasi: '',
+                                        latitude: 0,
+                                        longitude: 0,
                                     })
                                 }
                             >

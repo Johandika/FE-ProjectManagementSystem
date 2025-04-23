@@ -22,13 +22,14 @@ import type {
 } from '@/components/shared/DataTable'
 import { IoLocationSharp } from 'react-icons/io5'
 import { AiFillCreditCard } from 'react-icons/ai'
+import { formatDate } from '@/utils/formatDate'
 
 type Proyek = {
     id: string
     pekerjaan: string
     pic: string
-    klien: string
-    nomor_spk: number
+    client: string
+    nomor_kontrak: number
     tanggal_service_po: string
     tanggal_delivery: string
     tanggal_kontrak: string
@@ -37,12 +38,12 @@ type Proyek = {
     progress: number
     status: string
     idKlien: string
-    subkontraktor?: Array<{
-        keterangan: string
-        nama_vendor_subkon: string
-        nilai_subkon: number
-        nomor_surat: string
-    }>
+    // subkontraktor?: Array<{
+    //     keterangan: string
+    //     nama_vendor_subkon: string
+    //     nilai_subkon: number
+    //     nomor_surat: string
+    // }>
     lokasi?: Array<{
         nama: string
         latitude: number
@@ -163,7 +164,7 @@ const ProyekTable = () => {
                     return (
                         <div className="flex flex-col gap-1">
                             <div className="text-blue-600 text-xs font-semibold capitalize">
-                                {row.klien}
+                                {row.client}
                             </div>
                             <div className="text-base font-medium text-neutral-800 ">
                                 {row.pekerjaan}
@@ -177,17 +178,17 @@ const ProyekTable = () => {
             },
             {
                 header: 'Nomor Kontrak',
-                accessorKey: 'nomor_spk',
+                accessorKey: 'nomor_kontrak',
                 minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
                     return (
                         <div>
                             <div className="capitalize mb-1">
-                                {row.nomor_spk}
+                                {row.nomor_kontrak}
                             </div>
                             <div className="bg-blue-600 text-xs rounded-md px-3 py-[3px] text-center text-white w-fit">
-                                {row.tanggal_kontrak}
+                                {formatDate(row.tanggal_kontrak)}
                             </div>
                         </div>
                     )
@@ -205,7 +206,7 @@ const ProyekTable = () => {
                                 row.lokasi.map((loc, index) => (
                                     <a
                                         key={index}
-                                        href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
+                                        href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="group"
@@ -229,32 +230,32 @@ const ProyekTable = () => {
                     )
                 },
             },
-            {
-                header: 'Subkontraktor',
-                accessorKey: 'subkontraktor',
-                minWidth: 200,
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <div className="flex flex-col gap-1">
-                            {row.subkontraktor &&
-                            row.subkontraktor.length > 0 ? (
-                                row.subkontraktor.map((subkon, index) => (
-                                    <a key={index}>
-                                        <div className="text-sm font-medium flex gap-1 items-center  truncate">
-                                            {subkon.nomor_surat}
-                                        </div>
-                                    </a>
-                                ))
-                            ) : (
-                                <span className="text-gray-400">
-                                    Tidak ada lokasi
-                                </span>
-                            )}
-                        </div>
-                    )
-                },
-            },
+            // {
+            //     header: 'Subkontraktor',
+            //     accessorKey: 'subkontraktor',
+            //     minWidth: 200,
+            //     cell: (props) => {
+            //         const row = props.row.original
+            //         return (
+            //             <div className="flex flex-col gap-1">
+            //                 {row.subkontraktor &&
+            //                 row.subkontraktor.length > 0 ? (
+            //                     row.subkontraktor.map((subkon, index) => (
+            //                         <a key={index}>
+            //                             <div className="text-sm font-medium flex gap-1 items-center  truncate">
+            //                                 {subkon.nomor_surat}
+            //                             </div>
+            //                         </a>
+            //                     ))
+            //                 ) : (
+            //                     <span className="text-gray-400">
+            //                         Tidak ada lokasi
+            //                     </span>
+            //                 )}
+            //             </div>
+            //         )
+            //     },
+            // },
             // {
             //     header: 'Tangggal Delivery',
             //     accessorKey: 'tanggal_delivery',
@@ -318,12 +319,13 @@ const ProyekTable = () => {
             {
                 header: 'Progress',
                 accessorKey: 'progress',
+                minWidth: 150,
                 cell: (props) => {
                     const row = props.row.original
                     const progress = row.progress || 0 // Default to 0 if undefined
 
                     return (
-                        <div className="flex items-center justify-center">
+                        <div className="flex items-center justify-start">
                             <div className="relative w-16 h-16">
                                 {/* Background circle */}
                                 <svg

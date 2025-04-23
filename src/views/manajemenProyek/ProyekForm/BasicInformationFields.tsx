@@ -13,20 +13,15 @@ interface Termin {
 
 type FormFieldsName = {
     pekerjaan: string
-    klien: string
     pic: string
-    nomor_spk: string
-    // nomor_spo: string
+    nomor_kontrak: string
     tanggal_service_po: string
     tanggal_kontrak: string
     tanggal_delivery: string
     nilai_kontrak: number
-    realisasi: number
-    progress: number
-    sisa_waktu: number
+    timeline: number
     keterangan: string
-    status: string
-    idKlien: string
+    idClient: string
     berkas: string[]
     lokasi: string[]
     termin: Termin[]
@@ -39,13 +34,6 @@ type BasicInformationFields = {
     kliensList?: { id: string; nama: string; keterangan: string }[]
     berkasesList?: { id: string; nama: string }[]
 }
-
-const statuses = [
-    { label: 'Dalam Pengerjaan', value: 'Dalam Pengerjaan' },
-    { label: 'Selesai', value: 'Selesai' },
-    { label: 'Tertunda', value: 'Tertunda' },
-    { label: 'Dibatalkan', value: 'Dibatalkan' },
-]
 
 const BasicInformationFields = (props: BasicInformationFields) => {
     const { touched, errors, kliensList = [], berkasesList = [] } = props
@@ -74,12 +62,14 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 <div className="col-span-1">
                     <FormItem
                         label="Klien"
-                        invalid={(errors.idKlien && touched.idKlien) as boolean}
-                        errorMessage={errors.idKlien}
+                        invalid={
+                            (errors.idClient && touched.idClient) as boolean
+                        }
+                        errorMessage={errors.idClient}
                     >
-                        <Field name="idKlien">
+                        <Field name="idClient">
                             {({ field, form }: FieldProps) => {
-                                // Find the selected client based on current idKlien value
+                                // Find the selected client based on current idClient value
                                 const selectedClient = field.value
                                     ? kliensList.find(
                                           (client) => client.id === field.value
@@ -93,7 +83,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                         label: `${client.nama}`,
                                     })
                                 )
-
                                 return (
                                     <Select
                                         field={field}
@@ -113,18 +102,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                                 field.name,
                                                 option?.value
                                             )
-                                            // Also update the klien field with the client name
-                                            if (option) {
-                                                const client = kliensList.find(
-                                                    (c) => c.id === option.value
-                                                )
-                                                if (client) {
-                                                    form.setFieldValue(
-                                                        'klien',
-                                                        client.nama
-                                                    )
-                                                }
-                                            }
                                         }}
                                     />
                                 )
@@ -151,40 +128,22 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 <div className="col-span-1">
                     <FormItem
-                        label="Nomor SPK"
+                        label="Nomor Kontrak"
                         invalid={
-                            (errors.nomor_spk && touched.nomor_spk) as boolean
+                            (errors.nomor_kontrak &&
+                                touched.nomor_kontrak) as boolean
                         }
-                        errorMessage={errors.nomor_spk}
+                        errorMessage={errors.nomor_kontrak}
                     >
                         <Field
                             type="text"
                             autoComplete="off"
-                            name="nomor_spk"
-                            placeholder="Nomor SPK"
+                            name="nomor_kontrak"
+                            placeholder="Nomor Kontrak"
                             component={Input}
                         />
                     </FormItem>
                 </div>
-                {/* <div className="col-span-1">
-                    <FormItem
-                        label="Nomor SPO"
-                        invalid={
-                            (errors.nomor_spo && touched.nomor_spo) as boolean
-                        }
-                        errorMessage={errors.nomor_spo}
-                    >
-                        <Field
-                            type="text"
-                            autoComplete="off"
-                            name="nomor_spo"
-                            placeholder="Nomor SPO"
-                            component={Input}
-                        />
-                    </FormItem>
-                </div> */}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 <div className="col-span-1">
                     <FormItem
                         label="Tanggal Kontrak"
@@ -215,39 +174,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                     }}
                                 />
                             )}
-                        </Field>
-                    </FormItem>
-                </div>
-                <div className="col-span-1">
-                    <FormItem
-                        label="Status"
-                        invalid={(errors.status && touched.status) as boolean}
-                        errorMessage={errors.status}
-                    >
-                        <Field name="status">
-                            {({ field, form }: FieldProps) => {
-                                // Cari status yang sesuai dengan nilai saat ini
-                                const selectedStatus = field.value
-                                    ? statuses.find(
-                                          (s) => s.value === field.value
-                                      )
-                                    : null
-
-                                return (
-                                    <Select
-                                        field={field}
-                                        form={form}
-                                        options={statuses}
-                                        value={selectedStatus}
-                                        onChange={(option) =>
-                                            form.setFieldValue(
-                                                field.name,
-                                                option?.value
-                                            )
-                                        }
-                                    />
-                                )
-                            }}
                         </Field>
                     </FormItem>
                 </div>
@@ -352,71 +278,17 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </div>
                 <div className="col-span-1">
                     <FormItem
-                        label="Uang Muka"
-                        invalid={
-                            (errors.realisasi && touched.realisasi) as boolean
-                        }
-                        errorMessage={errors.realisasi}
-                    >
-                        <Field name="realisasi">
-                            {({ field, form }: FieldProps) => (
-                                <NumericFormat
-                                    {...field}
-                                    customInput={Input}
-                                    placeholder="Realisasi"
-                                    thousandSeparator="."
-                                    decimalSeparator=","
-                                    onValueChange={(values) => {
-                                        form.setFieldValue(
-                                            field.name,
-                                            values.value
-                                        )
-                                    }}
-                                />
-                            )}
-                        </Field>
-                    </FormItem>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
-                <div className="col-span-1">
-                    <FormItem
-                        label="Progress (%)"
-                        invalid={
-                            (errors.progress && touched.progress) as boolean
-                        }
-                        errorMessage={errors.progress}
-                    >
-                        <Field name="progress">
-                            {({ field, form }: FieldProps) => (
-                                <NumericFormat
-                                    {...field}
-                                    customInput={Input}
-                                    placeholder="%"
-                                    suffix="%"
-                                    onValueChange={(values) => {
-                                        form.setFieldValue(
-                                            field.name,
-                                            Number(values.value)
-                                        )
-                                    }}
-                                />
-                            )}
-                        </Field>
-                    </FormItem>
-                </div>
-                <div className="col-span-1">
-                    <FormItem
                         label="Waktu Pengerjaan (hari)"
                         invalid={
-                            (errors.sisa_waktu && touched.sisa_waktu) as boolean
+                            (errors.timeline && touched.timeline) as boolean
                         }
-                        errorMessage={errors.sisa_waktu}
+                        errorMessage={errors.timeline}
                     >
-                        <Field name="sisa_waktu">
+                        <Field name="timeline">
                             {({ field, form }: FieldProps) => (
                                 <NumericFormat
                                     {...field}
+                                    name={field.name}
                                     customInput={Input}
                                     placeholder="Sisa waktu dalam hari"
                                     suffix=" hari"
@@ -443,28 +315,32 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         // Convert berkas array values to options format
                         const selectedOptions = field.value
                             ? berkasesList
-                                  .filter((berkas) =>
-                                      field.value.includes(berkas.nama)
-                                  )
+                                  .filter((berkas) => {
+                                      // Cek jika field.value berisi id atau nama berkas
+                                      return (
+                                          field.value.includes(berkas.id) ||
+                                          field.value.includes(berkas.nama)
+                                      )
+                                  })
                                   .map((berkas) => ({
-                                      value: berkas.nama,
+                                      value: berkas.id,
                                       label: berkas.nama,
                                   }))
                             : []
 
                         // Map berkasesList to options format required by Select
                         const berkasOptions = berkasesList.map((berkas) => ({
-                            value: berkas.nama,
+                            value: berkas.id,
                             label: berkas.nama,
                         }))
 
                         return (
                             <Select
                                 isMulti
+                                value={selectedOptions}
+                                options={berkasOptions}
                                 field={field}
                                 form={form}
-                                options={berkasOptions}
-                                value={selectedOptions}
                                 placeholder="Pilih berkas"
                                 onChange={(options) => {
                                     // Extract just the values (berkas names) for saving to formik

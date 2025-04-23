@@ -5,11 +5,13 @@ export async function apiGetSubkontraktors<
     T,
     U extends Record<string, unknown>
 >(data: U) {
-    return ApiService.fetchData<T>({
-        url: '/master/subkontraktors',
-        method: 'post',
-        data,
+    const res = await ApiService.fetchData<T>({
+        url: '/subkon',
+        method: 'get',
+        params: data, //ubah
     })
+
+    return res
 }
 
 // delete
@@ -17,22 +19,32 @@ export async function apiDeleteSubkontraktors<
     T,
     U extends Record<string, unknown>
 >(data: U) {
-    return ApiService.fetchData<T>({
-        url: '/master/subkontraktors/delete',
-        method: 'delete',
-        data,
-    })
+    if (Array.isArray(data.id)) {
+        // jika ada penghapusan multiple
+        return ApiService.fetchData<T>({
+            url: '/subkon',
+            method: 'delete',
+            data,
+        })
+    } else {
+        // Untuk id tunggal
+        return ApiService.fetchData<T>({
+            url: `/subkon/${data.id}`,
+            method: 'delete',
+        })
+    }
 }
 
 // get by id
 export async function apiGetSubkontraktor<T, U extends Record<string, unknown>>(
     params: U
 ) {
-    return ApiService.fetchData<T>({
-        url: '/master/subkontraktor',
+    const res = await ApiService.fetchData<T>({
+        url: `/subkon/${params.id}`,
         method: 'get',
         params,
     })
+    return res.data
 }
 
 // edit
@@ -40,8 +52,8 @@ export async function apiPutSubkontraktor<T, U extends Record<string, unknown>>(
     data: U
 ) {
     return ApiService.fetchData<T>({
-        url: '/master/subkontraktors/update',
-        method: 'put',
+        url: `/subkon/${data.id}`,
+        method: 'patch',
         data,
     })
 }
@@ -52,7 +64,7 @@ export async function apiCreateSubkontraktor<
     U extends Record<string, unknown>
 >(data: U) {
     return ApiService.fetchData<T>({
-        url: '/master/subkontraktors/create',
+        url: '/subkon',
         method: 'post',
         data,
     })

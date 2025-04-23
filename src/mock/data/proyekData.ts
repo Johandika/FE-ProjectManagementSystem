@@ -4,8 +4,7 @@ export const proyeksData = [
         pekerjaan: 'Pembangunan Gedung Kantor 5 Lantai',
         klien: 'PT Maju Bersama',
         pic: 'Budi Santoso',
-        nomor_spk: 'SPK/2025/001',
-        nomor_spo: 'SPO/2025/001',
+        nomor_kontrak: 'SPK/2025/001',
         tanggal_service_po: '2025-02-15',
         tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2025-08-15',
@@ -31,11 +30,6 @@ export const proyeksData = [
                 longitude: 112.7688,
             },
         ],
-        termin: [
-            { keterangan: 'Termin 1', persen: 30 },
-            { keterangan: 'Termin 2', persen: 40 },
-            { keterangan: 'Termin 3', persen: 30 },
-        ],
         subkontraktor: [
             {
                 nomor_surat: 'SPS/KT/XI/2025/001',
@@ -58,8 +52,7 @@ export const proyeksData = [
         pekerjaan: 'Renovasi Kantor Cabang',
         klien: 'Bank Makmur',
         pic: 'Siti Nuraini',
-        nomor_spk: 'SPK/2025/002',
-        nomor_spo: 'SPO/2025/002',
+        nomor_kontrak: 'SPK/2025/002',
         tanggal_service_po: '2025-03-01',
         tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2025-05-30',
@@ -67,12 +60,12 @@ export const proyeksData = [
         realisasi: 875000000,
         progress: 70,
         sisa_waktu: 45,
+        status: 'Dalam Pengerjaan',
         keterangan:
             'Renovasi kantor cabang di area Kemang. Progress sesuai jadwal dengan beberapa revisi minor.',
-        status: 'Dalam Pengerjaan',
         idUser: 'user-b2c3d4e5-f6a7-8901-bcde-f12345678901',
         idKlien: 'klien-b2c3d4e5-f6a7-8901-bcde-f12345678901',
-        berkas: ['KTP', 'Kartu Keluarga'],
+        berkas: ['KTP', 'Kartu Keluarga', 'SIM', 'STNK'],
         lokasi: [
             {
                 nama: 'GI Pekanbaru',
@@ -84,11 +77,6 @@ export const proyeksData = [
                 latitude: -7.2504,
                 longitude: 112.7688,
             },
-        ],
-        termin: [
-            { keterangan: 'Termin 1', persen: 30 },
-            { keterangan: 'Termin 2', persen: 40 },
-            { keterangan: 'Termin 3', persen: 30 },
         ],
         subkontraktor: [
             {
@@ -112,8 +100,7 @@ export const proyeksData = [
         pekerjaan: 'Pembangunan Jalan Tol Seksi 3',
         klien: 'PT Infrastruktur Negara',
         pic: 'Hendra Wijaya',
-        nomor_spk: 'SPK/2025/003',
-        nomor_spo: 'SPO/2025/003',
+        nomor_kontrak: 'SPK/2025/003',
         tanggal_service_po: '2025-01-10',
         tanggal_kontrak: '2025-10-27',
         tanggal_delivery: '2026-01-10',
@@ -138,11 +125,6 @@ export const proyeksData = [
                 latitude: -7.2504,
                 longitude: 112.7688,
             },
-        ],
-        termin: [
-            { keterangan: 'Termin 1', persen: 30 },
-            { keterangan: 'Termin 2', persen: 40 },
-            { keterangan: 'Termin 3', persen: 30 },
         ],
         subkontraktor: [
             {

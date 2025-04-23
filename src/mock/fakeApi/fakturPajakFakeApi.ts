@@ -48,9 +48,12 @@ export default function berkasFakeApi(server: Server, apiPrefix: string) {
         }
     )
 
+    // get by id
     server.get(`${apiPrefix}/faktur-pajak`, (schema, { queryParams }) => {
         const id = queryParams.id
-        const berkas = schema.db.fakturPajaksData.find(id)
+        const berkas = schema.db.terminsData.where({
+            idFakturPajak: id,
+        })
         return berkas
     })
 
@@ -68,6 +71,16 @@ export default function berkasFakeApi(server: Server, apiPrefix: string) {
         `${apiPrefix}/faktur-pajak/create`,
         (schema, { requestBody }) => {
             const data = JSON.parse(requestBody)
+            // Generate UUID di BE
+            data.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+                /[xy]/g,
+                function (c) {
+                    const r = (Math.random() * 16) | 0,
+                        v = c === 'x' ? r : (r & 0x3) | 0x8
+                    return v.toString(16)
+                }
+            )
+            console.log('data BE', data)
             schema.db.fakturPajaksData.insert(data)
             return true
         }

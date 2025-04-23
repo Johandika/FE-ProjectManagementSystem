@@ -35,30 +35,6 @@ const KlienEdit = () => {
         dispatch(getKlien(data))
     }
 
-    const handleFormSubmit = async (
-        values: FormModel,
-        setSubmitting: SetSubmitting
-    ) => {
-        setSubmitting(true)
-        const success = await updateKlien(values)
-        setSubmitting(false)
-        if (success) {
-            popNotification('updated')
-        }
-    }
-
-    const handleDiscard = () => {
-        navigate('/master/klien')
-    }
-
-    const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
-        setDialogOpen(false)
-        const success = await deleteKlien({ id: klienData.id })
-        if (success) {
-            popNotification('deleted')
-        }
-    }
-
     const popNotification = (keyword: string) => {
         toast.push(
             <Notification
@@ -73,6 +49,63 @@ const KlienEdit = () => {
             }
         )
         navigate('/master/klien')
+    }
+
+    const handleFormSubmit = async (
+        values: FormModel,
+        setSubmitting: SetSubmitting
+    ) => {
+        try {
+            setSubmitting(true)
+            const result = await updateKlien(values)
+
+            if (result.statusCode === 200) {
+                popNotification('updated')
+            } else {
+                // Menampilkan notifikasi error
+                toast.push(
+                    <Notification
+                        title={'Gagal menambahkan'}
+                        type="danger"
+                        duration={3500}
+                    >
+                        {result.message}
+                    </Notification>,
+                    {
+                        placement: 'top-center',
+                    }
+                )
+            }
+        } finally {
+            // Pastikan setSubmitting selalu dipanggil di akhir proses
+            setSubmitting(false)
+        }
+    }
+
+    const handleDiscard = () => {
+        navigate('/master/klien')
+    }
+
+    const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
+        setDialogOpen(false)
+        const result = await deleteKlien({ id: klienData.id })
+        if (result.statusCode === 200) {
+            popNotification('deleted')
+        } else {
+            // Menampilkan notifikasi error
+            toast.push(
+                <Notification
+                    title={'Gagal menghapus'}
+                    type="danger"
+                    duration={3500}
+                >
+                    {result.message}
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
+        }
     }
 
     useEffect(() => {

@@ -1,37 +1,17 @@
-// import { useEffect } from 'react'
-// import { getProyek, useAppDispatch } from '../ProyekEdit/store'
-// import { useLocation } from 'react-router-dom'
 import Tabs from '@/components/ui/Tabs'
 import Detail from './components/Detail'
 import PurchaseOrder from './components/PurchaseOrder'
 import Termin from './components/Termin'
 import Bastp from './components/Bastp'
-import Subkontraktor from './components/Subkontraktor'
 import Adendum from './components/Adendum'
-import { injectReducer } from '@/store'
-import reducer from '../ProyekEdit/store'
+// import { injectReducer } from '@/store'
+// import reducer from '../ProyekEdit/store'
 
 const { TabNav, TabList, TabContent } = Tabs
 
-injectReducer('proyekEdit', reducer)
+// injectReducer('proyekEdit', reducer)
 
 export default function ProyekDetail() {
-    // const dispatch = useAppDispatch()
-    // const location = useLocation()
-
-    // const fetchData = (data: { id: string }) => {
-    //     dispatch(getProyek(data))
-    // }
-
-    // useEffect(() => {
-    //     const path = location.pathname.substring(
-    //         location.pathname.lastIndexOf('/') + 1
-    //     )
-    //     const rquestParam = { id: path }
-    //     fetchData(rquestParam)
-
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [location.pathname])
     return (
         <div>
             <Tabs defaultValue="tab1" variant="pill">

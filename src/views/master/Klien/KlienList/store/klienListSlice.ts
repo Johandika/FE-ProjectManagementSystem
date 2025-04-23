@@ -12,9 +12,16 @@ type Klien = {
 
 type Kliens = Klien[]
 
+// type GetMasterKlienResponse = {
+//     data: Kliens
+//     total: number
+// }
 type GetMasterKlienResponse = {
+    statusCode: number
+    message: string
     data: Kliens
-    total: number
+    totaldataClient: number
+    totalPage: number
 }
 
 type FilterQueries = {
@@ -28,7 +35,7 @@ export type MasterKlienListSlice = {
     loading: boolean
     deleteConfirmation: boolean
     selectedProduct: string
-    tableData: TableQueries
+    tableData: TableQueries & { totalPage?: number }
     filterData: FilterQueries
     productList: Klien[]
 }
@@ -37,6 +44,7 @@ type GetMasterKlienData = TableQueries & { filterData?: FilterQueries }
 
 export const SLICE_NAME = 'klienList'
 
+//get all
 export const getKliens = createAsyncThunk(
     SLICE_NAME + '/getKliens',
     async (data: GetMasterKlienData) => {
@@ -44,10 +52,16 @@ export const getKliens = createAsyncThunk(
             GetMasterKlienResponse,
             GetMasterKlienData
         >(data)
-        return response.data
+        // return response.data
+        return {
+            data: response.data.data,
+            total: response.data.totaldataClient,
+            totalPage: response.data.totalPage,
+        }
     }
 )
 
+// delete
 export const deleteKlien = async (data: { id: string | string[] }) => {
     const response = await apiDeleteKliens<boolean, { id: string | string[] }>(
         data
@@ -105,6 +119,7 @@ const klienListSlice = createSlice({
             .addCase(getKliens.fulfilled, (state, action) => {
                 state.productList = action.payload.data
                 state.tableData.total = action.payload.total
+                state.tableData.totalPage = action.payload.totalPage //TAMBAHAN TOTAL PAGE
                 state.loading = false
             })
             .addCase(getKliens.pending, (state) => {

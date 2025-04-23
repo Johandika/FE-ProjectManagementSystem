@@ -135,22 +135,22 @@ const FakturPajakTable = () => {
                     return <span className="capitalize">{row.tanggal}</span>
                 },
             },
-            {
-                header: 'Status',
-                accessorKey: 'status',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.status}</span>
-                },
-            },
-            {
-                header: 'Keterangan',
-                accessorKey: 'keterangan',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.keterangan}</span>
-                },
-            },
+            // {
+            //     header: 'Status',
+            //     accessorKey: 'status',
+            //     cell: (props) => {
+            //         const row = props.row.original
+            //         return <span className="capitalize">{row.status}</span>
+            //     },
+            // },
+            // {
+            //     header: 'Keterangan',
+            //     accessorKey: 'keterangan',
+            //     cell: (props) => {
+            //         const row = props.row.original
+            //         return <span className="capitalize">{row.keterangan}</span>
+            //     },
+            // },
             {
                 header: '',
                 id: 'action',

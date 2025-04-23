@@ -145,8 +145,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     : 'Sign Up'}
                             </Button>
                             <div className="mt-4 text-center">
-                                <span>Already have an account? </span>
-                                <ActionLink to={signInUrl}>Sign in</ActionLink>
+                                <span>Sudah punya akun? </span>
+                                <ActionLink to={signInUrl}>Masuk</ActionLink>
                             </div>
                         </FormContainer>
                     </Form>

@@ -18,9 +18,9 @@ type InitialData = {
     id?: string
     nomor?: string
     nominal?: number
-    keterangan?: string
+    // keterangan?: string
     tanggal?: string
-    status?: string
+    // status?: string
 }
 
 export type FormModel = Omit<InitialData, 'tags'> & {
@@ -46,9 +46,9 @@ const { useUniqueId } = hooks
 const validationSchema = Yup.object().shape({
     nomor: Yup.string().required('Nomor wajib diisi'),
     nominal: Yup.number().required('Nomor wajib diisi'),
-    keterangan: Yup.string().required('Keterangan wajib diisi'),
+    // keterangan: Yup.string().required('Keterangan wajib diisi'),
     tanggal: Yup.string().required('Tanggal wajib diisi'),
-    status: Yup.string().required('Status wajib diisi'),
+    // status: Yup.string().required('Status wajib diisi'),
 })
 
 const DeleteFakturPajakButton = ({ onDelete }: { onDelete: OnDelete }) => {
@@ -101,9 +101,9 @@ const FakturPajakForm = forwardRef<FormikRef, FakturPajakForm>((props, ref) => {
             id: '',
             nomor: '',
             nominal: 0,
-            keterangan: '',
+            // keterangan: '',
             tanggal: '',
-            status: 'Belum Lunas',
+            // status: 'Belum Lunas',
         },
         onFormSubmit,
         onDiscard,

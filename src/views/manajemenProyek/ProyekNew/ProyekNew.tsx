@@ -52,13 +52,34 @@ const ProyekNew = () => {
             nilai_kontrak: extractNumberFromString(
                 data.nilai_kontrak as string | number
             ),
-            progress: extractNumberFromString(data.progress as string | number),
-            realisasi: extractNumberFromString(
-                data.realisasi as string | number
-            ),
-            sisa_waktu: extractNumberFromString(
-                data.sisa_waktu as string | number
-            ),
+            item: data.item?.map((itemData) => ({
+                ...itemData,
+                detail: itemData.detail.map((detailItem) => ({
+                    ...detailItem,
+                    volume: extractNumberFromString(
+                        detailItem.volume as string | number
+                    ),
+                    harga_satuan_material: extractNumberFromString(
+                        detailItem.harga_satuan_material as string | number
+                    ),
+                    harga_satuan_jasa: extractNumberFromString(
+                        detailItem.harga_satuan_jasa as string | number
+                    ),
+                })),
+            })),
+            timeline: extractNumberFromString(data.timeline as string | number),
+            termin: data.termin?.map((terminItem) => ({
+                ...terminItem,
+                persen: extractNumberFromString(
+                    terminItem.persen as string | number
+                ),
+            })),
+            subkontraktor: data.subkontraktor?.map((subkonItem) => ({
+                ...subkonItem,
+                nilai_subkontrak: extractNumberFromString(
+                    subkonItem.nilai_subkontrak as string | number
+                ),
+            })),
         }
 
         const response = await apiCreateProyek<boolean, FormModel>(
@@ -102,7 +123,7 @@ const ProyekNew = () => {
         dispatch(getSubkontraktors()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
-
+    // Di ProyekNew.tsx
     return (
         <>
             <Loading

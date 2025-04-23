@@ -19,10 +19,12 @@ type Berkas = {
 }
 
 interface Subkontraktor {
+    nama?: string
+    id: string
     nomor_surat: string
-    nama_vendor_subkon: string
-    nilai_subkon: number
-    waktu_pelaksanaan_kerja: string[]
+    nilai_subkontrak: number
+    waktu_mulai_pelaksanaan: string
+    waktu_selesai_pelaksanaan: string
     keterangan: string
 }
 

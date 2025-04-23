@@ -154,6 +154,7 @@ const KlienTable = () => {
                     total: tableData.total as number,
                     pageIndex: tableData.pageIndex as number,
                     pageSize: tableData.pageSize as number,
+                    totalPage: tableData.totalPage as number, // Tambahkan jika diperlukan
                 }}
                 onPaginationChange={onPaginationChange}
                 onSelectChange={onSelectChange}

@@ -8,6 +8,8 @@ import {
     apiGetSubkontraktors,
 } from '@/services/ProyekService'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
+import { apiGetTermin } from '@/services/TerminService'
+import { apiGetFakturPajak } from '@/services/FakturPajakService'
 
 export const SLICE_NAME = 'proyekEdit'
 
@@ -35,8 +37,7 @@ interface ProyekData {
     pekerjaan?: string
     klien?: string
     pic?: string
-    nomor_spk?: string
-    nomor_spo?: string
+    nomor_kontrak?: string
     tanggal_service_po?: string
     tanggal_delivery?: string
     tanggal_kontrak?: string
@@ -54,6 +55,14 @@ interface ProyekData {
     subkontraktor?: Subkontraktor[]
 }
 
+// interface BerkasProyekData {
+//     id?: string
+//     nama?: string
+//     idProject?: string
+//     idBerkas?: string
+//     status?: boolean
+// }
+
 type Klien = {
     id: string
     nama: string
@@ -64,10 +73,27 @@ type Berkas = {
     nama: string
 }
 
+interface Termin {
+    id?: string
+    nama?: string
+    idProject: string
+    idFakturPajak?: string
+    status?: boolean
+}
+
+type FakturPajak = {
+    id?: string
+    nomor?: string
+    nominal?: number
+    tanggal?: string
+}
+
 type GetProyekResponse = ProyekData
 type Kliens = Klien[]
 type Berkases = Berkas[]
 type Subkontraktors = Subkontraktor[]
+type Termins = Termin[]
+// type GetBerkasProyekResponse = BerkasProyekData[]
 
 type GetKliensResponse = {
     data: Kliens
@@ -89,12 +115,17 @@ export type MasterProyekEditState = {
     loadingKliens: boolean
     loadingBerkases: boolean
     loadingSubkontraktors: boolean
+    loadingTermins: boolean
+    loadingFakturPajak: boolean
     proyekData: ProyekData
     kliensData?: GetKliensResponse
     berkasesData?: GetBerkasesResponse
     subkontraktorsData?: GetSubkontraktorsResponse
+    terminsData?: Termins
+    fakturPajakData?: FakturPajak[]
 }
 
+// get proyeks
 export const getProyek = createAsyncThunk(
     SLICE_NAME + '/getProyeks',
     async (data: { id: string }) => {
@@ -123,11 +154,33 @@ export const getBerkases = createAsyncThunk(
     }
 )
 
-//berkases get
+//subkontraktors get
 export const getSubkontraktors = createAsyncThunk(
     SLICE_NAME + '/getSubkontraktors',
     async () => {
         const response = await apiGetSubkontraktors<GetSubkontraktorsResponse>()
+        return response.data
+    }
+)
+
+// get termin by id
+export const getTermins = createAsyncThunk(
+    SLICE_NAME + '/getTermins',
+    async (data: { id: string }) => {
+        const response = await apiGetTermin<Termin, { id: string }>(data)
+
+        return response.data
+    }
+)
+
+// get by id
+export const getFakturPajak = createAsyncThunk(
+    SLICE_NAME + '/getFakturPajak',
+    async (data: { id: string }) => {
+        const response = await apiGetFakturPajak<FakturPajak, { id: string }>(
+            data
+        )
+        console.log('id', data)
         return response.data
     }
 )
@@ -145,6 +198,17 @@ export const updateProyek = async <T, U extends Record<string, unknown>>(
         progress: extractNumberFromString(data.progress as string | number),
         realisasi: extractNumberFromString(data.realisasi as string | number),
         sisa_waktu: extractNumberFromString(data.sisa_waktu as string | number),
+        termin: Array.isArray(data.termin)
+            ? (
+                  data.termin as Array<{
+                      keterangan: string
+                      persen: string | number
+                  }>
+              ).map((item) => ({
+                  keterangan: item.keterangan,
+                  persen: extractNumberFromString(item.persen),
+              }))
+            : data.termin,
     }
 
     const response = await apiPutProyek<T, U>(processedData)
@@ -163,7 +227,13 @@ const initialState: MasterProyekEditState = {
     loadingKliens: true,
     loadingBerkases: true,
     loadingSubkontraktors: true,
+    loadingTermins: true,
+    loadingFakturPajak: true,
+    terminsData: [],
+    // loadingBerkasProyeks: true,
+    // berkasProyekData: [],
     proyekData: {},
+    fakturPajakData: [],
 }
 
 const proyekEditSlice = createSlice({
@@ -178,6 +248,20 @@ const proyekEditSlice = createSlice({
             })
             .addCase(getProyek.pending, (state) => {
                 state.loading = true
+            })
+            .addCase(getTermins.fulfilled, (state, action) => {
+                state.terminsData = action.payload
+                state.loadingTermins = false
+            })
+            .addCase(getTermins.pending, (state) => {
+                state.loadingTermins = true
+            })
+            .addCase(getFakturPajak.fulfilled, (state, action) => {
+                state.fakturPajakData = action.payload
+                state.loadingFakturPajak = false
+            })
+            .addCase(getFakturPajak.pending, (state) => {
+                state.loadingFakturPajak = true
             })
             .addCase(getKliens.fulfilled, (state, action) => {
                 state.kliensData = action.payload

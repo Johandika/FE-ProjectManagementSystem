@@ -1,7 +1,6 @@
 import { forwardRef, useState } from 'react'
 import { FormContainer } from '@/components/ui/Form'
 import Button from '@/components/ui/Button'
-import hooks from '@/components/ui/hooks'
 import StickyFooter from '@/components/shared/StickyFooter'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { Form, Formik, FormikProps } from 'formik'
@@ -13,31 +12,49 @@ import * as Yup from 'yup'
 import LocationFields from './LocationFields'
 import TerminFields from './TerminFields'
 import SubkontraktorFields from './SubkontraktorFields'
+import ItemFields from './ItemFields'
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type FormikRef = FormikProps<any>
 
 type InitialData = {
-    id?: string
     pekerjaan?: string
     klien?: string
-    idKlien?: string
+    idClient?: string
     pic?: string
-    nomor_spk?: string
-    nomor_spo?: string
+    nomor_kontrak?: string
     tanggal_service_po?: string
     tanggal_kontrak?: string
     tanggal_delivery?: string
     nilai_kontrak?: number
-    realisasi?: number
-    progress?: number
-    sisa_waktu?: number
+    timeline?: number
     keterangan?: string
-    status?: string
     idUser?: string
     berkas?: string[]
-    lokasi?: { nama: string; longitude: number; latitude: number }[]
+    lokasi?: { lokasi: string; longitude: number; latitude: number }[]
     termin?: { keterangan: string; persen: number }[]
+    item?: {
+        item: string
+        detail: {
+            uraian: string
+            satuan: string
+            volume: number
+            harga_satuan_material: number
+            harga_satuan_jasa: number
+            jumlah_harga_material: number
+            jumlah_harga_jasa: number
+            jumlah: number
+        }[]
+    }[]
+    subkontraktor?: {
+        nama: string
+        nilai_subkontrak: number
+        nomor_surat: string
+        id: string
+        waktu_mulai_pelaksanaan: string
+        waktu_selesai_pelaksanaan: string
+        keterangan: string
+    }[]
 }
 
 export type FormModel = InitialData
@@ -57,19 +74,28 @@ type ProyekForm = {
     kliensList?: { id: string; nama: string; keterangan: string }[]
     berkasesList?: { id: string; nama: string }[]
     subkontraktorsList?: {
+        nama: string
+        nilai_subkontrak: number
         nomor_surat: string
-        nama_vendor_subkon: string
-        nilai_subkon: number
-        waktu_pelaksanaan_kerja: string[]
+        id: string
+        waktu_mulai_pelaksanaan: string
+        waktu_selesai_pelaksanaan: string
+        keterangan: string
+    }[]
+    terminsList?: {
+        id: string
+        persen: number
+        tanggal: string
+        status: string
+        idProject: string
+        idFakturPajak: string
         keterangan: string
     }[]
 }
 
-const { useUniqueId } = hooks
-
 const validationSchema = Yup.object().shape({
     pekerjaan: Yup.string().required('Pekerjaan wajib diisi'),
-    idKlien: Yup.string().required('Klien wajib diisi'),
+    idClient: Yup.string().required('Klien wajib diisi'),
     pic: Yup.string().required('PIC wajib diisi'),
 })
 
@@ -120,22 +146,17 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
     const {
         type,
         initialData = {
-            id: '',
             pekerjaan: '',
             klien: '',
-            idKlien: '',
+            idClient: '',
             pic: '',
-            nomor_spk: '',
-            nomor_spo: '',
+            nomor_kontrak: '',
             tanggal_service_po: '',
             tanggal_kontrak: '',
             tanggal_delivery: '',
             nilai_kontrak: 0,
-            realisasi: 0,
-            progress: 0,
-            sisa_waktu: 0,
+            timeline: 0,
             keterangan: '',
-            status: 'Dalam Pengerjaan',
             berkas: [],
             lokasi: [],
             termin: [],
@@ -146,9 +167,8 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
         kliensList = [],
         berkasesList = [],
         subkontraktorsList = [],
+        terminsList = [],
     } = props
-
-    const newId = useUniqueId('proyek-')
 
     return (
         <>
@@ -160,13 +180,10 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                 validationSchema={validationSchema}
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
-                    if (type === 'new') {
-                        formData.id = newId
-                    }
 
                     // Ensure client name is updated from the selected client ID
                     const selectedKlien = kliensList.find(
-                        (client) => client.id === formData.idKlien
+                        (client) => client.id === formData.idClient
                     )
                     if (selectedKlien) {
                         formData.klien = selectedKlien.nama
@@ -198,13 +215,29 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                     <TerminFields
                                         touched={touched}
                                         errors={errors}
+                                        terminsList={terminsList}
                                     />
 
-                                    {/* Payment Terms Fields */}
+                                    {/* Subkon Terms Fields */}
                                     <SubkontraktorFields
                                         touched={touched}
                                         errors={errors}
-                                        subkontraktorsList={subkontraktorsList}
+                                        subkontraktorsList={
+                                            subkontraktorsList.length > 0
+                                                ? subkontraktorsList
+                                                : []
+                                        }
+                                    />
+
+                                    {/* Items Fields */}
+                                    <ItemFields
+                                        touched={touched}
+                                        errors={errors}
+                                        subkontraktorsList={
+                                            subkontraktorsList.length > 0
+                                                ? subkontraktorsList
+                                                : []
+                                        }
                                     />
                                 </div>
                             </div>

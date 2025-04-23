@@ -4,8 +4,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
 import {
     apiDeleteProyeks,
-    apiGetProyeks,
     apiGetKliens,
+    apiGetProyeks,
 } from '@/services/ProyekService'
 
 type Proyek = {
@@ -13,8 +13,7 @@ type Proyek = {
     pekerjaan: string
     pic: string
     idKlien: string
-    nomor_spk: string
-    nomor_spo: string
+    nomor_kontrak: string
     tanggal_service_po: string
     tanggal_delivery: string
     nilai_kontrak: number
@@ -43,9 +42,16 @@ type GetMasterProyekResponse = {
     total: number
 }
 
-type GetKliensResponse = {
+// type GetKliensResponse = {
+//     data: Kliens
+//     total: number
+// }
+type GetMasterKlienResponse = {
+    statusCode: number
+    message: string
     data: Kliens
-    total: number
+    totaldataClient: number
+    totalPage: number
 }
 
 type FilterQueries = {
@@ -66,6 +72,7 @@ export type ProyekListSlice = {
     kliensList: Klien[]
 }
 
+type GetMasterKlienData = TableQueries & { filterData?: FilterQueries }
 type GetMasterProyekData = TableQueries & { filterData?: FilterQueries }
 
 export const SLICE_NAME = 'proyekList'
@@ -83,9 +90,17 @@ export const getProyeks = createAsyncThunk(
 
 export const getKliens = createAsyncThunk(
     SLICE_NAME + '/getKliens',
-    async () => {
-        const response = await apiGetKliens<GetKliensResponse>()
-        return response.data
+    async (data: GetMasterKlienData) => {
+        const response = await apiGetKliens<
+            GetMasterKlienResponse,
+            GetMasterKlienData
+        >(data)
+        // return response.data
+        return {
+            data: response.data.data,
+            total: response.data.totaldataClient,
+            totalPage: response.data.totalPage,
+        }
     }
 )
 
