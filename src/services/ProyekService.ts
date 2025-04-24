@@ -86,8 +86,8 @@ export async function apiPutProyek<T, U extends Record<string, unknown>>(
     data: U
 ) {
     return ApiService.fetchData<T>({
-        url: '/manajemen-proyek/update',
-        method: 'put',
+        url: `/project/${data.id}`,
+        method: 'patch',
         data,
     })
 }

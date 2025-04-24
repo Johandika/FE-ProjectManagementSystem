@@ -58,6 +58,20 @@ type InitialData = {
     }[]
 }
 
+type InitialDataEdit = {
+    pekerjaan?: string
+    pic?: string
+    nomor_kontrak?: string
+    tanggal_service_po?: string
+    tanggal_kontrak?: string
+    tanggal_delivery?: string
+    uang_muka?: number
+    nilai_kontrak?: number
+    idClient?: string
+    timeline?: number
+    keterangan?: string
+}
+
 export type FormModel = InitialData
 
 export type SetSubmitting = (isSubmitting: boolean) => void
@@ -68,6 +82,7 @@ type OnDelete = (callback: OnDeleteCallback) => void
 
 type ProyekForm = {
     initialData?: InitialData
+    initialDataEdit?: InitialDataEdit
     type: 'edit' | 'new'
     onDiscard?: () => void
     onDelete?: OnDelete
@@ -164,6 +179,19 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             termin: [],
             subkontraktor: [],
         },
+        initialDataEdit = {
+            pekerjaan: '',
+            pic: '',
+            nomor_kontrak: '',
+            tanggal_service_po: '',
+            uang_muka: 0,
+            tanggal_kontrak: '',
+            tanggal_delivery: '',
+            nilai_kontrak: 0,
+            timeline: 0,
+            keterangan: '',
+            idClient: '',
+        },
         onFormSubmit,
         onDiscard,
         onDelete,
@@ -173,13 +201,18 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
         terminsList = [],
     } = props
 
+    console.log('initialDataEdit', initialDataEdit)
     return (
         <>
             <Formik
                 innerRef={ref}
-                initialValues={{
-                    ...initialData,
-                }}
+                initialValues={
+                    type === 'new'
+                        ? {
+                              ...initialData,
+                          }
+                        : { ...initialDataEdit }
+                }
                 validationSchema={validationSchema}
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
@@ -195,45 +228,46 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div className="lg:col-span-2">
                                     <BasicInformationFields
+                                        type={type}
                                         touched={touched}
                                         errors={errors}
                                         kliensList={kliensList}
                                         berkasesList={berkasesList}
                                     />
-                                    {/* Location Fields */}
-                                    <LocationFields
-                                        touched={touched}
-                                        errors={errors}
-                                    />
 
-                                    {/* Payment Terms Fields */}
-                                    <TerminFields
-                                        touched={touched}
-                                        errors={errors}
-                                        terminsList={terminsList}
-                                    />
-
-                                    {/* Subkon Terms Fields */}
-                                    <SubkontraktorFields
-                                        touched={touched}
-                                        errors={errors}
-                                        subkontraktorsList={
-                                            subkontraktorsList.length > 0
-                                                ? subkontraktorsList
-                                                : []
-                                        }
-                                    />
-
-                                    {/* Items Fields */}
-                                    <ItemFields
-                                        touched={touched}
-                                        errors={errors}
-                                        subkontraktorsList={
-                                            subkontraktorsList.length > 0
-                                                ? subkontraktorsList
-                                                : []
-                                        }
-                                    />
+                                    {type === 'new' && (
+                                        <>
+                                            <LocationFields
+                                                touched={touched}
+                                                errors={errors}
+                                            />
+                                            <TerminFields
+                                                touched={touched}
+                                                errors={errors}
+                                                terminsList={terminsList}
+                                            />
+                                            <SubkontraktorFields
+                                                touched={touched}
+                                                errors={errors}
+                                                subkontraktorsList={
+                                                    subkontraktorsList.length >
+                                                    0
+                                                        ? subkontraktorsList
+                                                        : []
+                                                }
+                                            />
+                                            <ItemFields
+                                                touched={touched}
+                                                errors={errors}
+                                                subkontraktorsList={
+                                                    subkontraktorsList.length >
+                                                    0
+                                                        ? subkontraktorsList
+                                                        : []
+                                                }
+                                            />
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <StickyFooter
@@ -241,7 +275,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                 stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                             >
                                 <div>
-                                    {type === 'edit' && (
+                                    {type === 'new' && (
                                         <DeleteProyekButton
                                             onDelete={onDelete as OnDelete}
                                         />

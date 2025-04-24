@@ -54,6 +54,7 @@ type FormFieldsName = {
 }
 
 type BasicInformationFields = {
+    type: 'edit' | 'new'
     touched: FormikTouched<FormFieldsName>
     errors: FormikErrors<FormFieldsName>
     values?: FormFieldsName
@@ -62,7 +63,7 @@ type BasicInformationFields = {
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const { touched, errors, kliensList = [], berkasesList = [] } = props
+    const { type, touched, errors, kliensList = [], berkasesList = [] } = props
     return (
         <AdaptableCard divider className="mb-4">
             <h5>Informasi Dasar</h5>
@@ -356,67 +357,90 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     </FormItem>
                 </div>
                 <div className="col-span-1">
-                    <FormItem
-                        label="Berkas BASTP"
-                        invalid={(errors.berkas && touched.berkas) as boolean}
-                        errorMessage={errors.berkas}
-                    >
-                        <Field name="berkas">
-                            {({ field, form }: FieldProps) => {
-                                // Convert berkas array values to options format
-                                const selectedOptions = field.value
-                                    ? berkasesList
-                                          .filter((berkas) => {
-                                              // Cek jika field.value berisi id atau nama berkas
-                                              return (
-                                                  field.value.includes(
-                                                      berkas.id
-                                                  ) ||
-                                                  field.value.includes(
-                                                      berkas.nama
-                                                  )
-                                              )
-                                          })
-                                          .map((berkas) => ({
-                                              value: berkas.id,
-                                              label: berkas.nama,
-                                          }))
-                                    : []
+                    {type === 'new' && (
+                        <FormItem
+                            label="Berkas BASTP"
+                            invalid={
+                                (errors.berkas && touched.berkas) as boolean
+                            }
+                            errorMessage={errors.berkas}
+                        >
+                            <Field name="berkas">
+                                {({ field, form }: FieldProps) => {
+                                    // Convert berkas array values to options format
+                                    const selectedOptions = field.value
+                                        ? berkasesList
+                                              .filter((berkas) => {
+                                                  // Cek jika field.value adalah array ID atau array objek
+                                                  if (
+                                                      Array.isArray(field.value)
+                                                  ) {
+                                                      if (
+                                                          typeof field
+                                                              .value[0] ===
+                                                          'string'
+                                                      ) {
+                                                          // Handle berkas sebagai array ID
+                                                          return (
+                                                              field.value.includes(
+                                                                  berkas.id
+                                                              ) ||
+                                                              field.value.includes(
+                                                                  berkas.nama
+                                                              )
+                                                          )
+                                                      } else {
+                                                          // Handle BerkasProjects sebagai array objek
+                                                          return field.value.some(
+                                                              (item: any) =>
+                                                                  item.id ===
+                                                                  berkas.id
+                                                          )
+                                                      }
+                                                  }
+                                                  return false
+                                              })
+                                              .map((berkas) => ({
+                                                  value: berkas.id,
+                                                  label: berkas.nama,
+                                              }))
+                                        : []
 
-                                // Map berkasesList to options format required by Select
-                                const berkasOptions = berkasesList.map(
-                                    (berkas) => ({
-                                        value: berkas.id,
-                                        label: berkas.nama,
-                                    })
-                                )
+                                    // Map berkasesList to options format required by Select
+                                    const berkasOptions = berkasesList.map(
+                                        (berkas) => ({
+                                            value: berkas.id,
+                                            label: berkas.nama,
+                                        })
+                                    )
 
-                                return (
-                                    <Select
-                                        isMulti
-                                        value={selectedOptions}
-                                        options={berkasOptions}
-                                        field={field}
-                                        form={form}
-                                        placeholder="Pilih berkas"
-                                        onChange={(options) => {
-                                            // Extract just the values (berkas names) for saving to formik
-                                            const selectedValues = options
-                                                ? options.map(
-                                                      (option: any) =>
-                                                          option.value
-                                                  )
-                                                : []
-                                            form.setFieldValue(
-                                                field.name,
-                                                selectedValues
-                                            )
-                                        }}
-                                    />
-                                )
-                            }}
-                        </Field>
-                    </FormItem>
+                                    return (
+                                        <Select
+                                            isMulti
+                                            value={selectedOptions}
+                                            options={berkasOptions}
+                                            field={field}
+                                            form={form}
+                                            placeholder="Pilih berkas"
+                                            onChange={(options) => {
+                                                // Extract just the values (berkas names) for saving to formik
+                                                const selectedValues = options
+                                                    ? options.map(
+                                                          (option: any) =>
+                                                              option.value
+                                                      )
+                                                    : []
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    selectedValues
+                                                )
+                                            }}
+                                        />
+                                    )
+                                }}
+                            </Field>
+                        </FormItem>
+                    )}
                 </div>
             </div>
 

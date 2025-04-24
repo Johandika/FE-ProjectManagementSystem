@@ -45,7 +45,9 @@ interface ProyekData {
     realisasi?: number
     progress?: number
     sisa_waktu?: number
+    uang_muka?: number
     keterangan?: string
+    timeline?: number
     status?: string
     idUser?: string
     idClient?: string

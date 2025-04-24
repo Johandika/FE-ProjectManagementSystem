@@ -117,8 +117,6 @@ const ProyekEdit = () => {
         navigate('/manajemen-proyek')
     }
 
-    console.log(proyekData, 'proyekData')
-
     useEffect(() => {
         const path = location.pathname.substring(
             location.pathname.lastIndexOf('/') + 1
@@ -132,6 +130,24 @@ const ProyekEdit = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
+    // Mempersiapkan objek proyekDataEdit yang hanya berisi properti yang diinginkan
+    const proyekDataEdit = !isEmpty(proyekData)
+        ? {
+              id: proyekData.id, // tetap perlu id untuk update
+              pekerjaan: proyekData.pekerjaan,
+              pic: proyekData.pic,
+              nomor_kontrak: proyekData.nomor_kontrak,
+              tanggal_service_po: proyekData.tanggal_service_po,
+              uang_muka: proyekData.uang_muka,
+              tanggal_kontrak: proyekData.tanggal_kontrak,
+              tanggal_delivery: proyekData.tanggal_delivery,
+              nilai_kontrak: proyekData.nilai_kontrak,
+              timeline: proyekData.timeline,
+              keterangan: proyekData.keterangan,
+              idClient: proyekData.idClient,
+          }
+        : {}
+    console.log('proyekDataEdit', proyekDataEdit)
     return (
         <>
             <Loading
@@ -148,6 +164,7 @@ const ProyekEdit = () => {
                         <ProyekForm
                             type="edit"
                             initialData={proyekData}
+                            initialDataEdit={proyekDataEdit}
                             kliensList={kliensData}
                             berkasesList={berkasesData}
                             subkontraktorsList={subkontraktorsData}
