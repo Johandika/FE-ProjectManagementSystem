@@ -19,7 +19,7 @@ interface Termin {
 }
 
 interface Lokasi {
-    nama: string
+    lokasi: string
     longitude: number
     latitude: number
 }
@@ -48,10 +48,10 @@ interface ProyekData {
     keterangan?: string
     status?: string
     idUser?: string
-    idKlien?: string
+    idClient?: string
     berkas?: string[]
-    lokasi?: Lokasi[]
-    termin?: Termin[]
+    Lokasis?: Lokasi[]
+    TerminProjects?: Termin[]
     subkontraktor?: Subkontraktor[]
 }
 

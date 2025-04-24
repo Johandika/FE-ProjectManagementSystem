@@ -52,6 +52,9 @@ const ProyekNew = () => {
             nilai_kontrak: extractNumberFromString(
                 data.nilai_kontrak as string | number
             ),
+            uang_muka: extractNumberFromString(
+                data.uang_muka as string | number
+            ),
             item: data.item?.map((itemData) => ({
                 ...itemData,
                 detail: itemData.detail.map((detailItem) => ({

@@ -8,6 +8,8 @@ import {
     apiGetProyeks,
 } from '@/services/ProyekService'
 
+export const SLICE_NAME = 'proyekList'
+
 type Proyek = {
     id: string
     pekerjaan: string
@@ -42,10 +44,6 @@ type GetMasterProyekResponse = {
     total: number
 }
 
-// type GetKliensResponse = {
-//     data: Kliens
-//     total: number
-// }
 type GetMasterKlienResponse = {
     statusCode: number
     message: string
@@ -74,8 +72,6 @@ export type ProyekListSlice = {
 
 type GetMasterKlienData = TableQueries & { filterData?: FilterQueries }
 type GetMasterProyekData = TableQueries & { filterData?: FilterQueries }
-
-export const SLICE_NAME = 'proyekList'
 
 export const getProyeks = createAsyncThunk(
     SLICE_NAME + '/getProyeks',

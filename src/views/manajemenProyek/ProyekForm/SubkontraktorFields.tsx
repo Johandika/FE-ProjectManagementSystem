@@ -254,6 +254,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                                             : null,
                                                     ]}
                                                     singleDate={false}
+                                                    // inputFormat="DD-MM-YYYY"
                                                     closePickerOnChange={false}
                                                     onChange={(
                                                         selectedDates

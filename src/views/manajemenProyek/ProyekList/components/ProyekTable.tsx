@@ -34,18 +34,12 @@ type Proyek = {
     tanggal_delivery: string
     tanggal_kontrak: string
     nilai_kontrak: number
-    realisasi: number
+    uang_muka: number
     progress: number
     status: string
     idKlien: string
-    // subkontraktor?: Array<{
-    //     keterangan: string
-    //     nama_vendor_subkon: string
-    //     nilai_subkon: number
-    //     nomor_surat: string
-    // }>
-    lokasi?: Array<{
-        nama: string
+    Lokasis?: Array<{
+        lokasi: string
         latitude: number
         longitude: number
     }>
@@ -200,10 +194,11 @@ const ProyekTable = () => {
                 minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
+
                     return (
                         <div className="flex flex-col gap-1">
-                            {row.lokasi && row.lokasi.length > 0 ? (
-                                row.lokasi.map((loc, index) => (
+                            {row.Lokasis && row.Lokasis.length > 0 ? (
+                                row.Lokasis.map((loc, index) => (
                                     <a
                                         key={index}
                                         href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
@@ -216,7 +211,7 @@ const ProyekTable = () => {
                                                 <IoLocationSharp className="group-hover:text-blue-600 transition" />
                                             </div>
                                             <div className="text-blue-600">
-                                                {loc.nama}
+                                                {loc.lokasi}
                                             </div>
                                         </div>
                                     </a>
@@ -230,45 +225,6 @@ const ProyekTable = () => {
                     )
                 },
             },
-            // {
-            //     header: 'Subkontraktor',
-            //     accessorKey: 'subkontraktor',
-            //     minWidth: 200,
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return (
-            //             <div className="flex flex-col gap-1">
-            //                 {row.subkontraktor &&
-            //                 row.subkontraktor.length > 0 ? (
-            //                     row.subkontraktor.map((subkon, index) => (
-            //                         <a key={index}>
-            //                             <div className="text-sm font-medium flex gap-1 items-center  truncate">
-            //                                 {subkon.nomor_surat}
-            //                             </div>
-            //                         </a>
-            //                     ))
-            //                 ) : (
-            //                     <span className="text-gray-400">
-            //                         Tidak ada lokasi
-            //                     </span>
-            //                 )}
-            //             </div>
-            //         )
-            //     },
-            // },
-            // {
-            //     header: 'Tangggal Delivery',
-            //     accessorKey: 'tanggal_delivery',
-            //     minWidth: 150,
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return (
-            //             <span className="capitalize">
-            //                 {row.tanggal_delivery}
-            //             </span>
-            //         )
-            //     },
-            // },
             {
                 header: 'Nilai Kontrak',
                 accessorKey: 'nilai_kontrak',
@@ -279,9 +235,9 @@ const ProyekTable = () => {
                     // Determine the color based on conditions
                     let textColorClass = 'text-yellow-600' // Default color
 
-                    if (row.realisasi === 0) {
+                    if (row.uang_muka === 0) {
                         textColorClass = 'text-red-500' // Red when realization is 0
-                    } else if (row.realisasi === row.nilai_kontrak) {
+                    } else if (row.uang_muka === row.nilai_kontrak) {
                         textColorClass = 'text-green-500' // Green when realization equals contract value
                     }
 
@@ -297,25 +253,15 @@ const ProyekTable = () => {
                                     <AiFillCreditCard className="group-hover:text-blue-600 transition" />
                                 </div>
                                 <span>
-                                    Rp {row.realisasi.toLocaleString('id-ID')}
+                                    Rp {row.uang_muka.toLocaleString('id-ID')}
+                                    {/* Rp {row.uang_muka} */}
                                 </span>
                             </div>
                         </div>
                     )
                 },
             },
-            // {
-            //     header: 'Realiasasi',
-            //     accessorKey: 'realisasi',
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return (
-            //             <span className="capitalize">
-            //                 {row.realisasi.toLocaleString('id-ID')}
-            //             </span>
-            //         )
-            //     },
-            // },
+
             {
                 header: 'Progress',
                 accessorKey: 'progress',

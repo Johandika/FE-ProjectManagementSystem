@@ -10,11 +10,35 @@ interface Termin {
     keterangan: string
     persen: number
 }
+interface DetailItem {
+    uraian: string
+    satuan: string
+    volume: number
+    harga_satuan_material: number
+    harga_satuan_jasa: number
+    jumlah_harga_material: number
+    jumlah_harga_jasa: number
+    jumlah: number
+}
+interface Item {
+    item: string
+    detail: DetailItem[]
+}
+interface Subkontraktor {
+    nama: string
+    nilai_subkontrak: number
+    nomor_surat: string
+    id: string
+    waktu_mulai_pelaksanaan: string
+    waktu_selesai_pelaksanaan: string
+    keterangan: string
+}
 
 type FormFieldsName = {
     pekerjaan: string
     pic: string
     nomor_kontrak: string
+    uang_muka: number
     tanggal_service_po: string
     tanggal_kontrak: string
     tanggal_delivery: string
@@ -25,6 +49,8 @@ type FormFieldsName = {
     berkas: string[]
     lokasi: string[]
     termin: Termin[]
+    item: Item[]
+    subkontraktor: Subkontraktor[]
 }
 
 type BasicInformationFields = {
@@ -37,7 +63,6 @@ type BasicInformationFields = {
 
 const BasicInformationFields = (props: BasicInformationFields) => {
     const { touched, errors, kliensList = [], berkasesList = [] } = props
-
     return (
         <AdaptableCard divider className="mb-4">
             <h5>Informasi Dasar</h5>
@@ -162,7 +187,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                             ? new Date(field.value)
                                             : null
                                     }
-                                    inputFormat="YYYY-MM-DD"
+                                    inputFormat="DD-MM-YYYY"
                                     onChange={(date) => {
                                         const formattedDate = date
                                             ? dayjs(date).format('YYYY-MM-DD')
@@ -197,7 +222,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                             ? new Date(field.value)
                                             : null
                                     }
-                                    inputFormat="YYYY-MM-DD"
+                                    inputFormat="DD-MM-YYYY"
                                     onChange={(date) => {
                                         const formattedDate = date
                                             ? dayjs(date).format('YYYY-MM-DD')
@@ -230,7 +255,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                             ? new Date(field.value)
                                             : null
                                     }
-                                    inputFormat="YYYY-MM-DD"
+                                    inputFormat="DD-MM-YYYY"
                                     onChange={(date) => {
                                         const formattedDate = date
                                             ? dayjs(date).format('YYYY-MM-DD')
@@ -278,6 +303,33 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </div>
                 <div className="col-span-1">
                     <FormItem
+                        label="Uang Muka"
+                        invalid={
+                            (errors.uang_muka && touched.uang_muka) as boolean
+                        }
+                        errorMessage={errors.uang_muka}
+                    >
+                        <Field name="uang_muka">
+                            {({ field, form }: FieldProps) => (
+                                <NumericFormat
+                                    {...field}
+                                    customInput={Input}
+                                    placeholder="Uang Muka"
+                                    thousandSeparator="."
+                                    decimalSeparator=","
+                                    onValueChange={(values) => {
+                                        form.setFieldValue(
+                                            field.name,
+                                            values.value
+                                        )
+                                    }}
+                                />
+                            )}
+                        </Field>
+                    </FormItem>
+                </div>
+                <div className="col-span-1">
+                    <FormItem
                         label="Waktu Pengerjaan (hari)"
                         invalid={
                             (errors.timeline && touched.timeline) as boolean
@@ -303,62 +355,71 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </Field>
                     </FormItem>
                 </div>
+                <div className="col-span-1">
+                    <FormItem
+                        label="Berkas BASTP"
+                        invalid={(errors.berkas && touched.berkas) as boolean}
+                        errorMessage={errors.berkas}
+                    >
+                        <Field name="berkas">
+                            {({ field, form }: FieldProps) => {
+                                // Convert berkas array values to options format
+                                const selectedOptions = field.value
+                                    ? berkasesList
+                                          .filter((berkas) => {
+                                              // Cek jika field.value berisi id atau nama berkas
+                                              return (
+                                                  field.value.includes(
+                                                      berkas.id
+                                                  ) ||
+                                                  field.value.includes(
+                                                      berkas.nama
+                                                  )
+                                              )
+                                          })
+                                          .map((berkas) => ({
+                                              value: berkas.id,
+                                              label: berkas.nama,
+                                          }))
+                                    : []
+
+                                // Map berkasesList to options format required by Select
+                                const berkasOptions = berkasesList.map(
+                                    (berkas) => ({
+                                        value: berkas.id,
+                                        label: berkas.nama,
+                                    })
+                                )
+
+                                return (
+                                    <Select
+                                        isMulti
+                                        value={selectedOptions}
+                                        options={berkasOptions}
+                                        field={field}
+                                        form={form}
+                                        placeholder="Pilih berkas"
+                                        onChange={(options) => {
+                                            // Extract just the values (berkas names) for saving to formik
+                                            const selectedValues = options
+                                                ? options.map(
+                                                      (option: any) =>
+                                                          option.value
+                                                  )
+                                                : []
+                                            form.setFieldValue(
+                                                field.name,
+                                                selectedValues
+                                            )
+                                        }}
+                                    />
+                                )
+                            }}
+                        </Field>
+                    </FormItem>
+                </div>
             </div>
 
-            <FormItem
-                label="Berkas BASTP"
-                invalid={(errors.berkas && touched.berkas) as boolean}
-                errorMessage={errors.berkas}
-            >
-                <Field name="berkas">
-                    {({ field, form }: FieldProps) => {
-                        // Convert berkas array values to options format
-                        const selectedOptions = field.value
-                            ? berkasesList
-                                  .filter((berkas) => {
-                                      // Cek jika field.value berisi id atau nama berkas
-                                      return (
-                                          field.value.includes(berkas.id) ||
-                                          field.value.includes(berkas.nama)
-                                      )
-                                  })
-                                  .map((berkas) => ({
-                                      value: berkas.id,
-                                      label: berkas.nama,
-                                  }))
-                            : []
-
-                        // Map berkasesList to options format required by Select
-                        const berkasOptions = berkasesList.map((berkas) => ({
-                            value: berkas.id,
-                            label: berkas.nama,
-                        }))
-
-                        return (
-                            <Select
-                                isMulti
-                                value={selectedOptions}
-                                options={berkasOptions}
-                                field={field}
-                                form={form}
-                                placeholder="Pilih berkas"
-                                onChange={(options) => {
-                                    // Extract just the values (berkas names) for saving to formik
-                                    const selectedValues = options
-                                        ? options.map(
-                                              (option: any) => option.value
-                                          )
-                                        : []
-                                    form.setFieldValue(
-                                        field.name,
-                                        selectedValues
-                                    )
-                                }}
-                            />
-                        )
-                    }}
-                </Field>
-            </FormItem>
             <FormItem
                 label="Keterangan"
                 labelClass="!justify-start"

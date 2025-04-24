@@ -13,26 +13,39 @@ import ApiService from './ApiService'
 // }
 
 // get by id
+// export async function apiGetTermin<T, U extends Record<string, unknown>>(
+//     params: U
+// ) {
+//     return ApiService.fetchData<T>({
+//         url: '/termin',
+//         method: 'get',
+//         params,
+//     })
+// }
+
+// get by id
 export async function apiGetTermin<T, U extends Record<string, unknown>>(
     params: U
 ) {
-    return ApiService.fetchData<T>({
-        url: '/termin',
+    const res = await ApiService.fetchData<T>({
+        url: `/select/termin/${params.id}`,
         method: 'get',
         params,
     })
+    console.log('termin', res.data)
+    return res.data
 }
 
 // update
-export async function apiEditTermin<T, U extends Record<string, unknown>>(
-    data: U
-) {
-    return ApiService.fetchData<T>({
-        url: '/termin/update',
-        method: 'put',
-        data,
-    })
-}
+// export async function apiEditTermin<T, U extends Record<string, unknown>>(
+//     data: U
+// ) {
+//     return ApiService.fetchData<T>({
+//         url: '/termin/update',
+//         method: 'put',
+//         data,
+//     })
+// }
 
 // // delete
 // export async function apiDeleteBerkasProyeks<

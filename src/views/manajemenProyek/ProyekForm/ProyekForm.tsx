@@ -28,6 +28,7 @@ type InitialData = {
     tanggal_delivery?: string
     nilai_kontrak?: number
     timeline?: number
+    uang_muka?: number
     keterangan?: string
     idUser?: string
     berkas?: string[]
@@ -147,19 +148,21 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
         type,
         initialData = {
             pekerjaan: '',
-            klien: '',
-            idClient: '',
             pic: '',
             nomor_kontrak: '',
             tanggal_service_po: '',
+            uang_muka: 0,
             tanggal_kontrak: '',
             tanggal_delivery: '',
             nilai_kontrak: 0,
             timeline: 0,
             keterangan: '',
+            idClient: '',
             berkas: [],
+            item: [],
             lokasi: [],
             termin: [],
+            subkontraktor: [],
         },
         onFormSubmit,
         onDiscard,
@@ -180,14 +183,6 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                 validationSchema={validationSchema}
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
-
-                    // Ensure client name is updated from the selected client ID
-                    const selectedKlien = kliensList.find(
-                        (client) => client.id === formData.idClient
-                    )
-                    if (selectedKlien) {
-                        formData.klien = selectedKlien.nama
-                    }
 
                     //COCOKKAN DATA PADA BERKAS DENGAN DATA PADA PROYEK.BERKAS
 

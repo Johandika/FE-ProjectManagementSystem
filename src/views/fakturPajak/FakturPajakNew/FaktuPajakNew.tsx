@@ -11,7 +11,6 @@ const FakturPajakNew = () => {
     const navigate = useNavigate()
 
     const addFakturPajak = async (data: FormModel) => {
-        console.log('Data yang akan dikirim:', data)
         const response = await apiCreateFakturPajak<boolean, FormModel>(data)
         return response.data
     }

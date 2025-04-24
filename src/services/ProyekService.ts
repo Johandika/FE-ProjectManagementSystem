@@ -53,11 +53,20 @@ export async function apiGetSubkontraktors<
 export async function apiDeleteProyeks<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    return ApiService.fetchData<T>({
-        url: '/manajemen-proyek/delete',
-        method: 'delete',
-        data,
-    })
+    if (Array.isArray(data.id)) {
+        // jika ada penghapusan multiple
+        return ApiService.fetchData<T>({
+            url: '/project/delete',
+            method: 'patch',
+            data,
+        })
+    } else {
+        // Untuk id tunggal
+        return ApiService.fetchData<T>({
+            url: `/project/softDeleted/${data.id}`,
+            method: 'patch',
+        })
+    }
 }
 
 // get by id

@@ -117,6 +117,8 @@ const ProyekEdit = () => {
         navigate('/manajemen-proyek')
     }
 
+    console.log(proyekData, 'proyekData')
+
     useEffect(() => {
         const path = location.pathname.substring(
             location.pathname.lastIndexOf('/') + 1

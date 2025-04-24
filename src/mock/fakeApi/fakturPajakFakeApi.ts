@@ -80,7 +80,6 @@ export default function berkasFakeApi(server: Server, apiPrefix: string) {
                     return v.toString(16)
                 }
             )
-            console.log('data BE', data)
             schema.db.fakturPajaksData.insert(data)
             return true
         }
