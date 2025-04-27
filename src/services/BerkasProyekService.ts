@@ -6,7 +6,7 @@ export async function apiCreateBerkasProyek<
     U extends Record<string, unknown>
 >(data: U) {
     return ApiService.fetchData<T>({
-        url: '/berkasProyeks/create',
+        url: '/berkasProject',
         method: 'post',
         data,
     })
@@ -34,13 +34,26 @@ export async function apiPutBerkasProyek<T, U extends Record<string, unknown>>(
     })
 }
 
+// update status
+export async function apiUpdateStatusBerkasProyek<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = await ApiService.fetchData<T>({
+        url: `/berkasProject/status/${data.id}`,
+        method: 'patch',
+        data,
+    })
+    return res.data
+}
+
 // delete
-export async function apiDeleteBerkasProyeks<
+export async function apiDeleteBerkasProyek<
     T,
     U extends Record<string, unknown>
 >(data: U) {
     return ApiService.fetchData<T>({
-        url: '/berkasProyeks/delete',
+        url: `/berkasProject/${data.id}`,
         method: 'delete',
         data,
     })

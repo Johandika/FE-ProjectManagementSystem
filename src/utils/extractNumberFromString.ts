@@ -28,3 +28,20 @@ export const extractNumberFromString = (
     // Jika NaN, kembalikan 0
     return isNaN(result) ? 0 : result
 }
+
+// Fungsi untuk mengekstrak nilai numerik murni (tanpa desimal) dari berbagai format
+export const extractIntegerFromStringAndFloat = (
+    value: string | number | undefined
+): number => {
+    if (value === undefined || value === null) {
+        return 0
+    }
+    // Langkah 1: Ubah float menjadi string
+    const stringValue: string = value.toString()
+    // Langkah 2: Hilangkan semua titik dan koma
+    const cleanedString: string = stringValue.replace(/[.,]/g, '')
+
+    // Langkah 3: Ubah kembali menjadi number
+    const formattedNumber = Number(cleanedString)
+    return formattedNumber
+}

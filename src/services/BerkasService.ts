@@ -11,6 +11,17 @@ export async function apiGetBerkases<T, U extends Record<string, unknown>>(
     })
 }
 
+// select berkas
+export async function apiSelectBerkas<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: '/select/berkas',
+        method: 'get',
+        data,
+    })
+}
+
 // delete
 export async function apiDeleteBerkases<T, U extends Record<string, unknown>>(
     data: U

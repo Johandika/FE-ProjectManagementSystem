@@ -12,6 +12,8 @@ import { BiHardHat } from 'react-icons/bi'
 import isLastChild from '@/utils/isLastChild'
 import classNames from 'classnames'
 import { injectReducer } from '@/store'
+import { formatDate } from '@/utils/formatDate'
+import { format } from 'path'
 
 injectReducer('proyekEdit', reducer)
 
@@ -23,9 +25,9 @@ export default function Detail() {
         (state) => state.proyekEdit.data.proyekData
     )
 
-    const terminsData = useAppSelector(
-        (state) => state.proyekEdit.data.terminsData
-    )
+    // const terminsData = useAppSelector(
+    //     (state) => state.proyekEdit.data.terminsData
+    // )
 
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
@@ -62,7 +64,7 @@ export default function Detail() {
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Klien :</div>
-                            <div>{proyekData.klien}</div>
+                            <div>{proyekData.Client?.nama}</div>
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">PIC :</div>
@@ -74,15 +76,23 @@ export default function Detail() {
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Tgl. Kontrak :</div>
-                            <div>{proyekData.tanggal_kontrak}</div>
+                            <div>
+                                {formatDate(proyekData.tanggal_kontrak || '')}
+                            </div>
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Tgl. PO :</div>
-                            <div>{proyekData.tanggal_service_po}</div>
+                            <div>
+                                {formatDate(
+                                    proyekData.tanggal_service_po || ''
+                                )}
+                            </div>
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Tgl. Delivery :</div>
-                            <div>{proyekData.tanggal_delivery}</div>
+                            <div>
+                                {formatDate(proyekData.tanggal_delivery || '')}
+                            </div>
                         </div>
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Status :</div>
@@ -97,9 +107,9 @@ export default function Detail() {
                             </div>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Realisasi :</div>
+                            <div className="font-semibold">Uang Muka :</div>
                             <div>
-                                {proyekData.realisasi?.toLocaleString('id-ID')}
+                                {proyekData.uang_muka?.toLocaleString('id-ID')}
                             </div>
                         </div>
                         <div className="flex flex-row gap-2">
@@ -110,23 +120,28 @@ export default function Detail() {
                             <div className="font-semibold">
                                 Waktu Pengerjaan (hari) :
                             </div>
-                            <div>{proyekData.sisa_waktu}</div>
+                            <div>{proyekData.timeline}</div>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Berkas BAST :</div>
+                            <div className="font-semibold">Berkas BASTP :</div>
                             <div>
-                                {proyekData.berkas &&
-                                    proyekData.berkas.map((berkas, index) => (
-                                        <span key={index}>
-                                            {berkas}
-                                            {index <
-                                            proyekData.berkas.length - 1
-                                                ? ', '
-                                                : ''}
-                                        </span>
-                                    ))}
+                                {proyekData.BerkasProjects &&
+                                    proyekData.BerkasProjects.map(
+                                        (berkas, index) => (
+                                            <span key={berkas.id}>
+                                                {berkas.nama}
+                                                {index <
+                                                proyekData.BerkasProjects
+                                                    .length -
+                                                    1
+                                                    ? ', '
+                                                    : ''}
+                                            </span>
+                                        )
+                                    )}
                             </div>
                         </div>
+
                         <div className="flex flex-col sm:flex-row gap-0 sm:gap-2">
                             <div className="font-semibold flex-0">
                                 Keterangan :
@@ -145,16 +160,16 @@ export default function Detail() {
                     />
                     {proyekData && (
                         <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-                            {proyekData.lokasi?.map((data, index) => (
+                            {proyekData.Lokasis?.map((data, index) => (
                                 <a
-                                    key={data.nama}
+                                    key={data.id}
                                     href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={classNames(
                                         'flex items-center px-4 py-6 group',
                                         !isLastChild(
-                                            proyekData.lokasi as [],
+                                            proyekData.Lokasis as [],
                                             index
                                         ) &&
                                             'border-b border-gray-200 dark:border-gray-600'
@@ -167,7 +182,7 @@ export default function Detail() {
                                         <div className="ml-3 rtl:mr-3">
                                             <div className="flex items-center">
                                                 <div className="text-gray-900 dark:text-gray-100 font-semibold">
-                                                    {data.nama}
+                                                    {data.lokasi}
                                                 </div>
                                             </div>
                                             <span>
@@ -178,6 +193,9 @@ export default function Detail() {
                                     </div>
                                 </a>
                             ))}
+                            {!proyekData.Lokasis && (
+                                <div>Lokasi tidak terdaftar</div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -188,7 +206,7 @@ export default function Detail() {
                         desc="Informasi termin pembayaran proyek"
                     />
                     <div className="space-y-2">
-                        {terminsData?.map((termin, index) => (
+                        {proyekData.TerminProjects?.map((termin, index) => (
                             <div
                                 key={index}
                                 className="bg-slate-50 rounded-md flex flex-row items-center gap-3 p-6 w-full"
@@ -196,6 +214,9 @@ export default function Detail() {
                                 {termin.keterangan} = {termin.persen}%
                             </div>
                         ))}
+                        {!proyekData.TerminProjects && (
+                            <div>Termin tidak terdaftar</div>
+                        )}
                     </div>
                 </div>
                 {/* Subkontraktor */}
@@ -204,15 +225,15 @@ export default function Detail() {
                         title="Informasi Subkontraktor"
                         desc="Informasi subkontraktor proyek"
                     />
-                    {proyekData.subkontraktor && (
+                    {proyekData.SubkonProjects && (
                         <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-                            {proyekData.subkontraktor?.map((data, index) => (
+                            {proyekData.SubkonProjects?.map((data, index) => (
                                 <section
-                                    key={data.nama_vendor_subkon}
+                                    key={data.id}
                                     className={classNames(
                                         'flex items-center px-4 py-6 group',
                                         !isLastChild(
-                                            proyekData.subkontraktor as [],
+                                            proyekData.SubkonProjects as [],
                                             index
                                         ) &&
                                             'border-b border-gray-200 dark:border-gray-600'
@@ -225,27 +246,27 @@ export default function Detail() {
                                         <div className="ml-3 rtl:mr-3">
                                             <div className="flex items-center gap-1">
                                                 <div className="text-gray-900 dark:text-gray-100 font-semibold">
-                                                    {data.nama_vendor_subkon}
+                                                    {data.nama}
                                                 </div>
                                                 <span>
                                                     ({data.nomor_surat})
                                                 </span>
                                             </div>
                                             <div>
-                                                {data.nilai_subkon.toLocaleString(
+                                                {data.nilai_subkontrak?.toLocaleString(
                                                     'id-ID'
                                                 )}
                                             </div>
                                             <span>
-                                                {
-                                                    data
-                                                        .waktu_pelaksanaan_kerja[0]
-                                                }{' '}
+                                                {formatDate(
+                                                    data.waktu_mulai_pelaksanaan ||
+                                                        ''
+                                                )}{' '}
                                                 s.d.{' '}
-                                                {
-                                                    data
-                                                        .waktu_pelaksanaan_kerja[1]
-                                                }
+                                                {formatDate(
+                                                    data.waktu_selesai_pelaksanaan ||
+                                                        ''
+                                                )}
                                             </span>
                                             <div>{data.keterangan}</div>
                                         </div>
@@ -254,7 +275,7 @@ export default function Detail() {
                             ))}
                         </div>
                     )}
-                    {!proyekData.subkontraktor && (
+                    {!proyekData.SubkonProjects && (
                         <div>Subkontraktor tidak terdaftar</div>
                     )}
                 </div>

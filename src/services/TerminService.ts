@@ -32,7 +32,6 @@ export async function apiGetTermin<T, U extends Record<string, unknown>>(
         method: 'get',
         params,
     })
-    console.log('termin', res.data)
     return res.data
 }
 

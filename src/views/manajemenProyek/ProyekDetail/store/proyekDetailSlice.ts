@@ -7,6 +7,7 @@ import {
     apiGetFakturPajak,
     apiGetFakturPajaks,
 } from '@/services/FakturPajakService'
+import { apiSelectBerkas } from '@/services/BerkasService'
 
 export const SLICE_NAME = 'proyekDetail'
 
@@ -25,13 +26,20 @@ type FakturPajak = {
     tanggal: string
 }
 
+type SelectBerkas = {
+    id: string
+    nama: string
+}
+
 type BerkasProyeks = BerkasProyekData[]
 
 export type MasterProyekDetailState = {
     loadingBerkasProyeks: boolean
-    berkasProyekData?: BerkasProyeks
     loadingFakturPajaks: boolean
+    loadingSelectBerkas: boolean
+    berkasProyekData?: BerkasProyeks
     berkasFakturPajaks?: FakturPajak[]
+    selectBerkasData?: SelectBerkas[]
 }
 
 // get berkasProyek by id
@@ -51,6 +59,15 @@ export const getFakturPajaks = createAsyncThunk(
     SLICE_NAME + '/getFakturPajaks',
     async () => {
         const response = await apiGetFakturPajaks<FakturPajak[]>()
+        return response.data
+    }
+)
+
+// get all select berkas
+export const selectBerkas = createAsyncThunk(
+    SLICE_NAME + '/selectBerkas',
+    async () => {
+        const response = await apiSelectBerkas<SelectBerkas[]>()
         return response.data
     }
 )
@@ -80,6 +97,8 @@ export const updateBerkasProyekStatus = createAsyncThunk(
 const initialState: MasterProyekDetailState = {
     loadingBerkasProyeks: true,
     loadingFakturPajaks: true,
+    loadingSelectBerkas: true,
+    selectBerkasData: [],
     berkasProyekData: [],
     berkasFakturPajaks: [],
 }
@@ -96,6 +115,13 @@ const proyekDetailSlice = createSlice({
             })
             .addCase(getBerkasProyek.pending, (state) => {
                 state.loadingBerkasProyeks = true
+            })
+            .addCase(selectBerkas.fulfilled, (state, action) => {
+                state.selectBerkasData = action.payload
+                state.loadingSelectBerkas = false
+            })
+            .addCase(selectBerkas.pending, (state) => {
+                state.loadingSelectBerkas = true
             })
             .addCase(getFakturPajaks.fulfilled, (state, action) => {
                 state.berkasProyekData = action.payload
