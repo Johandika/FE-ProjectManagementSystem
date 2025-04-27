@@ -4,6 +4,7 @@ import PurchaseOrder from './components/PurchaseOrder'
 import Termin from './components/Termin'
 import Bastp from './components/Bastp'
 import Adendum from './components/Adendum'
+import Items from './components/Items'
 // import { injectReducer } from '@/store'
 // import reducer from '../ProyekEdit/store'
 
@@ -20,7 +21,8 @@ export default function ProyekDetail() {
                     <TabNav value="tab2">Purchase Order</TabNav>
                     <TabNav value="tab3">Termin</TabNav>
                     <TabNav value="tab4">BASTP</TabNav>
-                    <TabNav value="tab6">Adendum</TabNav>
+                    <TabNav value="tab5">Adendum</TabNav>
+                    <TabNav value="tab6">Items</TabNav>
                 </TabList>
                 <div className="px-4">
                     <TabContent value="tab1">
@@ -37,6 +39,9 @@ export default function ProyekDetail() {
                     </TabContent>
                     <TabContent value="tab5">
                         <Adendum />
+                    </TabContent>
+                    <TabContent value="tab6">
+                        <Items />
                     </TabContent>
                 </div>
             </Tabs>

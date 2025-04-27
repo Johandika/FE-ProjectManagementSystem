@@ -38,27 +38,27 @@ const appsNavigationConfig: NavigationTree[] = [
                 subMenu: [],
             },
             // Menu3
-            {
-                key: 'apps.purchaseOrder',
-                path: '/purchase-order',
-                title: 'Purchase Order',
-                translateKey: 'nav.apps.purchaseOrder',
-                icon: 'manajemenPengadaan',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
+            // {
+            //     key: 'apps.purchaseOrder',
+            //     path: '/purchase-order',
+            //     title: 'Purchase Order',
+            //     translateKey: 'nav.apps.purchaseOrder',
+            //     icon: 'manajemenPengadaan',
+            //     type: NAV_ITEM_TYPE_ITEM,
+            //     authority: [],
+            //     subMenu: [],
+            // },
             // Menu4
-            {
-                key: 'apps.fakturPajak',
-                path: '/faktur-pajak',
-                title: 'Faktur Pajak',
-                translateKey: 'nav.apps.fakturPajak',
-                icon: 'manajemenKeuangan',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
+            // {
+            //     key: 'apps.fakturPajak',
+            //     path: '/faktur-pajak',
+            //     title: 'Faktur Pajak',
+            //     translateKey: 'nav.apps.fakturPajak',
+            //     icon: 'manajemenKeuangan',
+            //     type: NAV_ITEM_TYPE_ITEM,
+            //     authority: [],
+            //     subMenu: [],
+            // },
             // Menu5
             {
                 key: 'apps.master',

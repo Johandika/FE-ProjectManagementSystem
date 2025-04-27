@@ -57,59 +57,59 @@ export const protectedRoutes = [
     //     },
     // },
     // Purchase Order
-    {
-        key: 'apps.purchaseOrder',
-        path: '/purchase-order',
-        component: lazy(
-            () => import('@/views/purchaseOrder/PurchaseOrderList')
-        ),
-        authority: [],
-    },
-    {
-        key: 'apps.purchaseOrder',
-        path: '/purchase-order-edit/:orderId',
-        component: lazy(
-            () => import('@/views/purchaseOrder/PurchaseOrderEdit')
-        ),
-        authority: [],
-        meta: {
-            header: 'Ubah Purchase Order',
-        },
-    },
-    {
-        key: 'apps.purchaseOrder',
-        path: '/purchase-order-new',
-        component: lazy(() => import('@/views/purchaseOrder/PurchaseOrderNew')),
-        authority: [],
-        meta: {
-            header: 'Tambah Purchase Order',
-        },
-    },
+    // {
+    //     key: 'apps.purchaseOrder',
+    //     path: '/purchase-order',
+    //     component: lazy(
+    //         () => import('@/views/purchaseOrder/PurchaseOrderList')
+    //     ),
+    //     authority: [],
+    // },
+    // {
+    //     key: 'apps.purchaseOrder',
+    //     path: '/purchase-order-edit/:orderId',
+    //     component: lazy(
+    //         () => import('@/views/purchaseOrder/PurchaseOrderEdit')
+    //     ),
+    //     authority: [],
+    //     meta: {
+    //         header: 'Ubah Purchase Order',
+    //     },
+    // },
+    // {
+    //     key: 'apps.purchaseOrder',
+    //     path: '/purchase-order-new',
+    //     component: lazy(() => import('@/views/purchaseOrder/PurchaseOrderNew')),
+    //     authority: [],
+    //     meta: {
+    //         header: 'Tambah Purchase Order',
+    //     },
+    // },
     // Faktur Pajak
-    {
-        key: 'apps.fakturPajak',
-        path: '/faktur-pajak',
-        component: lazy(() => import('@/views/fakturPajak/FakturPajakList')),
-        authority: [],
-    },
-    {
-        key: 'apps.fakturPajak',
-        path: '/faktur-pajak-edit/:klienId',
-        component: lazy(() => import('@/views/fakturPajak/FakturPajakEdit')),
-        authority: [],
-        meta: {
-            header: 'Ubah Faktur Pajak',
-        },
-    },
-    {
-        key: 'apps.fakturPajak',
-        path: '/faktur-pajak-new',
-        component: lazy(() => import('@/views/fakturPajak/FakturPajakNew')),
-        authority: [],
-        meta: {
-            header: 'Tambah Faktur Pajak',
-        },
-    },
+    // {
+    //     key: 'apps.fakturPajak',
+    //     path: '/faktur-pajak',
+    //     component: lazy(() => import('@/views/fakturPajak/FakturPajakList')),
+    //     authority: [],
+    // },
+    // {
+    //     key: 'apps.fakturPajak',
+    //     path: '/faktur-pajak-edit/:klienId',
+    //     component: lazy(() => import('@/views/fakturPajak/FakturPajakEdit')),
+    //     authority: [],
+    //     meta: {
+    //         header: 'Ubah Faktur Pajak',
+    //     },
+    // },
+    // {
+    //     key: 'apps.fakturPajak',
+    //     path: '/faktur-pajak-new',
+    //     component: lazy(() => import('@/views/fakturPajak/FakturPajakNew')),
+    //     authority: [],
+    //     meta: {
+    //         header: 'Tambah Faktur Pajak',
+    //     },
+    // },
     // Klien
     {
         key: 'apps.klien',

@@ -740,13 +740,18 @@ const PurchaseOrder = () => {
                             <ConfirmDialog
                                 isOpen={dialogOpen}
                                 type="danger"
-                                title="Hapus Faktur"
+                                title="Hapus Purchase Order"
                                 confirmButtonColor="red-600"
                                 onClose={handleCancelDelete}
                                 onRequestClose={handleCancelDelete}
                                 onCancel={handleCancelDelete}
                                 onConfirm={handleDelete}
-                            ></ConfirmDialog>
+                            >
+                                <p>
+                                    Apakah kamu yakin ingin menghapus purchase
+                                    order ini ?
+                                </p>
+                            </ConfirmDialog>
                         </Form>
                     )
                 }}

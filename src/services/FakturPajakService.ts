@@ -40,8 +40,9 @@ export async function apiDeleteFakturPajaks<
         })
     } else {
         // Untuk id tunggal
+        console.log('data', data)
         return ApiService.fetchData<T>({
-            url: `/fakturPajak/${data.id}`,
+            url: `/fakturPajak/${data}`,
             method: 'delete',
         })
     }
@@ -63,6 +64,7 @@ export async function apiGetFakturPajak<T, U extends Record<string, unknown>>(
 export async function apiPutFakturPajak<T, U extends Record<string, unknown>>(
     data: U
 ) {
+    console.log('dataapi', data)
     return ApiService.fetchData<T>({
         url: `/fakturPajak/${data.id}`,
         method: 'patch',

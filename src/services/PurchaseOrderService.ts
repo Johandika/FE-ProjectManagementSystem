@@ -65,6 +65,7 @@ export async function apiGetPurchaseByProyek<
 export async function apiPutPurchaseOrder<T, U extends Record<string, unknown>>(
     data: U
 ) {
+    console.log('datapurchase', data)
     return ApiService.fetchData<T>({
         url: `/purchase/${data.id}`,
         method: 'patch',

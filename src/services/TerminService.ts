@@ -28,7 +28,7 @@ export async function apiGetTermin<T, U extends Record<string, unknown>>(
     params: U
 ) {
     const res = await ApiService.fetchData<T>({
-        url: `/select/termin/${params.id}`,
+        url: `/terminProject/project/${params.id}`,
         method: 'get',
         params,
     })

@@ -145,9 +145,17 @@ const ProyekEdit = () => {
               timeline: proyekData.timeline,
               keterangan: proyekData.keterangan,
               idClient: proyekData.idClient,
+              //   Pakai untuk nanti
+              //       lokasi: proyekData.Lokasis,
+              //       subkontraktor: proyekData.SubkonProjects,
+              //       berkas: proyekData.BerkasProjects,
+              //   }
           }
         : {}
+
     console.log('proyekDataEdit', proyekDataEdit)
+    console.log('proyekData', proyekData)
+
     return (
         <>
             <Loading
