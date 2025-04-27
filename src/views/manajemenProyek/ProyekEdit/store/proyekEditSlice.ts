@@ -9,9 +9,16 @@ import {
 } from '@/services/ProyekService'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 import { apiGetTermin } from '@/services/TerminService'
-import { apiGetFakturPajak } from '@/services/FakturPajakService'
+import {
+    apiGetFakturPajak,
+    apiGetFakturPajakByProyek,
+} from '@/services/FakturPajakService'
 import { apiSelectBerkas } from '@/services/BerkasService'
 import { apiUpdateStatusBerkasProyek } from '@/services/BerkasProyekService'
+import {
+    apiDeletePurchaseOrders,
+    apiGetPurchaseByProyek,
+} from '@/services/PurchaseOrderService'
 
 export const SLICE_NAME = 'proyekEdit'
 
@@ -100,6 +107,20 @@ type FakturPajak = {
     tanggal?: string
 }
 
+interface PurchaseOrder {
+    id: string
+    nomor_po: string
+    nama: string
+    tanggal_po: string
+    pabrik: string
+    harga: number
+    status: string
+    estimasi_pengerjaan: number
+    idProject: string
+    createdAt: string
+    updatedAt: string
+}
+
 type GetProyekResponse = ProyekData
 type Kliens = Klien[]
 type Berkases = Berkas[]
@@ -126,6 +147,14 @@ type SelectBerkas = {
     nama: string
 }
 
+type GetPurchaseByProyekResponse = {
+    statusCode: number
+    message: string
+    data: PurchaseOrder[]
+    totaldataPurchase: number
+    totalPage: number
+}
+
 export type MasterProyekEditState = {
     loading: boolean
     loadingKliens: boolean
@@ -134,6 +163,7 @@ export type MasterProyekEditState = {
     loadingTermins: boolean
     loadingFakturPajak: boolean
     loadingSelectBerkas: boolean
+    loadingPurchaseOrders: boolean
     updateBerkasStatus: boolean
     proyekData: ProyekData
     loadingUpdateBerkasStatus: boolean
@@ -143,6 +173,7 @@ export type MasterProyekEditState = {
     terminsData?: Termins
     fakturPajakData?: FakturPajak[]
     selectBerkasData?: SelectBerkas[]
+    purchaseOrdersData: PurchaseOrder[]
 }
 
 // get proyeks
@@ -203,6 +234,21 @@ export const getTermins = createAsyncThunk(
     }
 )
 
+// get purchase by proyek id
+export const getPurchaseByProyek = createAsyncThunk(
+    SLICE_NAME + '/getPurchaseByProyek',
+    async (data: { id: string }) => {
+        console.log('data', data.id)
+        const response = await apiGetPurchaseByProyek<
+            GetPurchaseByProyekResponse,
+            { id: string }
+        >(data)
+
+        console.log('getPurchaseByProyek', getPurchaseByProyek)
+        return response.data
+    }
+)
+
 // get by id
 export const getFakturPajak = createAsyncThunk(
     SLICE_NAME + '/getFakturPajak',
@@ -215,6 +261,19 @@ export const getFakturPajak = createAsyncThunk(
     }
 )
 
+// get all faktur pajak by proyek id
+export const getFakturPajakByProyekId = createAsyncThunk(
+    SLICE_NAME + '/getFakturPajakByProyekId',
+    async (data: { id: string }) => {
+        const response = await apiGetFakturPajakByProyek<
+            FakturPajak,
+            { id: string }
+        >(data)
+        console.log('RES apiGetFakturPajakByProyek', response.data)
+        return response.data
+    }
+)
+
 // Tambahkan di file slice
 export const updateBerkasProyekStatus = createAsyncThunk(
     SLICE_NAME + '/updateBerkasProyekStatus',
@@ -223,14 +282,13 @@ export const updateBerkasProyekStatus = createAsyncThunk(
             boolean,
             typeof data
         >(data)
-        return response.data
+        return response.payload
     }
 )
 
 export const updateProyek = async <T, U extends Record<string, unknown>>(
     data: U
 ) => {
-    // Buat salinan data dan pastikan nilai numerik
     // Buat salinan data dan pastikan nilai numerik
     const processedData = {
         ...data,
@@ -264,6 +322,15 @@ export const deleteProyek = async <T, U extends Record<string, unknown>>(
     return response.data
 }
 
+export const deletePurchase = async <T, U extends Record<string, unknown>>(
+    data: U
+) => {
+    console.log('data', data)
+    const response = await apiDeletePurchaseOrders<T, U>(data)
+    console.log('response deletePurchase', response)
+    return response.data
+}
+
 const initialState: MasterProyekEditState = {
     loading: true,
     loadingKliens: true,
@@ -272,6 +339,7 @@ const initialState: MasterProyekEditState = {
     loadingTermins: true,
     loadingSelectBerkas: true,
     loadingFakturPajak: true,
+    loadingPurchaseOrders: true,
     terminsData: [],
     selectBerkasData: [],
 
@@ -279,6 +347,7 @@ const initialState: MasterProyekEditState = {
     // berkasProyekData: [],
     proyekData: {},
     fakturPajakData: [],
+    purchaseOrdersData: [],
 }
 
 const proyekEditSlice = createSlice({
@@ -322,6 +391,13 @@ const proyekEditSlice = createSlice({
             .addCase(getFakturPajak.pending, (state) => {
                 state.loadingFakturPajak = true
             })
+            .addCase(getFakturPajakByProyekId.fulfilled, (state, action) => {
+                state.fakturPajakData = action.payload
+                state.loadingFakturPajak = false
+            })
+            .addCase(getFakturPajakByProyekId.pending, (state) => {
+                state.loadingFakturPajak = true
+            })
             .addCase(getKliens.fulfilled, (state, action) => {
                 state.kliensData = action.payload
                 state.loadingKliens = false
@@ -342,6 +418,18 @@ const proyekEditSlice = createSlice({
             })
             .addCase(getSubkontraktors.pending, (state) => {
                 state.loadingSubkontraktors = true
+            })
+            // handle Purchaseby Proyek
+            .addCase(getPurchaseByProyek.fulfilled, (state, action) => {
+                state.purchaseOrdersData = action.payload
+                state.loadingPurchaseOrders = false
+            })
+            .addCase(getPurchaseByProyek.pending, (state) => {
+                state.loadingPurchaseOrders = true
+            })
+            .addCase(getPurchaseByProyek.rejected, (state) => {
+                state.loadingPurchaseOrders = false
+                state.purchaseOrdersData = [] // Reset to empty array on error
             })
     },
 })

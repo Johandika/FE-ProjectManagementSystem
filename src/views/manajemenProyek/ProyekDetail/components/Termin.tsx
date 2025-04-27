@@ -16,8 +16,8 @@ import * as Yup from 'yup'
 import dayjs from 'dayjs'
 import { NumericFormat } from 'react-number-format'
 import { apiCreateFakturPajak } from '@/services/FakturPajakService'
-import { getFakturPajaks } from '../store'
 import { extractIntegerFromStringAndFloat } from '@/utils/extractNumberFromString'
+import DescriptionSection from './DesriptionSection'
 
 // Define missing interfaces
 export interface SetSubmitting {
@@ -62,7 +62,6 @@ export default function Termin() {
     }
 
     const onDialogClose = (e: React.MouseEvent) => {
-        console.log('onDialogClose', e)
         setIsOpen(false)
     }
 
@@ -86,7 +85,6 @@ export default function Termin() {
         { setSubmitting }: { setSubmitting: SetSubmitting }
     ) => {
         setSubmitting(true)
-        console.log('values', values)
         const processedData = {
             ...values,
             nominal: extractIntegerFromStringAndFloat(
@@ -122,12 +120,9 @@ export default function Termin() {
         (state) => state.proyekEdit.data.terminsData
     )
 
-    // const fakturPajakData = useAppSelector(
-    //     (state) => state.proyekEdit.data.fakturPajakData
-    // )
-    // const fakturPajaksData = useAppSelector(
-    //     (state) => state.proyekEdit.data.fakturPajakData
-    // )
+    const fakturPajakData = useAppSelector(
+        (state) => state.proyekEdit.data.fakturPajakData
+    )
 
     const loadingTermins = useAppSelector(
         (state) => state.proyekEdit.data.loadingTermins
@@ -139,7 +134,7 @@ export default function Termin() {
 
     const fetchData = (data: { id: string }) => {
         dispatch(getTermins(data)) // by id
-        dispatch(getFakturPajaks()) // by id
+        // dispatch(getFakturPajakByProyek(data)) // by id
     }
 
     useEffect(() => {
@@ -152,47 +147,64 @@ export default function Termin() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
-    console.log(terminsData, 'terminsData')
     return (
         <>
             <Loading loading={loadingTermins}>
                 <div className="flex flex-col py-6 space-y-2">
-                    <Button
-                        size="sm"
-                        variant="solid"
-                        // onClick={}
-                        className="w-fit"
-                    >
-                        Tambah Faktur
-                    </Button>
-                    {terminsData?.map((termin, index) => (
-                        <div
-                            key={index}
-                            className="bg-slate-50 rounded-md flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-between gap-3 p-10 w-full"
+                    <div className="flex flex-row justify-between">
+                        <DescriptionSection
+                            title="Purchase Order"
+                            desc="Tambahkan data purchase order"
+                        />
+                        <Button
+                            size="sm"
+                            variant="twoTone"
+                            // onClick={}
+                            className="w-fit text-xs"
                         >
-                            <div className="text-sm flex flex-col text-slate-600">
-                                {termin.keterangan}
-                                <span className="font-bold text-xl">
-                                    {termin.persen}%
-                                </span>
-                            </div>
-                            {termin.idFakturPajak ? (
-                                <div>
-                                    <Button size="sm" variant="solid" disabled>
-                                        {termin.idFakturPajak}
-                                    </Button>
+                            Tambah Termin
+                        </Button>
+                    </div>
+                    {terminsData?.map((termin, index) => {
+                        // map semua termin yang ada pada proyek ini
+                        // find  data faktur pajak by project dengan termin.idFakturPajak
+                        return (
+                            <div
+                                key={index}
+                                className="bg-slate-50 rounded-md flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-between gap-3 p-10 w-full"
+                            >
+                                <div className="text-sm flex flex-col text-slate-600">
+                                    {termin.keterangan}
+                                    <span className="font-bold text-xl">
+                                        {termin.persen}%
+                                    </span>
                                 </div>
-                            ) : (
-                                <Button
-                                    size="sm"
-                                    variant="solid"
-                                    onClick={() => openDialog(termin)}
-                                >
-                                    Tambah Faktur
-                                </Button>
-                            )}
-                        </div>
-                    ))}
+                                {/* JIka faktur ada tampilkan button edit dan delete faktur */}
+                                {termin.idFakturPajak ? (
+                                    <>
+                                        <div>asgasg</div>
+                                        <div>
+                                            <Button
+                                                size="sm"
+                                                variant="solid"
+                                                disabled
+                                            >
+                                                {termin.idFakturPajak}
+                                            </Button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        variant="solid"
+                                        onClick={() => openDialog(termin)}
+                                    >
+                                        Tambah Faktur
+                                    </Button>
+                                )}
+                            </div>
+                        )
+                    })}
                 </div>
 
                 <Formik

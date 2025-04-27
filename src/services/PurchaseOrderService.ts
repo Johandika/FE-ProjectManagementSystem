@@ -47,6 +47,20 @@ export async function apiGetPurchaseOrder<T, U extends Record<string, unknown>>(
     return res.data
 }
 
+// get by id
+export async function apiGetPurchaseByProyek<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = await ApiService.fetchData<T>({
+        url: `/purchase/project/${data.id}`,
+        method: 'get',
+        data,
+    })
+
+    return res.data
+}
+
 // edit
 export async function apiPutPurchaseOrder<T, U extends Record<string, unknown>>(
     data: U

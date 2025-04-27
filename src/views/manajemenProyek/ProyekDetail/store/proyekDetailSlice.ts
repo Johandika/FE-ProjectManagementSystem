@@ -5,7 +5,7 @@ import {
 } from '@/services/BerkasProyekService'
 import {
     apiGetFakturPajak,
-    apiGetFakturPajaks,
+    apiGetFakturPajakByProyek,
 } from '@/services/FakturPajakService'
 import { apiSelectBerkas } from '@/services/BerkasService'
 
@@ -24,6 +24,8 @@ type FakturPajak = {
     nomor: string
     nominal: number
     tanggal: string
+    keterangan: string
+    status: string
 }
 
 type SelectBerkas = {
@@ -50,15 +52,6 @@ export const getBerkasProyek = createAsyncThunk(
             BerkasProyeks,
             { id: string }
         >(data)
-        return response.data
-    }
-)
-
-// get all fakturPajak
-export const getFakturPajaks = createAsyncThunk(
-    SLICE_NAME + '/getFakturPajaks',
-    async () => {
-        const response = await apiGetFakturPajaks<FakturPajak[]>()
         return response.data
     }
 )
@@ -123,11 +116,11 @@ const proyekDetailSlice = createSlice({
             .addCase(selectBerkas.pending, (state) => {
                 state.loadingSelectBerkas = true
             })
-            .addCase(getFakturPajaks.fulfilled, (state, action) => {
+            .addCase(getFakturPajakByProyek.fulfilled, (state, action) => {
                 state.berkasProyekData = action.payload
                 state.loadingFakturPajaks = false
             })
-            .addCase(getFakturPajaks.pending, (state) => {
+            .addCase(getFakturPajakByProyek.pending, (state) => {
                 state.loadingFakturPajaks = true
             })
             // Tambahkan case untuk update berkas

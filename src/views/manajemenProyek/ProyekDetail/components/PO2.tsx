@@ -20,9 +20,44 @@ import {
 import { formatDate } from '@/utils/formatDate'
 import { DatePicker, Notification, toast } from '@/components/ui'
 import dayjs from 'dayjs'
-import { NumericFormat } from 'react-number-format'
-import { extractNumberFromString } from '@/utils/extractNumberFromString'
-import DescriptionSection from './DesriptionSection'
+
+// Import the utility function for number extraction
+export const extractNumberFromString = (
+    value: string | number | undefined
+): number => {
+    // Jika undefined atau null, kembalikan 0
+    if (value === undefined || value === null) {
+        return 0
+    }
+
+    // Jika sudah number, langsung kembalikan
+    if (typeof value === 'number') {
+        return value
+    }
+
+    // Konversi ke string untuk memastikan
+    const strValue = String(value)
+
+    // Hapus semua karakter non-numerik kecuali titik dan koma
+    // Ganti koma dengan titik untuk format desimal standar
+    const cleanedValue = strValue
+        .replace(/[^\d.,]/g, '') // Hapus semua kecuali angka, titik, dan koma
+        .replace(/\./g, '') // Hapus titik (pemisah ribuan)
+        .replace(/,/g, '.') // Ganti koma dengan titik (untuk desimal)
+
+    // Konversi ke number
+    const result = parseFloat(cleanedValue)
+
+    // Jika NaN, kembalikan 0
+    return isNaN(result) ? 0 : result
+}
+
+// Utility function to format numbers to Indonesia locale
+const formatCurrency = (value: number | string): string => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value
+    if (isNaN(numValue)) return ''
+    return numValue.toLocaleString('id-ID')
+}
 
 // Define types for your PO data
 type PurchaseOrder = {
@@ -71,8 +106,14 @@ type FormValues = {
 // Validation schema for the form fields
 const validationSchema = Yup.object().shape({
     tempPabrik: Yup.string().required('Pabrik harus diisi'),
-    tempNama: Yup.string().required('Pabrik harus diisi'),
+    tempNama: Yup.string().required('Nama harus diisi'),
     tempNomorPo: Yup.string().required('Nomor PO harus diisi'),
+    tempHarga: Yup.string()
+        .required('Harga harus diisi')
+        .test('min-value', 'Harga minimal 1', function (value) {
+            const numValue = extractNumberFromString(value)
+            return numValue >= 1
+        }),
     tempEstimasi: Yup.number()
         .required('Estimasi pengerjaan harus diisi')
         .min(1, 'Estimasi minimal 1 hari'),
@@ -115,6 +156,56 @@ const PurchaseOrder = () => {
             dispatch(getPurchaseByProyek({ id: projectId }))
         }
     }, [dispatch, projectId])
+
+    // Function to create a new purchase order
+    const createPurchaseOrder = async (data: CreatePurchaseOrderRequest) => {
+        setIsSubmitting(true)
+
+        try {
+            await apiCreatePurchaseOrder({
+                ...data,
+                // Ensure numeric values
+                harga: Number(data.harga),
+                estimasi_pengerjaan: Number(data.estimasi_pengerjaan),
+            })
+
+            // Refresh the purchase orders data
+            if (projectId) {
+                dispatch(getPurchaseByProyek({ id: projectId }))
+            }
+            return true
+        } catch (error) {
+            console.error('Error creating purchase order:', error)
+            return false
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    // Function to update an existing purchase order
+    const updatePurchaseOrder = async (data: UpdatePurchaseOrderRequest) => {
+        setIsSubmitting(true)
+
+        try {
+            await apiPutPurchaseOrder({
+                ...data,
+                // Ensure numeric values
+                harga: Number(data.harga),
+                estimasi_pengerjaan: Number(data.estimasi_pengerjaan),
+            })
+
+            // Refresh the purchase orders data
+            if (projectId) {
+                dispatch(getPurchaseByProyek({ id: projectId }))
+            }
+            return true
+        } catch (error) {
+            console.error('Error updating purchase order:', error)
+            return false
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
 
     // Initialize form values
     const initialValues: FormValues = {
@@ -162,7 +253,13 @@ const PurchaseOrder = () => {
                     }
 
                     const handleSave = async () => {
-                        // Validate fields first (your existing validation code)
+                        // Validate fields first
+                        await validateField('tempPabrik')
+                        await validateField('tempHarga')
+                        await validateField('tempEstimasi')
+                        await validateField('tempNomorPo')
+                        await validateField('tempNama')
+                        await validateField('tempTanggalPo')
 
                         if (
                             !errors.tempPabrik &&
@@ -176,6 +273,7 @@ const PurchaseOrder = () => {
 
                             const requestData = {
                                 pabrik: values.tempPabrik,
+                                // Extract actual numeric value from formatted string
                                 harga: extractNumberFromString(
                                     values.tempHarga
                                 ),
@@ -301,7 +399,11 @@ const PurchaseOrder = () => {
 
                             // Set temporary values for editing
                             setFieldValue('tempPabrik', purchase.pabrik)
-                            setFieldValue('tempHarga', purchase.harga)
+                            // Format the price number for display
+                            setFieldValue(
+                                'tempHarga',
+                                formatCurrency(purchase.harga)
+                            )
                             setFieldValue(
                                 'tempEstimasi',
                                 purchase.estimasi_pengerjaan
@@ -314,6 +416,22 @@ const PurchaseOrder = () => {
                             setEditIndex(index)
                             setShowForm(true)
                         }
+                    }
+
+                    // Handle price input formatting
+                    const handlePriceChange = (
+                        e: React.ChangeEvent<HTMLInputElement>
+                    ) => {
+                        const value = e.target.value
+
+                        // Extract numeric value
+                        const numericValue = extractNumberFromString(value)
+
+                        // Format the value
+                        const formattedValue = formatCurrency(numericValue)
+
+                        // Update the field with the formatted value
+                        setFieldValue('tempHarga', formattedValue)
                     }
 
                     // Fungsi untuk membuka dialog konfirmasi
@@ -362,14 +480,14 @@ const PurchaseOrder = () => {
 
                     return (
                         <Form>
-                            <AdaptableCard divider>
+                            <AdaptableCard divider className="mb-4">
                                 <div className="flex justify-between items-center mb-4">
-                                    {/* <div className="flex flex-col gap-4 border-b border-gray-200 py-6"></div> */}
-                                    <DescriptionSection
-                                        title="Purchase Order"
-                                        desc="Tambahkan data
-                                            purchase order"
-                                    />
+                                    <div>
+                                        <h5>Purchase Order</h5>
+                                        <p className="mb-0">
+                                            Tambahkan data purchase order
+                                        </p>
+                                    </div>
                                     {!showForm && (
                                         <Button
                                             size="sm"
@@ -518,7 +636,7 @@ const PurchaseOrder = () => {
                                                 </Field>
                                             </FormItem>
 
-                                            {/* Edit Harga*/}
+                                            {/* Edit Harga - Modified for formatting */}
                                             <FormItem
                                                 className="mb-3"
                                                 label="Harga"
@@ -538,22 +656,18 @@ const PurchaseOrder = () => {
                                                 <Field name="tempHarga">
                                                     {({
                                                         field,
-                                                        form,
                                                     }: FieldProps) => (
-                                                        <NumericFormat
-                                                            {...field}
-                                                            customInput={Input}
+                                                        <Input
+                                                            type="text"
+                                                            autoComplete="off"
                                                             placeholder="Harga"
-                                                            thousandSeparator="."
-                                                            decimalSeparator=","
-                                                            onValueChange={(
-                                                                values
-                                                            ) => {
-                                                                form.setFieldValue(
-                                                                    field.name,
-                                                                    values.value
+                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={(e) =>
+                                                                handlePriceChange(
+                                                                    e
                                                                 )
-                                                            }}
+                                                            }
                                                         />
                                                     )}
                                                 </Field>
@@ -731,8 +845,9 @@ const PurchaseOrder = () => {
                                     purchaseOrdersData.length === 0) &&
                                     !showForm && (
                                         <div className="text-center py-8 text-gray-500">
-                                            Belum ada data faktur. Klik 'Tambah
-                                            Faktur' untuk menambahkan.
+                                            Belum ada data purchase order. Klik
+                                            'Tambah Purchase Order' untuk
+                                            menambahkan.
                                         </div>
                                     )}
                             </AdaptableCard>
@@ -740,13 +855,16 @@ const PurchaseOrder = () => {
                             <ConfirmDialog
                                 isOpen={dialogOpen}
                                 type="danger"
-                                title="Hapus Faktur"
+                                title="Hapus Purchase Order"
                                 confirmButtonColor="red-600"
                                 onClose={handleCancelDelete}
                                 onRequestClose={handleCancelDelete}
                                 onCancel={handleCancelDelete}
                                 onConfirm={handleDelete}
-                            ></ConfirmDialog>
+                            >
+                                Apakah Anda yakin ingin menghapus purchase order
+                                ini?
+                            </ConfirmDialog>
                         </Form>
                     )
                 }}

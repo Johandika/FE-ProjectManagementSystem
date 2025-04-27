@@ -23,7 +23,7 @@ import ApiService from './ApiService'
 //     })
 // }
 
-// get by id
+// get termin by project
 export async function apiGetTermin<T, U extends Record<string, unknown>>(
     params: U
 ) {

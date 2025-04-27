@@ -48,7 +48,7 @@ export default function Detail() {
 
     return (
         <section className=" ">
-            <div className="">
+            <div>
                 {/* Informasi Dasar */}
                 <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
                     <DescriptionSection

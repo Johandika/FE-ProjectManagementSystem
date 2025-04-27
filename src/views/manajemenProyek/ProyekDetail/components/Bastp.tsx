@@ -26,7 +26,6 @@ import { Field, FieldProps, Form, Formik } from 'formik'
 import {
     apiCreateBerkasProyek,
     apiDeleteBerkasProyek,
-    apiUpdateStatusBerkasProyek,
 } from '@/services/BerkasProyekService'
 import { HiOutlineTrash } from 'react-icons/hi'
 
@@ -91,7 +90,43 @@ export default function Bastp() {
             const data = { id: updatedItem.id, status: updatedItem.status }
 
             // Dispatch action untuk update
-            await dispatch(updateBerkasProyekStatus(data))
+            try {
+                // Dispatch action untuk update
+                const result = await dispatch(updateBerkasProyekStatus(data))
+                // Show success notification if update was successful
+                if (result.payload.statusCode === 200) {
+                    popNotification('updated')
+                } else {
+                    toast.push(
+                        <Notification
+                            title="Error updating BASTP"
+                            type="danger"
+                            duration={2500}
+                        >
+                            {result.payload.message}
+                        </Notification>,
+                        {
+                            placement: 'top-center',
+                        }
+                    )
+                }
+            } catch (error) {
+                console.error('Error updating BASTP status:', error)
+
+                // Show error notification
+                toast.push(
+                    <Notification
+                        title="Error updating BASTP"
+                        type="danger"
+                        duration={2500}
+                    >
+                        An error occurred while updating the BASTP status
+                    </Notification>,
+                    {
+                        placement: 'top-center',
+                    }
+                )
+            }
         }
 
     const fetchData = (data: { id: string }) => {

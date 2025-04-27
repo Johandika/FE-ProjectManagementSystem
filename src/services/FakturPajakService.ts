@@ -13,6 +13,19 @@ export async function apiGetFakturPajaks<T, U extends Record<string, unknown>>(
     return res
 }
 
+// get all faktur pajak by proyek
+export async function apiGetFakturPajakByProyek<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = await ApiService.fetchData<T>({
+        url: `/fakturPajak/project/${data.id}`,
+        method: 'get',
+        data: data, //ubah
+    })
+    return res.data
+}
+
 // delete
 export async function apiDeleteFakturPajaks<
     T,
@@ -32,19 +45,6 @@ export async function apiDeleteFakturPajaks<
             method: 'delete',
         })
     }
-}
-
-// get one by id proyek
-export async function apiGetFakturPajakByProyek<
-    T,
-    U extends Record<string, unknown>
->(params: U) {
-    const res = await ApiService.fetchData<T>({
-        url: `/fakturPajak/project/${params.id}`,
-        method: 'get',
-        params,
-    })
-    return res.data
 }
 
 // get one by id faktur
