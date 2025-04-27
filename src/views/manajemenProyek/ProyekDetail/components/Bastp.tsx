@@ -93,6 +93,8 @@ export default function Bastp() {
             try {
                 // Dispatch action untuk update
                 const result = await dispatch(updateBerkasProyekStatus(data))
+
+                console.log(result)
                 // Show success notification if update was successful
                 if (result.payload.statusCode === 200) {
                     popNotification('updated')

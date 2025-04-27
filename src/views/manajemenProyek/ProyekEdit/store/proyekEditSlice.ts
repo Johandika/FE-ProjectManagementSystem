@@ -164,6 +164,7 @@ export type MasterProyekEditState = {
     loadingFakturPajak: boolean
     loadingSelectBerkas: boolean
     loadingPurchaseOrders: boolean
+    loadingFakturPajakByProyekData: boolean
     updateBerkasStatus: boolean
     proyekData: ProyekData
     loadingUpdateBerkasStatus: boolean
@@ -172,6 +173,7 @@ export type MasterProyekEditState = {
     subkontraktorsData?: GetSubkontraktorsResponse
     terminsData?: Termins
     fakturPajakData?: FakturPajak[]
+    fakturPajakByProyekData?: FakturPajak[]
     selectBerkasData?: SelectBerkas[]
     purchaseOrdersData: PurchaseOrder[]
 }
@@ -269,7 +271,6 @@ export const getFakturPajakByProyekId = createAsyncThunk(
             FakturPajak,
             { id: string }
         >(data)
-        console.log('RES apiGetFakturPajakByProyek', response.data)
         return response.data
     }
 )
@@ -282,7 +283,7 @@ export const updateBerkasProyekStatus = createAsyncThunk(
             boolean,
             typeof data
         >(data)
-        return response.payload
+        return response
     }
 )
 
@@ -340,6 +341,7 @@ const initialState: MasterProyekEditState = {
     loadingSelectBerkas: true,
     loadingFakturPajak: true,
     loadingPurchaseOrders: true,
+    loadingFakturPajakByProyekData: true,
     terminsData: [],
     selectBerkasData: [],
 
@@ -347,6 +349,7 @@ const initialState: MasterProyekEditState = {
     // berkasProyekData: [],
     proyekData: {},
     fakturPajakData: [],
+    fakturPajakByProyekData: [],
     purchaseOrdersData: [],
 }
 
@@ -392,11 +395,11 @@ const proyekEditSlice = createSlice({
                 state.loadingFakturPajak = true
             })
             .addCase(getFakturPajakByProyekId.fulfilled, (state, action) => {
-                state.fakturPajakData = action.payload
+                state.fakturPajakByProyekData = action.payload
                 state.loadingFakturPajak = false
             })
             .addCase(getFakturPajakByProyekId.pending, (state) => {
-                state.loadingFakturPajak = true
+                state.loadingFakturPajakByProyekData = true
             })
             .addCase(getKliens.fulfilled, (state, action) => {
                 state.kliensData = action.payload

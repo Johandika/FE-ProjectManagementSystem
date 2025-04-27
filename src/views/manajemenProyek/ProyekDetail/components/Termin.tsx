@@ -1,7 +1,11 @@
 import { Loading } from '@/components/shared'
 import { useAppDispatch } from '@/store'
 import React, { useEffect, useState } from 'react'
-import { getTermins, useAppSelector } from '../../ProyekEdit/store'
+import {
+    getFakturPajakByProyekId,
+    getTermins,
+    useAppSelector,
+} from '../../ProyekEdit/store'
 import {
     Button,
     DatePicker,
@@ -18,6 +22,8 @@ import { NumericFormat } from 'react-number-format'
 import { apiCreateFakturPajak } from '@/services/FakturPajakService'
 import { extractIntegerFromStringAndFloat } from '@/utils/extractNumberFromString'
 import DescriptionSection from './DesriptionSection'
+import { formatDate } from '@/utils/formatDate'
+import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
 
 // Define missing interfaces
 export interface SetSubmitting {
@@ -120,8 +126,8 @@ export default function Termin() {
         (state) => state.proyekEdit.data.terminsData
     )
 
-    const fakturPajakData = useAppSelector(
-        (state) => state.proyekEdit.data.fakturPajakData
+    const FakturPajakByProyekData = useAppSelector(
+        (state) => state.proyekEdit.data.fakturPajakByProyekData
     )
 
     const loadingTermins = useAppSelector(
@@ -134,6 +140,7 @@ export default function Termin() {
 
     const fetchData = (data: { id: string }) => {
         dispatch(getTermins(data)) // by id
+        dispatch(getFakturPajakByProyekId(data))
         // dispatch(getFakturPajakByProyek(data)) // by id
     }
 
@@ -147,14 +154,15 @@ export default function Termin() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
+    console.log('FakturPajakByProyekData', FakturPajakByProyekData)
     return (
         <>
             <Loading loading={loadingTermins}>
                 <div className="flex flex-col py-6 space-y-2">
                     <div className="flex flex-row justify-between">
                         <DescriptionSection
-                            title="Purchase Order"
-                            desc="Tambahkan data purchase order"
+                            title="Termin"
+                            desc="Tambahkan data termin dan faktur"
                         />
                         <Button
                             size="sm"
@@ -168,40 +176,102 @@ export default function Termin() {
                     {terminsData?.map((termin, index) => {
                         // map semua termin yang ada pada proyek ini
                         // find  data faktur pajak by project dengan termin.idFakturPajak
+                        const fakturByTermin = FakturPajakByProyekData?.find(
+                            (faktur) => faktur.id === termin.idFakturPajak
+                        )
+                        console.log('fakturByTermin', fakturByTermin)
                         return (
                             <div
                                 key={index}
-                                className="bg-slate-50 rounded-md flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-between gap-3 p-10 w-full"
+                                className="bg-slate-50 rounded-md flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-between gap-3 p-6 sm:p-10 w-full"
                             >
-                                <div className="text-sm flex flex-col text-slate-600">
-                                    {termin.keterangan}
-                                    <span className="font-bold text-xl">
-                                        {termin.persen}%
-                                    </span>
+                                <div className="flex flex-col  gap-4  sm:gap-0 sm:flex-row w-full">
+                                    <div className="text-sm flex flex-col text-slate-600 flex-auto sm:items-start items-center">
+                                        {termin.keterangan}
+                                        <span className="font-bold text-xl">
+                                            {termin.persen}%
+                                        </span>
+                                    </div>
+                                    {/* JIka faktur ada tampilkan button edit dan delete faktur */}
+                                    {termin.idFakturPajak ? (
+                                        <>
+                                            {fakturByTermin && (
+                                                <>
+                                                    <div className="flex flex-col items-center sm:items-start flex-1">
+                                                        <span className="font-semibold text-base">
+                                                            INFORMASI FAKTUR
+                                                        </span>
+                                                        <div>
+                                                            <span className="font-semibold">
+                                                                Nomor :{' '}
+                                                            </span>
+                                                            {
+                                                                fakturByTermin?.nominal
+                                                            }
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-semibold">
+                                                                Nominal :{' '}
+                                                            </span>
+                                                            {
+                                                                fakturByTermin?.nominal
+                                                            }
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-semibold">
+                                                                Tanggal :{' '}
+                                                            </span>
+                                                            {formatDate(
+                                                                fakturByTermin?.tanggal ||
+                                                                    ''
+                                                            ) || ''}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex space-x-6 sm:space-x-2 justify-center sm:justify-start">
+                                                        <Button
+                                                            type="button"
+                                                            shape="circle"
+                                                            variant="plain"
+                                                            size="sm"
+                                                            icon={
+                                                                <HiOutlinePencil />
+                                                            }
+                                                            className="text-indigo-500"
+                                                            // onClick={() =>
+                                                            //     handleEdit(
+                                                            //         index
+                                                            //     )
+                                                            // }
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            shape="circle"
+                                                            variant="plain"
+                                                            size="sm"
+                                                            className="text-red-500"
+                                                            icon={
+                                                                <HiOutlineTrash />
+                                                            }
+                                                            // onClick={() =>
+                                                            //     handleConfirmDelete(
+                                                            //         index
+                                                            //     )
+                                                            // }
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            variant="solid"
+                                            onClick={() => openDialog(termin)}
+                                        >
+                                            Tambah Faktur
+                                        </Button>
+                                    )}
                                 </div>
-                                {/* JIka faktur ada tampilkan button edit dan delete faktur */}
-                                {termin.idFakturPajak ? (
-                                    <>
-                                        <div>asgasg</div>
-                                        <div>
-                                            <Button
-                                                size="sm"
-                                                variant="solid"
-                                                disabled
-                                            >
-                                                {termin.idFakturPajak}
-                                            </Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <Button
-                                        size="sm"
-                                        variant="solid"
-                                        onClick={() => openDialog(termin)}
-                                    >
-                                        Tambah Faktur
-                                    </Button>
-                                )}
                             </div>
                         )
                     })}
