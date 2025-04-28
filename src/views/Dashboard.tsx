@@ -12,7 +12,7 @@ const Dashboard = () => {
                 <h3>Dashboard</h3>
                 <p>Masih dummy, tergantung kebutuhan</p>
             </div>
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2">
                 <SplineArea />
                 <BasicBar />
                 <BasicColumn />

@@ -7,8 +7,8 @@ import ActionLink from '@/components/shared/ActionLink'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
-import useAuth from '@/utils/hooks/useAuth'
 import type { CommonProps } from '@/@types/common'
+import { apiRegister } from '@/services/AuthService'
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -16,27 +16,26 @@ interface SignUpFormProps extends CommonProps {
 }
 
 type SignUpFormSchema = {
-    userName: string
+    nama: string
     password: string
     email: string
+    nomor_telepon: number
 }
 
 const validationSchema = Yup.object().shape({
-    userName: Yup.string().required('Please enter your user name'),
+    nama: Yup.string().required('Nama tidak boleh kosong'),
     email: Yup.string()
-        .email('Invalid email')
-        .required('Please enter your email'),
-    password: Yup.string().required('Please enter your password'),
+        .email('Email tidak valid')
+        .required('Email tidak boleh kosong'),
+    password: Yup.string().required('Password tidak boleh kosong'),
     confirmPassword: Yup.string().oneOf(
         [Yup.ref('password')],
-        'Your passwords do not match'
+        'Password tidak cocok'
     ),
 })
 
 const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, signInUrl = '/sign-in' } = props
-
-    const { signUp } = useAuth()
 
     const [message, setMessage] = useTimeOutMessage()
 
@@ -44,9 +43,17 @@ const SignUpForm = (props: SignUpFormProps) => {
         values: SignUpFormSchema,
         setSubmitting: (isSubmitting: boolean) => void
     ) => {
-        const { userName, password, email } = values
+        console.log('value', values)
+
+        const { nama, password, email, nomor_telepon } = values
         setSubmitting(true)
-        const result = await signUp({ userName, password, email })
+
+        const result = await apiRegister({
+            nama,
+            password,
+            email,
+            nomor_telepon,
+        })
 
         if (result?.status === 'failed') {
             setMessage(result.message)
@@ -64,10 +71,11 @@ const SignUpForm = (props: SignUpFormProps) => {
             )}
             <Formik
                 initialValues={{
-                    userName: 'admin1',
-                    password: '123Qwe1',
-                    confirmPassword: '123Qwe1',
-                    email: 'test@testmail.com',
+                    nama: '',
+                    password: '',
+                    confirmPassword: '',
+                    email: '',
+                    nomor_telepon: '' as unknown as number,
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values, { setSubmitting }) => {
@@ -82,15 +90,15 @@ const SignUpForm = (props: SignUpFormProps) => {
                     <Form>
                         <FormContainer>
                             <FormItem
-                                label="User Name"
-                                invalid={errors.userName && touched.userName}
-                                errorMessage={errors.userName}
+                                label="Nama"
+                                invalid={errors.nama && touched.nama}
+                                errorMessage={errors.nama}
                             >
                                 <Field
                                     type="text"
                                     autoComplete="off"
-                                    name="userName"
-                                    placeholder="User Name"
+                                    name="nama"
+                                    placeholder="Nama Lengkap"
                                     component={Input}
                                 />
                             </FormItem>
@@ -108,6 +116,22 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 />
                             </FormItem>
                             <FormItem
+                                label="Nomor Telepon"
+                                invalid={
+                                    errors.nomor_telepon &&
+                                    touched.nomor_telepon
+                                }
+                                errorMessage={errors.nomor_telepon}
+                            >
+                                <Field
+                                    type="text"
+                                    autoComplete="off"
+                                    name="nomor_telepon"
+                                    placeholder="Nomor Telepon"
+                                    component={Input}
+                                />
+                            </FormItem>
+                            <FormItem
                                 label="Password"
                                 invalid={errors.password && touched.password}
                                 errorMessage={errors.password}
@@ -120,7 +144,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 />
                             </FormItem>
                             <FormItem
-                                label="Confirm Password"
+                                label="Konfirmasi Password"
                                 invalid={
                                     errors.confirmPassword &&
                                     touched.confirmPassword
@@ -130,7 +154,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 <Field
                                     autoComplete="off"
                                     name="confirmPassword"
-                                    placeholder="Confirm Password"
+                                    placeholder="Konfirmasi Password"
                                     component={PasswordInput}
                                 />
                             </FormItem>
@@ -140,9 +164,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                 variant="solid"
                                 type="submit"
                             >
-                                {isSubmitting
-                                    ? 'Creating Account...'
-                                    : 'Sign Up'}
+                                {isSubmitting ? 'Membuat Akun...' : 'Daftar'}
                             </Button>
                             <div className="mt-4 text-center">
                                 <span>Sudah punya akun? </span>

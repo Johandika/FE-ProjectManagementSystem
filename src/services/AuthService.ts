@@ -7,6 +7,7 @@ import type {
     SignInResponse,
     SignUpResponse,
 } from '@/@types/auth'
+import { apiCreateRole, apiGetRoles } from './RoleService'
 
 export async function apiSignIn(data: SignInCredential) {
     return ApiService.fetchData<SignInResponse>({
@@ -37,6 +38,32 @@ export async function apiForgotPassword(data: ForgotPassword) {
         method: 'post',
         data,
     })
+}
+
+export async function apiRegister(data) {
+    console.log('data', data)
+    await apiCreateRole({
+        nama: 'Suped_Admin',
+        keterangan: '-',
+    })
+
+    const roles = await apiGetRoles()
+    const idRole = roles?.data.data[0].id
+    const proceedData = {
+        ...data,
+        idRole,
+    }
+    console.log('proceedData', proceedData)
+
+    const res = await ApiService.fetchData({
+        url: '/user/register',
+        method: 'post',
+        data: proceedData,
+    })
+
+    console.log('res', res)
+
+    return res
 }
 
 export async function apiResetPassword(data: ResetPassword) {

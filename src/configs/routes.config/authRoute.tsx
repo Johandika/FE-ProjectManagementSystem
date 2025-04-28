@@ -21,6 +21,12 @@ const authRoute: Routes = [
         authority: [],
     },
     {
+        key: 'register',
+        path: `/register`,
+        component: lazy(() => import('@/views/auth/SignUp')),
+        authority: [],
+    },
+    {
         key: 'resetPassword',
         path: `/reset-password`,
         component: lazy(() => import('@/views/auth/ResetPassword')),

@@ -15,6 +15,7 @@ interface SignInFormProps extends CommonProps {
     disableSubmit?: boolean
     forgotPasswordUrl?: string
     signUpUrl?: string
+    register?: string
 }
 
 type SignInFormSchema = {
@@ -36,6 +37,7 @@ const SignInForm = (props: SignInFormProps) => {
         disableSubmit = false,
         className,
         forgotPasswordUrl = '/forgot-password',
+        register = '/register',
     } = props
 
     const [message, setMessage] = useTimeOutMessage()
