@@ -69,3 +69,78 @@ export async function apiCreateSubkontraktor<
         data,
     })
 }
+
+// =====================================================
+
+// get all subkon by project
+export async function apiGetSubkontraktorsByProject<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = await ApiService.fetchData<T>({
+        url: `/subkonProject/project/${data.id}`,
+        method: 'get',
+        params: data,
+    })
+
+    return res
+}
+
+// get one subkon proyek
+export async function apiGetSubkontraktorByProject<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = await ApiService.fetchData<T>({
+        url: `/subkonProject/${data.id}`,
+        method: 'get',
+        params: data,
+    })
+
+    return res
+}
+
+// get one subkon proyek
+export async function apiCreateSubkontraktorProject<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: '/subkonProject',
+        method: 'post',
+        data,
+    })
+}
+
+// update subkon proyek
+export async function apiUpdateSubkontraktorProject<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/subkonProject/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// update subkon proyek
+export async function apiDeleteSubkontraktorsProject<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    if (Array.isArray(data.id)) {
+        // jika ada penghapusan multiple
+        return ApiService.fetchData<T>({
+            url: '/subkonProject',
+            method: 'delete',
+            data,
+        })
+    } else {
+        // Untuk id tunggal
+        return ApiService.fetchData<T>({
+            url: `/subkonProject/${data.id}`,
+            method: 'delete',
+        })
+    }
+}

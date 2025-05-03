@@ -88,6 +88,7 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
 }
 
 const ProyekTable = () => {
+    const navigate = useNavigate()
     const tableRef = useRef<DataTableResetHandle>(null)
 
     const dispatch = useAppDispatch()
@@ -108,6 +109,11 @@ const ProyekTable = () => {
     const kliensList = useAppSelector(
         (state) => state.proyekList.data.kliensList
     )
+
+    // Handler for row click to navigate to detail page
+    const handleRowClick = (row: Proyek) => {
+        navigate(`/manajemen-proyek-detail/${row.id}`)
+    }
 
     // Process the data to include client names
     const data = useMemo(() => {
@@ -198,24 +204,27 @@ const ProyekTable = () => {
                     return (
                         <div className="flex flex-col gap-1">
                             {row.Lokasis && row.Lokasis.length > 0 ? (
-                                row.Lokasis.map((loc, index) => (
-                                    <a
-                                        key={index}
-                                        href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group"
-                                    >
-                                        <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
-                                            <div className="text-lg group-hover:scale-110 transition">
-                                                <IoLocationSharp className="group-hover:text-blue-600 transition" />
+                                row.Lokasis.map((loc, index) => {
+                                    console.log('row', row)
+                                    return (
+                                        <a
+                                            key={index}
+                                            href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group"
+                                        >
+                                            <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
+                                                <div className="text-lg group-hover:scale-110 transition">
+                                                    <IoLocationSharp className="group-hover:text-blue-600 transition" />
+                                                </div>
+                                                <div className="text-blue-600">
+                                                    {loc.lokasi}
+                                                </div>
                                             </div>
-                                            <div className="text-blue-600">
-                                                {loc.lokasi}
-                                            </div>
-                                        </div>
-                                    </a>
-                                ))
+                                        </a>
+                                    )
+                                })
                             ) : (
                                 <span className="text-gray-400">
                                     Tidak ada lokasi
@@ -268,7 +277,7 @@ const ProyekTable = () => {
                 minWidth: 150,
                 cell: (props) => {
                     const row = props.row.original
-                    const progress = row.progress || 0 // Default to 0 if undefined
+                    const progress = row.progress || 0
 
                     return (
                         <div className="flex items-center justify-start">
@@ -365,6 +374,7 @@ const ProyekTable = () => {
                 onPaginationChange={onPaginationChange}
                 onSelectChange={onSelectChange}
                 onSort={onSort}
+                onRowClick={handleRowClick} // Add this line to pass the handleRowClick function
             />
             <ProyekDeleteConfirmation />
         </>

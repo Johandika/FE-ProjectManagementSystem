@@ -275,7 +275,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                 stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                             >
                                 <div>
-                                    {type === 'new' && (
+                                    {type === 'edit' && (
                                         <DeleteProyekButton
                                             onDelete={onDelete as OnDelete}
                                         />

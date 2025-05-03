@@ -179,7 +179,7 @@ const PurchaseOrder = () => {
                                 harga: extractNumberFromString(
                                     values.tempHarga
                                 ),
-                                estimasi_pengerjaan: Number(
+                                estimasi_pengerjaan: extractNumberFromString(
                                     values.tempEstimasi
                                 ),
                                 idProject: values.tempIdProject,

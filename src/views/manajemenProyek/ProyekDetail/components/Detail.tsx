@@ -131,7 +131,7 @@ export default function Detail() {
                                             <span key={berkas.id}>
                                                 {berkas.nama}
                                                 {index <
-                                                proyekData.BerkasProjects
+                                                proyekData?.BerkasProjects
                                                     .length -
                                                     1
                                                     ? ', '
@@ -152,75 +152,9 @@ export default function Detail() {
                         </div>
                     </div>
                 </div>
-                {/* Informasi Lokasi */}
-                <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
-                    <DescriptionSection
-                        title="Informasi Lokasi"
-                        desc="Informasi lokasi proyek"
-                    />
-                    {proyekData && (
-                        <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-                            {proyekData.Lokasis?.map((data, index) => (
-                                <a
-                                    key={data.id}
-                                    href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={classNames(
-                                        'flex items-center px-4 py-6 group',
-                                        !isLastChild(
-                                            proyekData.Lokasis as [],
-                                            index
-                                        ) &&
-                                            'border-b border-gray-200 dark:border-gray-600'
-                                    )}
-                                >
-                                    <div className="flex items-center">
-                                        <div className="text-3xl">
-                                            <IoLocationSharp className="group-hover:text-blue-600 transition" />
-                                        </div>
-                                        <div className="ml-3 rtl:mr-3">
-                                            <div className="flex items-center">
-                                                <div className="text-gray-900 dark:text-gray-100 font-semibold">
-                                                    {data.lokasi}
-                                                </div>
-                                            </div>
-                                            <span>
-                                                lat: {data.latitude}, long:{' '}
-                                                {data.longitude}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </a>
-                            ))}
-                            {!proyekData.Lokasis && (
-                                <div>Lokasi tidak terdaftar</div>
-                            )}
-                        </div>
-                    )}
-                </div>
-                {/* Informasi Termin */}
-                <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
-                    <DescriptionSection
-                        title="Informasi Termin"
-                        desc="Informasi termin pembayaran proyek"
-                    />
-                    <div className="space-y-2">
-                        {proyekData.TerminProjects?.map((termin, index) => (
-                            <div
-                                key={index}
-                                className="bg-slate-50 rounded-md flex flex-row items-center gap-3 p-6 w-full"
-                            >
-                                {termin.keterangan} = {termin.persen}%
-                            </div>
-                        ))}
-                        {!proyekData.TerminProjects && (
-                            <div>Termin tidak terdaftar</div>
-                        )}
-                    </div>
-                </div>
+
                 {/* Subkontraktor */}
-                <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
+                {/* <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
                     <DescriptionSection
                         title="Informasi Subkontraktor"
                         desc="Informasi subkontraktor proyek"
@@ -278,7 +212,7 @@ export default function Detail() {
                     {!proyekData.SubkonProjects && (
                         <div>Subkontraktor tidak terdaftar</div>
                     )}
-                </div>
+                </div> */}
             </div>
         </section>
     )

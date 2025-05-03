@@ -40,6 +40,7 @@ type DataTableProps<T> = {
     onPaginationChange?: (page: number) => void
     onSelectChange?: (num: number) => void
     onSort?: (sort: OnSortParam) => void
+    onRowClick?: (row: T) => void // Add this new prop
     pageSizes?: number[]
     selectable?: boolean
     skeletonAvatarColumns?: number[]
@@ -115,6 +116,7 @@ function _DataTable<T>(
         onPaginationChange,
         onSelectChange,
         onSort,
+        onRowClick, // Extract the onRowClick prop
         pageSizes = [10, 25, 50, 100],
         selectable = false,
         skeletonAvatarProps,
@@ -311,7 +313,18 @@ function _DataTable<T>(
                             .rows.slice(0, pageSize)
                             .map((row) => {
                                 return (
-                                    <Tr key={row.id}>
+                                    <Tr
+                                        key={row.id}
+                                        className={
+                                            onRowClick
+                                                ? 'cursor-pointer hover:bg-gray-50'
+                                                : ''
+                                        }
+                                        onClick={() =>
+                                            onRowClick &&
+                                            onRowClick(row.original as T)
+                                        }
+                                    >
                                         {row.getVisibleCells().map((cell) => {
                                             return (
                                                 <Td

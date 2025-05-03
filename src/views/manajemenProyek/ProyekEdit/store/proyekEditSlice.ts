@@ -29,6 +29,7 @@ interface Termin {
 }
 
 interface Lokasi {
+    id?: string
     lokasi: string
     longitude: number
     latitude: number
