@@ -109,6 +109,10 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                         label: `${client.nama}`,
                                     })
                                 )
+
+                                // console.log('field.value1', field.value)
+                                // console.log('selected client', selectedClient)
+                                // console.log(' kliensList', kliensList)
                                 return (
                                     <Select
                                         field={field}

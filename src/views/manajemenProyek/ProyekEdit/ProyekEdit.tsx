@@ -144,7 +144,7 @@ const ProyekEdit = () => {
               nilai_kontrak: proyekData.nilai_kontrak,
               timeline: proyekData.timeline,
               keterangan: proyekData.keterangan,
-              idClient: proyekData.idClient,
+              idClient: proyekData.Client.id,
               //   Pakai untuk nanti
               //       lokasi: proyekData.Lokasis,
               //       subkontraktor: proyekData.SubkonProjects,

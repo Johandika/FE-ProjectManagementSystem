@@ -50,15 +50,18 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
 
-    const onDetail = () => {
+    const onDetail = (e) => {
+        e.stopPropagation()
         navigate(`/manajemen-proyek-detail/${row.id}`)
     }
 
-    const onEdit = () => {
+    const onEdit = (e) => {
+        e.stopPropagation()
         navigate(`/manajemen-proyek-edit/${row.id}`)
     }
 
-    const onDelete = () => {
+    const onDelete = (e) => {
+        e.stopPropagation()
         dispatch(toggleDeleteConfirmation(true))
         dispatch(setSelectedProyek(row.id))
     }
@@ -67,19 +70,19 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
         <div className="flex justify-end text-lg">
             <span
                 className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onDetail}
+                onClick={(e) => onDetail(e)}
             >
                 <TbReportSearch />
             </span>
             <span
                 className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
+                onClick={(e) => onEdit(e)}
             >
                 <HiOutlinePencil />
             </span>
             <span
                 className="cursor-pointer p-2 hover:text-red-500"
-                onClick={onDelete}
+                onClick={(e) => onDelete(e)}
             >
                 <HiOutlineTrash />
             </span>
@@ -374,7 +377,7 @@ const ProyekTable = () => {
                 onPaginationChange={onPaginationChange}
                 onSelectChange={onSelectChange}
                 onSort={onSort}
-                onRowClick={handleRowClick} // Add this line to pass the handleRowClick function
+                onRowClick={handleRowClick}
             />
             <ProyekDeleteConfirmation />
         </>

@@ -1,830 +1,389 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
+import DataTable from '@/components/shared/DataTable'
+import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
+import { TbReportSearch } from 'react-icons/tb'
 import {
-    HiOutlineTrash,
-    HiOutlinePencil,
-    HiOutlineDocument,
-} from 'react-icons/hi'
-import { LuFilePlus2 } from 'react-icons/lu'
-import classNames from 'classnames'
-import isLastChild from '@/utils/isLastChild'
-import DescriptionSection from './DesriptionSection'
-import reducer, {
-    getAdendumsByProyek,
+    getProyeks,
+    setTableData,
+    setSelectedProyek,
+    toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
+    getKliens,
 } from '../store'
-import { injectReducer } from '@/store'
-import { Field, FieldProps, Form, Formik } from 'formik'
-import { FormItem, FormContainer } from '@/components/ui/Form'
-import Input from '@/components/ui/Input'
-import Button from '@/components/ui/Button'
-import AdaptableCard from '@/components/shared/AdaptableCard'
-import { ConfirmDialog, Loading } from '@/components/shared'
-import * as Yup from 'yup'
-import { Notification, toast } from '@/components/ui'
-import DatePicker from '@/components/ui/DatePicker'
-import { NumericFormat } from 'react-number-format'
-import { extractNumberFromString } from '@/utils/extractNumberFromString'
-import {
-    apiCreateAdendum,
-    apiDeleteAdendum,
-    apiEditAdendum,
-    apiUpdateStatusAdendum,
-} from '@/services/AdendumService'
+import useThemeClass from '@/utils/hooks/useThemeClass'
+import ProyekDeleteConfirmation from './ProyekDeleteConfirmation'
+import { useNavigate } from 'react-router-dom'
+import cloneDeep from 'lodash/cloneDeep'
+import type {
+    DataTableResetHandle,
+    OnSortParam,
+    ColumnDef,
+} from '@/components/shared/DataTable'
+import { IoLocationSharp } from 'react-icons/io5'
+import { AiFillCreditCard } from 'react-icons/ai'
+import { formatDate } from '@/utils/formatDate'
 
-type Adendum = {
+type Proyek = {
     id: string
-    dasar_adendum: string
-    nilai_sebelum_adendum: number
-    nilai_adendum: number
-    tanggal: string
-    idProject: string
+    pekerjaan: string
+    pic: string
+    client: string
+    nomor_kontrak: number
+    tanggal_service_po: string
+    tanggal_delivery: string
+    tanggal_kontrak: string
+    nilai_kontrak: number
+    uang_muka: number
+    progress: number
     status: string
+    idKlien: string
+    Lokasis?: Array<{
+        lokasi: string
+        latitude: number
+        longitude: number
+    }>
 }
 
-// Form values type
-type FormValues = {
-    tempDasarAdendum: string
-    tempNilaiSebelumAdendum: number | string
-    tempNilaiAdendum: number | string
-    tempTanggal: Date | null
-    tempIdProject: string
-}
-
-// Validation schema for the form fields
-const validationSchema = Yup.object().shape({
-    tempDasarAdendum: Yup.string().required('Dasar adendum harus diisi'),
-    tempNilaiSebelumAdendum: Yup.string().required(
-        'Nilai sebelum adendum harus diisi'
-    ),
-    tempNilaiAdendum: Yup.string().required('Nilai adendum harus diisi'),
-    tempTanggal: Yup.date()
-        .required('Tanggal harus diisi')
-        .typeError('Format tanggal tidak valid'),
-})
-
-injectReducer('proyekDetail', reducer)
-
-export default function Adendum() {
-    const [showForm, setShowForm] = useState(false)
-    const [editIndex, setEditIndex] = useState<number | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [dialogOpen, setDialogOpen] = useState(false)
-    const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
-    // New state for status confirmation dialog
-    const [statusDialogOpen, setStatusDialogOpen] = useState(false)
-    const [adendumToUpdateStatus, setAdendumToUpdateStatus] =
-        useState<Adendum | null>(null)
-
+const ActionColumn = ({ row }: { row: Proyek }) => {
     const dispatch = useAppDispatch()
-    const projectId = location.pathname.substring(
-        location.pathname.lastIndexOf('/') + 1
-    )
+    const { textTheme } = useThemeClass()
+    const navigate = useNavigate()
 
-    const adendumByProyekData = useAppSelector(
-        (state) => state.proyekDetail.data.adendumsByProyekData
-    )
-
-    const loading = useAppSelector(
-        (state) => state.proyekDetail.data.loadingAdendumsByProyek
-    )
-
-    // Fetch adendums when component mounts
-    useEffect(() => {
-        const requestParam = { id: projectId }
-        dispatch(getAdendumsByProyek(requestParam))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, projectId])
-
-    // Format date for display
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        })
+    const onDetail = (e) => {
+        // Mencegah event klik menjalar ke baris tabel
+        e.stopPropagation()
+        navigate(`/manajemen-proyek-detail/${row.id}`)
     }
 
-    // Format currency for display
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-        }).format(amount)
+    const onEdit = (e) => {
+        // Mencegah event klik menjalar ke baris tabel
+        e.stopPropagation()
+        navigate(`/manajemen-proyek-edit/${row.id}`)
     }
 
-    // Initialize form values
-    const initialValues: FormValues = {
-        tempDasarAdendum: '',
-        tempNilaiSebelumAdendum: '',
-        tempNilaiAdendum: '',
-        tempTanggal: null,
-        tempIdProject: projectId || '',
-    }
-
-    // Success notification helper
-    const popNotification = (keyword: string) => {
-        toast.push(
-            <Notification
-                title={`Berhasil ${keyword}`}
-                type="success"
-                duration={2500}
-            >
-                Data adendum berhasil {keyword}
-            </Notification>,
-            {
-                placement: 'top-center',
-            }
-        )
+    const onDelete = (e) => {
+        // Mencegah event klik menjalar ke baris tabel
+        e.stopPropagation()
+        dispatch(toggleDeleteConfirmation(true))
+        dispatch(setSelectedProyek(row.id))
     }
 
     return (
-        <Loading loading={loading || isSubmitting}>
-            <Formik
-                enableReinitialize
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={() => {
-                    // Form submission is handled by save button
-                }}
+        <div className="flex justify-end text-lg">
+            <span
+                className={`cursor-pointer p-2 hover:${textTheme}`}
+                onClick={onDetail}
             >
-                {(formikProps) => {
-                    const { values, errors, touched, setFieldValue } =
-                        formikProps
+                <TbReportSearch />
+            </span>
+            <span
+                className={`cursor-pointer p-2 hover:${textTheme}`}
+                onClick={onEdit}
+            >
+                <HiOutlinePencil />
+            </span>
+            <span
+                className="cursor-pointer p-2 hover:text-red-500"
+                onClick={onDelete}
+            >
+                <HiOutlineTrash />
+            </span>
+        </div>
+    )
+}
 
-                    const handleAddAdendum = () => {
-                        setShowForm(true)
-                        setEditIndex(null)
+const ProyekTable = () => {
+    const navigate = useNavigate()
+    const tableRef = useRef<DataTableResetHandle>(null)
 
-                        // Reset temp values
-                        setFieldValue('tempDasarAdendum', '')
-                        setFieldValue('tempNilaiSebelumAdendum', '')
-                        setFieldValue('tempNilaiAdendum', '')
-                        setFieldValue('tempTanggal', null)
-                    }
+    const dispatch = useAppDispatch()
 
-                    const handleSave = async () => {
-                        // Validate fields
-                        if (
-                            !errors.tempDasarAdendum &&
-                            !errors.tempNilaiSebelumAdendum &&
-                            !errors.tempNilaiAdendum &&
-                            !errors.tempTanggal
-                        ) {
-                            setIsSubmitting(true)
+    const { pageIndex, pageSize, sort, query, total } = useAppSelector(
+        (state) => state.proyekList.data.tableData
+    )
 
-                            const requestData = {
-                                dasar_adendum: values.tempDasarAdendum,
-                                nilai_sebelum_adendum: extractNumberFromString(
-                                    values.tempNilaiSebelumAdendum
-                                ),
-                                nilai_adendum: extractNumberFromString(
-                                    values.tempNilaiAdendum
-                                ),
-                                tanggal: values.tempTanggal?.toISOString(),
-                                idProject: values.tempIdProject,
-                            }
+    const filterData = useAppSelector(
+        (state) => state.proyekList.data.filterData
+    )
 
-                            try {
-                                let result
+    const loading = useAppSelector((state) => state.proyekList.data.loading)
 
-                                if (editIndex !== null && adendumByProyekData) {
-                                    // Handle edit with API call
-                                    const adendumId =
-                                        adendumByProyekData[editIndex].id
-                                    result = await apiEditAdendum({
-                                        id: adendumId,
-                                        ...requestData,
-                                    })
-                                } else {
-                                    // Handle create with API call
-                                    result = await apiCreateAdendum(requestData)
-                                }
+    const proyekData = useAppSelector(
+        (state) => state.proyekList.data.proyekList
+    )
+    const kliensList = useAppSelector(
+        (state) => state.proyekList.data.kliensList
+    )
 
-                                setIsSubmitting(false)
+    // Handler for row click to navigate to detail page
+    const handleRowClick = (row: Proyek) => {
+        navigate(`/manajemen-proyek-detail/${row.id}`)
+    }
 
-                                if (
-                                    result &&
-                                    result.data?.statusCode >= 200 &&
-                                    result.data?.statusCode < 300
-                                ) {
-                                    // Refresh data
-                                    dispatch(
-                                        getAdendumsByProyek({ id: projectId })
-                                    )
+    // Process the data to include client names
+    const data = useMemo(() => {
+        return proyekData.map((proyek) => {
+            // Find the matching client
+            const client = kliensList.find(
+                (client) => client.id === proyek.idKlien
+            )
 
-                                    // Show success notification
-                                    popNotification(
-                                        editIndex !== null
-                                            ? 'diperbarui'
-                                            : 'ditambahkan'
-                                    )
+            // Return proyek object with client name from kliensList
+            return {
+                ...proyek,
+                klien: client ? client.nama : 'Klien Tidak Ditemukan',
+            }
+        })
+    }, [proyekData, kliensList])
 
-                                    // Reset form and close
-                                    resetFormFields()
-                                    setShowForm(false)
-                                    setEditIndex(null)
-                                } else {
-                                    // Show error notification
-                                    toast.push(
-                                        <Notification
-                                            title="Error"
-                                            type="danger"
-                                            duration={2500}
+    useEffect(() => {
+        fetchData()
+        dispatch(getKliens()) // kliens
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pageIndex, pageSize, sort])
+
+    useEffect(() => {
+        if (tableRef) {
+            tableRef.current?.resetSorting()
+        }
+    }, [filterData])
+
+    const tableData = useMemo(
+        () => ({ pageIndex, pageSize, sort, query, total }),
+        [pageIndex, pageSize, sort, query, total]
+    )
+
+    const fetchData = () => {
+        dispatch(getProyeks({ pageIndex, pageSize, sort, query, filterData }))
+    }
+
+    const columns: ColumnDef<Proyek>[] = useMemo(
+        () => [
+            {
+                header: 'Pekerjaan',
+                accessorKey: 'pekerjaan',
+                row: 100,
+                minWidth: 350,
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <div className="flex flex-col gap-1">
+                            <div className="text-blue-600 text-xs font-semibold capitalize">
+                                {row.client}
+                            </div>
+                            <div className="text-base font-medium text-neutral-800 ">
+                                {row.pekerjaan}
+                            </div>
+                            <div className="text-blue-600 text-xs font-semibold">
+                                {row.pic}
+                            </div>
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'Nomor Kontrak',
+                accessorKey: 'nomor_kontrak',
+                minWidth: 200,
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <div>
+                            <div className="capitalize mb-1">
+                                {row.nomor_kontrak}
+                            </div>
+                            <div className="bg-blue-600 text-xs rounded-md px-3 py-[3px] text-center text-white w-fit">
+                                {formatDate(row.tanggal_kontrak)}
+                            </div>
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'Lokasi',
+                accessorKey: 'lokasi',
+                minWidth: 200,
+                cell: (props) => {
+                    const row = props.row.original
+
+                    return (
+                        <div className="flex flex-col gap-1">
+                            {row.Lokasis && row.Lokasis.length > 0 ? (
+                                row.Lokasis.map((loc, index) => {
+                                    return (
+                                        <a
+                                            key={index}
+                                            href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group"
+                                            onClick={(e) => e.stopPropagation()} // Mencegah klik link juga memicu klik baris
                                         >
-                                            {result
-                                                ? result?.message
-                                                : 'Gagal menambahkan adendum'}
-                                        </Notification>,
-                                        { placement: 'top-center' }
+                                            <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
+                                                <div className="text-lg group-hover:scale-110 transition">
+                                                    <IoLocationSharp className="group-hover:text-blue-600 transition" />
+                                                </div>
+                                                <div className="text-blue-600">
+                                                    {loc.lokasi}
+                                                </div>
+                                            </div>
+                                        </a>
                                     )
-                                }
-                            } catch (error) {
-                                setIsSubmitting(false)
-                                console.error('Error:', error)
+                                })
+                            ) : (
+                                <span className="text-gray-400">
+                                    Tidak ada lokasi
+                                </span>
+                            )}
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'Nilai Kontrak',
+                accessorKey: 'nilai_kontrak',
+                minWidth: 200,
+                cell: (props) => {
+                    const row = props.row.original
 
-                                // Show generic error notification
-                                toast.push(
-                                    <Notification
-                                        title="Error"
-                                        type="danger"
-                                        duration={2500}
-                                    >
-                                        {error
-                                            ? error.response.data?.message
-                                            : 'Gagal menambahkan adendum'}
-                                    </Notification>,
-                                    { placement: 'top-center' }
-                                )
-                            }
-                        }
-                    }
+                    // Determine the color based on conditions
+                    let textColorClass = 'text-yellow-600' // Default color
 
-                    // Helper function to reset form fields
-                    const resetFormFields = () => {
-                        setFieldValue('tempDasarAdendum', '')
-                        setFieldValue('tempNilaiSebelumAdendum', '')
-                        setFieldValue('tempNilaiAdendum', '')
-                        setFieldValue('tempTanggal', null)
-                    }
-
-                    const handleCancel = () => {
-                        setShowForm(false)
-                        setEditIndex(null)
-                        resetFormFields()
-                    }
-
-                    const handleEdit = (index: number) => {
-                        if (adendumByProyekData) {
-                            const adendum = adendumByProyekData[index]
-
-                            // Set temporary values for editing
-                            setFieldValue(
-                                'tempDasarAdendum',
-                                adendum.dasar_adendum
-                            )
-                            setFieldValue(
-                                'tempNilaiSebelumAdendum',
-                                adendum.nilai_sebelum_adendum
-                            )
-                            setFieldValue(
-                                'tempNilaiAdendum',
-                                adendum.nilai_adendum
-                            )
-                            setFieldValue(
-                                'tempTanggal',
-                                new Date(adendum.tanggal)
-                            )
-                            setFieldValue('tempIdProject', adendum.idProject)
-
-                            setEditIndex(index)
-                            setShowForm(true)
-                        }
-                    }
-
-                    // Modified to open confirmation dialog first
-                    const handleOpenStatusConfirmation = (data: Adendum) => {
-                        setAdendumToUpdateStatus(data)
-                        setStatusDialogOpen(true)
-                    }
-
-                    // This function is now called only after confirmation
-                    const handleUpdateStatusAdendum = async () => {
-                        if (!adendumToUpdateStatus) return
-
-                        setIsSubmitting(true)
-                        try {
-                            let newStatus = ''
-                            let statusMessage = ''
-
-                            if (
-                                adendumToUpdateStatus.status ===
-                                'BELUM_DISETUJUI'
-                            ) {
-                                newStatus = 'SUDAH_DISETUJUI'
-                                statusMessage = 'disetujui'
-                            } else if (
-                                adendumToUpdateStatus.status ===
-                                'SUDAH_DISETUJUI'
-                            ) {
-                                newStatus = 'BELUM_DISETUJUI'
-                                statusMessage = 'dibatalkan persetujuannya'
-                            }
-
-                            const res = await apiUpdateStatusAdendum({
-                                id: adendumToUpdateStatus.id,
-                                status: newStatus,
-                            })
-
-                            // Success notification
-                            toast.push(
-                                <Notification
-                                    title="Status berhasil diperbarui"
-                                    type="success"
-                                    duration={2500}
-                                >
-                                    Adendum berhasil {statusMessage}
-                                </Notification>,
-                                {
-                                    placement: 'top-center',
-                                }
-                            )
-
-                            // Refresh data after successful update
-                            dispatch(getAdendumsByProyek({ id: projectId }))
-                        } catch (error) {
-                            console.error(
-                                'Error updating status adendum:',
-                                error
-                            )
-
-                            // Error notification
-                            toast.push(
-                                <Notification
-                                    title="Gagal memperbarui status"
-                                    type="danger"
-                                    duration={2500}
-                                >
-                                    {error?.response?.data?.message ||
-                                        'Terjadi kesalahan saat memperbarui status adendum'}
-                                </Notification>,
-                                {
-                                    placement: 'top-center',
-                                }
-                            )
-                        } finally {
-                            setIsSubmitting(false)
-                            setStatusDialogOpen(false)
-                            setAdendumToUpdateStatus(null)
-                        }
-                    }
-
-                    // Function to cancel status update
-                    const handleCancelStatusUpdate = () => {
-                        setStatusDialogOpen(false)
-                        setAdendumToUpdateStatus(null)
-                    }
-
-                    // Function to open confirmation dialog
-                    const handleConfirmDelete = (index: number) => {
-                        setDeleteIndex(index)
-                        setDialogOpen(true)
-                    }
-
-                    // Function to close confirmation dialog
-                    const handleCancelDelete = () => {
-                        setDialogOpen(false)
-                        setDeleteIndex(null)
-                    }
-
-                    const handleDelete = async () => {
-                        if (deleteIndex !== null && adendumByProyekData) {
-                            const adendumId = adendumByProyekData[deleteIndex]
-
-                            setIsSubmitting(true)
-                            try {
-                                // Call delete API with adendum ID
-                                const success = await apiDeleteAdendum(
-                                    adendumId
-                                )
-
-                                if (success) {
-                                    // Refresh data after successful delete
-                                    dispatch(
-                                        getAdendumsByProyek({ id: projectId })
-                                    )
-                                    popNotification('dihapus')
-                                }
-                            } catch (error) {
-                                console.error('Error deleting adendum:', error)
-
-                                // Show error notification
-                                toast.push(
-                                    <Notification
-                                        title="Error"
-                                        type="danger"
-                                        duration={2500}
-                                    >
-                                        Gagal menghapus adendum
-                                    </Notification>,
-                                    { placement: 'top-center' }
-                                )
-                            } finally {
-                                setIsSubmitting(false)
-                                setDialogOpen(false)
-                                setDeleteIndex(null)
-                            }
-                        }
+                    if (row.uang_muka === 0) {
+                        textColorClass = 'text-red-500' // Red when realization is 0
+                    } else if (row.uang_muka === row.nilai_kontrak) {
+                        textColorClass = 'text-green-500' // Green when realization equals contract value
                     }
 
                     return (
-                        <Form>
-                            <AdaptableCard divider>
-                                <div className="flex justify-between items-center mb-4">
-                                    <DescriptionSection
-                                        title="Informasi Adendum"
-                                        desc="Informasi adendum proyek"
-                                    />
-                                    {!showForm && (
-                                        <Button
-                                            size="sm"
-                                            variant="twoTone"
-                                            onClick={handleAddAdendum}
-                                            className="w-fit text-xs"
-                                            type="button"
-                                        >
-                                            Tambah Adendum
-                                        </Button>
-                                    )}
+                        <div className="flex flex-col">
+                            <div className="text-sm font-semibold text-neutral-700">
+                                Rp {row.nilai_kontrak.toLocaleString('id-ID')}
+                            </div>
+                            <div
+                                className={`text-xs font-semibold ${textColorClass} gap-1 flex items-center`}
+                            >
+                                <div className="text-lg">
+                                    <AiFillCreditCard className="group-hover:text-blue-600 transition" />
                                 </div>
-
-                                {/* Form untuk input adendum */}
-                                {showForm && (
-                                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
-                                        <h6 className="mb-3">
-                                            {editIndex !== null
-                                                ? 'Edit Adendum'
-                                                : 'Tambah Adendum Baru'}
-                                        </h6>
-
-                                        <FormContainer>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                {/* Dasar Adendum */}
-                                                <FormItem
-                                                    label="Dasar Adendum"
-                                                    errorMessage={
-                                                        errors.tempDasarAdendum &&
-                                                        touched.tempDasarAdendum
-                                                            ? errors.tempDasarAdendum
-                                                            : ''
-                                                    }
-                                                    invalid={
-                                                        !!(
-                                                            errors.tempDasarAdendum &&
-                                                            touched.tempDasarAdendum
-                                                        )
-                                                    }
-                                                >
-                                                    <Field
-                                                        type="text"
-                                                        autoComplete="off"
-                                                        name="tempDasarAdendum"
-                                                        placeholder="Contoh: Perubahan Spesifikasi Teknis"
-                                                        component={Input}
-                                                    />
-                                                </FormItem>
-
-                                                {/* Tanggal */}
-                                                <FormItem
-                                                    label="Tanggal"
-                                                    errorMessage={
-                                                        errors.tempTanggal &&
-                                                        touched.tempTanggal
-                                                            ? errors.tempTanggal
-                                                            : ''
-                                                    }
-                                                    invalid={
-                                                        !!(
-                                                            errors.tempTanggal &&
-                                                            touched.tempTanggal
-                                                        )
-                                                    }
-                                                >
-                                                    <DatePicker
-                                                        placeholder="Pilih tanggal"
-                                                        value={
-                                                            values.tempTanggal
-                                                        }
-                                                        inputFormat="DD-MM-YYYY"
-                                                        onChange={(date) => {
-                                                            setFieldValue(
-                                                                'tempTanggal',
-                                                                date
-                                                            )
-                                                        }}
-                                                    />
-                                                </FormItem>
-
-                                                {/* Nilai Sebelum Adendum */}
-                                                <FormItem
-                                                    label="Nilai Sebelum Adendum"
-                                                    className="mb-3"
-                                                    errorMessage={
-                                                        errors.tempNilaiSebelumAdendum &&
-                                                        touched.tempNilaiSebelumAdendum
-                                                            ? errors.tempNilaiSebelumAdendum
-                                                            : ''
-                                                    }
-                                                    invalid={
-                                                        !!(
-                                                            errors.tempNilaiSebelumAdendum &&
-                                                            touched.tempNilaiSebelumAdendum
-                                                        )
-                                                    }
-                                                >
-                                                    <Field name="tempNilaiSebelumAdendum">
-                                                        {({
-                                                            field,
-                                                            form,
-                                                        }: FieldProps) => (
-                                                            <NumericFormat
-                                                                {...field}
-                                                                placeholder="Nilai dalam Rupiah"
-                                                                customInput={
-                                                                    Input
-                                                                }
-                                                                thousandSeparator="."
-                                                                decimalSeparator=","
-                                                                onValueChange={(
-                                                                    val
-                                                                ) =>
-                                                                    form.setFieldValue(
-                                                                        field.name,
-                                                                        val.value
-                                                                    )
-                                                                }
-                                                            />
-                                                        )}
-                                                    </Field>
-                                                </FormItem>
-
-                                                {/* Nilai Adendum */}
-                                                <FormItem
-                                                    label="Nilai Adendum"
-                                                    className="mb-3"
-                                                    errorMessage={
-                                                        errors.tempNilaiAdendum &&
-                                                        touched.tempNilaiAdendum
-                                                            ? errors.tempNilaiAdendum
-                                                            : ''
-                                                    }
-                                                    invalid={
-                                                        !!(
-                                                            errors.tempNilaiAdendum &&
-                                                            touched.tempNilaiAdendum
-                                                        )
-                                                    }
-                                                >
-                                                    <Field name="tempNilaiAdendum">
-                                                        {({
-                                                            field,
-                                                            form,
-                                                        }: FieldProps) => (
-                                                            <NumericFormat
-                                                                {...field}
-                                                                placeholder="Nilai dalam Rupiah"
-                                                                customInput={
-                                                                    Input
-                                                                }
-                                                                thousandSeparator="."
-                                                                decimalSeparator=","
-                                                                onValueChange={(
-                                                                    val
-                                                                ) =>
-                                                                    form.setFieldValue(
-                                                                        field.name,
-                                                                        val.value
-                                                                    )
-                                                                }
-                                                            />
-                                                        )}
-                                                    </Field>
-                                                </FormItem>
-                                            </div>
-
-                                            <div className="flex justify-end space-x-2 mt-4">
-                                                <Button
-                                                    size="sm"
-                                                    variant="plain"
-                                                    onClick={handleCancel}
-                                                    type="button"
-                                                >
-                                                    Batal
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="solid"
-                                                    onClick={handleSave}
-                                                    type="button"
-                                                    loading={isSubmitting}
-                                                >
-                                                    Simpan
-                                                </Button>
-                                            </div>
-                                        </FormContainer>
-                                    </div>
-                                )}
-
-                                {/* Daftar adendum */}
-                                {adendumByProyekData &&
-                                adendumByProyekData.length > 0 ? (
-                                    <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-                                        {adendumByProyekData.map(
-                                            (data: Adendum, index: number) => {
-                                                // If currently editing this item, don't show it in the list
-                                                if (editIndex === index) {
-                                                    return null
-                                                }
-
-                                                return (
-                                                    <div
-                                                        key={data.id}
-                                                        className={classNames(
-                                                            'flex items-center justify-between px-4 py-6',
-                                                            !isLastChild(
-                                                                adendumByProyekData,
-                                                                index
-                                                            ) &&
-                                                                'border-b border-gray-200 dark:border-gray-600'
-                                                        )}
-                                                    >
-                                                        <div className="flex items-center flex-grow ">
-                                                            <div className="text-3xl">
-                                                                <HiOutlineDocument className="text-indigo-500" />
-                                                            </div>
-                                                            <div className="ml-3 rtl:mr-3">
-                                                                <div className="flex items-center">
-                                                                    <div className="text-gray-900 dark:text-gray-100 font-semibold">
-                                                                        {
-                                                                            data.dasar_adendum
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                                <div className="text-gray-500 text-sm mt-1">
-                                                                    <div>
-                                                                        Tanggal:{' '}
-                                                                        {formatDate(
-                                                                            data.tanggal
-                                                                        )}
-                                                                    </div>
-                                                                    <div>
-                                                                        Nilai
-                                                                        Sebelum:{' '}
-                                                                        {formatCurrency(
-                                                                            data.nilai_sebelum_adendum
-                                                                        )}
-                                                                    </div>
-                                                                    <div>
-                                                                        Nilai
-                                                                        Adendum:{' '}
-                                                                        {formatCurrency(
-                                                                            data.nilai_adendum
-                                                                        )}
-                                                                    </div>
-                                                                    <div>
-                                                                        Selisih:{' '}
-                                                                        {formatCurrency(
-                                                                            data.nilai_adendum -
-                                                                                data.nilai_sebelum_adendum
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex space-x-2 ">
-                                                            <Button
-                                                                size="sm"
-                                                                variant="solid"
-                                                                color={
-                                                                    data?.status ===
-                                                                    'SUDAH_DISETUJUI'
-                                                                        ? 'red'
-                                                                        : ''
-                                                                }
-                                                                onClick={() =>
-                                                                    handleOpenStatusConfirmation(
-                                                                        data
-                                                                    )
-                                                                }
-                                                                className="w-fit text-xs "
-                                                                type="button"
-                                                            >
-                                                                {data?.status ===
-                                                                'SUDAH_DISETUJUI'
-                                                                    ? 'Batalkan Persetujuan'
-                                                                    : 'Setujui Adendum'}
-                                                            </Button>
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                icon={
-                                                                    <HiOutlinePencil />
-                                                                }
-                                                                className="text-indigo-500"
-                                                                onClick={() =>
-                                                                    handleEdit(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                className="text-red-500"
-                                                                icon={
-                                                                    <HiOutlineTrash />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleConfirmDelete(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-8 text-gray-500">
-                                        Belum ada data adendum. Klik 'Tambah
-                                        Adendum' untuk menambahkan.
-                                    </div>
-                                )}
-                            </AdaptableCard>
-
-                            {/* Dialog Konfirmasi Hapus */}
-                            <ConfirmDialog
-                                isOpen={dialogOpen}
-                                type="danger"
-                                title="Hapus Adendum"
-                                confirmButtonColor="red-600"
-                                onClose={handleCancelDelete}
-                                onRequestClose={handleCancelDelete}
-                                onCancel={handleCancelDelete}
-                                onConfirm={handleDelete}
-                            >
-                                <p>
-                                    Apakah kamu yakin ingin menghapus adendum
-                                    ini?
-                                </p>
-                            </ConfirmDialog>
-
-                            {/* Dialog Konfirmasi Perubahan Status */}
-                            <ConfirmDialog
-                                isOpen={statusDialogOpen}
-                                type={
-                                    adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'danger'
-                                        : 'success'
-                                }
-                                title={
-                                    adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'Batalkan Persetujuan Adendum'
-                                        : 'Setujui Adendum'
-                                }
-                                confirmButtonColor={
-                                    adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'red-600'
-                                        : 'emerald-600'
-                                }
-                                onClose={handleCancelStatusUpdate}
-                                onRequestClose={handleCancelStatusUpdate}
-                                onCancel={handleCancelStatusUpdate}
-                                onConfirm={handleUpdateStatusAdendum}
-                            >
-                                <p>
-                                    {adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'Apakah kamu yakin ingin membatalkan persetujuan adendum ini?'
-                                        : 'Apakah kamu yakin ingin menyetujui adendum ini?'}
-                                </p>
-                            </ConfirmDialog>
-                        </Form>
+                                <span>
+                                    Rp {row.uang_muka.toLocaleString('id-ID')}
+                                </span>
+                            </div>
+                        </div>
                     )
+                },
+            },
+
+            {
+                header: 'Progress',
+                accessorKey: 'progress',
+                minWidth: 150,
+                cell: (props) => {
+                    const row = props.row.original
+                    const progress = row.progress || 0
+
+                    return (
+                        <div className="flex items-center justify-start">
+                            <div className="relative w-16 h-16">
+                                {/* Background circle */}
+                                <svg
+                                    className="w-full h-full"
+                                    viewBox="0 0 100 100"
+                                >
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="40"
+                                        fill="none"
+                                        stroke="#a8e6d5"
+                                        strokeWidth="15"
+                                    />
+                                    {/* Progress circle */}
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="40"
+                                        fill="none"
+                                        stroke="#3cbfa6"
+                                        strokeWidth="15"
+                                        strokeDasharray={`${
+                                            progress * 2.51
+                                        } 251`}
+                                        strokeDashoffset="0"
+                                        transform="rotate(-90 50 50)"
+                                    />
+                                </svg>
+                                {/* Percentage text in the middle */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-xs font-medium text-teal-500">
+                                        {progress}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'Status',
+                accessorKey: 'status',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span className="capitalize">{row.status}</span>
+                },
+            },
+            {
+                header: '',
+                id: 'action',
+                cell: (props) => <ActionColumn row={props.row.original} />,
+            },
+        ],
+        []
+    )
+
+    const onPaginationChange = (page: number) => {
+        const newTableData = cloneDeep(tableData)
+        newTableData.pageIndex = page
+        dispatch(setTableData(newTableData))
+    }
+
+    const onSelectChange = (value: number) => {
+        const newTableData = cloneDeep(tableData)
+        newTableData.pageSize = Number(value)
+        newTableData.pageIndex = 1
+        dispatch(setTableData(newTableData))
+    }
+
+    const onSort = (sort: OnSortParam) => {
+        const newTableData = cloneDeep(tableData)
+        newTableData.sort = sort
+        dispatch(setTableData(newTableData))
+    }
+
+    return (
+        <>
+            <DataTable
+                ref={tableRef}
+                columns={columns}
+                data={data}
+                skeletonAvatarColumns={[0]}
+                skeletonAvatarProps={{ className: 'rounded-md' }}
+                loading={loading}
+                pagingData={{
+                    total: tableData.total as number,
+                    pageIndex: tableData.pageIndex as number,
+                    pageSize: tableData.pageSize as number,
                 }}
-            </Formik>
-        </Loading>
+                onPaginationChange={onPaginationChange}
+                onSelectChange={onSelectChange}
+                onSort={onSort}
+                onRowClick={handleRowClick}
+            />
+            <ProyekDeleteConfirmation />
+        </>
     )
 }
+
+export default ProyekTable
