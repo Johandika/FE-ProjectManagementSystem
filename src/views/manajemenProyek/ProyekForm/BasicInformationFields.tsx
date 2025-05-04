@@ -208,74 +208,82 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     </FormItem>
                 </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
-                <div className="col-span-1">
-                    <FormItem
-                        label="Tanggal PO"
-                        invalid={
-                            (errors.tanggal_service_po &&
-                                touched.tanggal_service_po) as boolean
-                        }
-                        errorMessage={errors.tanggal_service_po}
-                    >
-                        <Field name="tanggal_service_po">
-                            {({ field, form }: FieldProps) => (
-                                <DatePicker
-                                    placeholder="Pilih Tanggal"
-                                    value={
-                                        field.value
-                                            ? new Date(field.value)
-                                            : null
-                                    }
-                                    inputFormat="DD-MM-YYYY"
-                                    onChange={(date) => {
-                                        const formattedDate = date
-                                            ? dayjs(date).format('YYYY-MM-DD')
-                                            : ''
-                                        form.setFieldValue(
-                                            field.name,
-                                            formattedDate
-                                        )
-                                    }}
-                                />
-                            )}
-                        </Field>
-                    </FormItem>
-                </div>
-                <div className="col-span-1">
-                    <FormItem
-                        label="Tanggal Delivery"
-                        invalid={
-                            (errors.tanggal_delivery &&
-                                touched.tanggal_delivery) as boolean
-                        }
-                        errorMessage={errors.tanggal_delivery}
-                    >
-                        <Field name="tanggal_delivery">
-                            {({ field, form }: FieldProps) => (
-                                <DatePicker
-                                    placeholder="Pilih Tanggal"
-                                    value={
-                                        field.value
-                                            ? new Date(field.value)
-                                            : null
-                                    }
-                                    inputFormat="DD-MM-YYYY"
-                                    onChange={(date) => {
-                                        const formattedDate = date
-                                            ? dayjs(date).format('YYYY-MM-DD')
-                                            : ''
-                                        form.setFieldValue(
-                                            field.name,
-                                            formattedDate
-                                        )
-                                    }}
-                                />
-                            )}
-                        </Field>
-                    </FormItem>
-                </div>
-            </div>
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
+                {type === 'new' && (
+                    <>
+                        <div className="col-span-1">
+                            <FormItem
+                                label="Tanggal PO"
+                                invalid={
+                                    (errors.tanggal_service_po &&
+                                        touched.tanggal_service_po) as boolean
+                                }
+                                errorMessage={errors.tanggal_service_po}
+                            >
+                                <Field name="tanggal_service_po">
+                                    {({ field, form }: FieldProps) => (
+                                        <DatePicker
+                                            placeholder="Pilih Tanggal"
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : null
+                                            }
+                                            inputFormat="DD-MM-YYYY"
+                                            onChange={(date) => {
+                                                const formattedDate = date
+                                                    ? dayjs(date).format(
+                                                          'YYYY-MM-DD'
+                                                      )
+                                                    : ''
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    formattedDate
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                            </FormItem>
+                        </div>
+                        <div className="col-span-1">
+                            <FormItem
+                                label="Tanggal Delivery"
+                                invalid={
+                                    (errors.tanggal_delivery &&
+                                        touched.tanggal_delivery) as boolean
+                                }
+                                errorMessage={errors.tanggal_delivery}
+                            >
+                                <Field name="tanggal_delivery">
+                                    {({ field, form }: FieldProps) => (
+                                        <DatePicker
+                                            placeholder="Pilih Tanggal"
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : null
+                                            }
+                                            inputFormat="DD-MM-YYYY"
+                                            onChange={(date) => {
+                                                const formattedDate = date
+                                                    ? dayjs(date).format(
+                                                          'YYYY-MM-DD'
+                                                      )
+                                                    : ''
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    formattedDate
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                            </FormItem>
+                        </div>
+                    </>
+                )}
+            </div> */}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 <div className="col-span-1">
@@ -335,7 +343,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </div>
                 <div className="col-span-1">
                     <FormItem
-                        label="Waktu Pengerjaan (hari)"
+                        label="Timeline (hari)"
                         invalid={
                             (errors.timeline && touched.timeline) as boolean
                         }
