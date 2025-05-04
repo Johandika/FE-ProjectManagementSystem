@@ -80,20 +80,7 @@ export default function Detail() {
                                 {formatDate(proyekData.tanggal_kontrak || '')}
                             </div>
                         </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Tgl. PO :</div>
-                            <div>
-                                {formatDate(
-                                    proyekData.tanggal_service_po || ''
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Tgl. Delivery :</div>
-                            <div>
-                                {formatDate(proyekData.tanggal_delivery || '')}
-                            </div>
-                        </div>
+
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Status :</div>
                             <div>{proyekData.status}</div>

@@ -17,6 +17,7 @@ import {
     apiGetAdendum,
     apiGetAdendumsByProyek,
 } from '@/services/AdendumService'
+import { apiGetItem, apiGetItemsByProyek } from '@/services/ItemService'
 
 export const SLICE_NAME = 'proyekDetail'
 
@@ -78,10 +79,31 @@ type AdendumByProyek = {
     status: string
 }
 
+type ItemProject = {
+    id: string
+    uraian: string
+    satuan: string
+    volume: number
+    harga_satuan_materia: number
+    harga_satuan_jasa: number
+    jumlah_harga_material: number
+    jumlah_harga_jasa: number
+    status: string | null
+}
+
+type ItemByProyek = {
+    id: string
+    nama: string
+    keterangan: string
+    status: boolean
+    DetailItemProjects: ItemProject[]
+}
+
 type BerkasProyeks = BerkasProyekData[]
 type LokasiProyeks = LokasisByProyek[]
 type SubkonProyek = SubkonByProyek[]
 type AdendumProyek = AdendumByProyek[]
+type ItemProyek = ItemByProyek[]
 type Subkontraktors = SubkonByProyek[]
 
 export type MasterProyekDetailState = {
@@ -95,6 +117,10 @@ export type MasterProyekDetailState = {
     loadingSubkontraktors: boolean
     loadingAdendumsByProyek: boolean
     loadingAdendum: boolean
+    loadingItemsByProyek: boolean
+    loadingItem: boolean
+    itemsByProyekData?: ItemProyek
+    itemData?: ItemProyek
     adendumsByProyekData?: AdendumProyek
     adendumData?: AdendumProyek
     berkasProyekData?: BerkasProyeks
@@ -106,6 +132,28 @@ export type MasterProyekDetailState = {
     subkonProyekData: SubkonProyek
     subkontraktorsData?: Subkontraktors
 }
+
+// get items by project
+export const getItemsByProyek = createAsyncThunk(
+    SLICE_NAME + '/getItemsByProyek',
+    async (data: { id: string }) => {
+        const response = await apiGetItemsByProyek<ItemProyek, { id: string }>(
+            data
+        )
+        return response.data
+    }
+)
+
+// get one item
+export const getItem = createAsyncThunk(
+    SLICE_NAME + '/getItem',
+    async (data: { id: string }) => {
+        const response = await apiGetItem<ItemProyek, { id: string }>(data)
+        return response.data
+    }
+)
+
+// ========================================================================
 
 // get adendums by project
 export const getAdendumsByProyek = createAsyncThunk(
@@ -257,8 +305,12 @@ const initialState: MasterProyekDetailState = {
     loadingSubkontraktors: true,
     loadingAdendumsByProyek: true,
     loadingAdendum: true,
+    loadingItemsByProyek: true,
+    loadingItem: true,
     lokasisByProyekData: [],
     lokasiData: [],
+    itemsByProyekData: [],
+    itemData: [],
     selectBerkasData: [],
     berkasProyekData: [],
     adendumsByProyekData: [],
@@ -287,6 +339,20 @@ const proyekDetailSlice = createSlice({
             })
             .addCase(getAdendumsByProyek.pending, (state) => {
                 state.loadingAdendumsByProyek = true
+            })
+            .addCase(getItemsByProyek.fulfilled, (state, action) => {
+                state.itemsByProyekData = action.payload
+                state.loadingItemsByProyek = false
+            })
+            .addCase(getItemsByProyek.pending, (state) => {
+                state.loadingItemsByProyek = true
+            })
+            .addCase(getItem.fulfilled, (state, action) => {
+                state.itemData = action.payload
+                state.loadingItem = false
+            })
+            .addCase(getItem.pending, (state) => {
+                state.loadingItem = true
             })
             .addCase(getAdendum.fulfilled, (state, action) => {
                 state.adendumData = action.payload

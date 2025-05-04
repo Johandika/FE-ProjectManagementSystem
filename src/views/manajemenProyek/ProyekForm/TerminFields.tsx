@@ -39,8 +39,8 @@ const TerminFields = (props: TerminFieldsProps) => {
     // Mengisi formik values dengan data dari terminsList saat komponen dimount
     useEffect(() => {
         if (terminsList && terminsList.length > 0) {
-            const formattedTermin = terminsList.map((item) => ({
-                keterangan: item.keterangan,
+            const formattedTermin = terminsList.map((item, index) => ({
+                keterangan: item.keterangan || `Termin ${index + 1}`,
                 persen: item.persen,
             }))
             setFieldValue('termin', formattedTermin)
@@ -88,6 +88,20 @@ const TerminFields = (props: TerminFieldsProps) => {
 
                             {values.termin &&
                                 values.termin.map((_, index) => {
+                                    // Otomatis set keterangan sebagai "Termin {index+1}"
+                                    const terminName = `Termin ${index + 1}`
+
+                                    // Jika keterangan kosong atau berbeda dengan format yang diharapkan, update
+                                    if (
+                                        values.termin[index].keterangan !==
+                                        terminName
+                                    ) {
+                                        setFieldValue(
+                                            `termin[${index}].keterangan`,
+                                            terminName
+                                        )
+                                    }
+
                                     const keteranganError =
                                         errors.termin?.[index]?.keterangan &&
                                         touched.termin?.[index]?.keterangan
@@ -115,12 +129,17 @@ const TerminFields = (props: TerminFieldsProps) => {
                                                         : ''
                                                 }
                                             >
-                                                <Field
+                                                <Input
                                                     type="text"
-                                                    autoComplete="off"
+                                                    value={terminName}
+                                                    disabled
+                                                    readOnly
+                                                    className="bg-gray-100"
+                                                />
+                                                <Field
+                                                    type="hidden"
                                                     name={`termin[${index}].keterangan`}
-                                                    placeholder="Keterangan termin"
-                                                    component={Input}
+                                                    value={terminName}
                                                 />
                                             </FormItem>
                                             <FormItem

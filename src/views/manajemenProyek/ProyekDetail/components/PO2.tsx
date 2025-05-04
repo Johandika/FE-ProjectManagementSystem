@@ -1,389 +1,248 @@
-import { useEffect, useMemo, useRef } from 'react'
-import DataTable from '@/components/shared/DataTable'
-import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-import { TbReportSearch } from 'react-icons/tb'
-import {
-    getProyeks,
-    setTableData,
-    setSelectedProyek,
-    toggleDeleteConfirmation,
-    useAppDispatch,
-    useAppSelector,
-    getKliens,
-} from '../store'
-import useThemeClass from '@/utils/hooks/useThemeClass'
-import ProyekDeleteConfirmation from './ProyekDeleteConfirmation'
-import { useNavigate } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
-import type {
-    DataTableResetHandle,
-    OnSortParam,
-    ColumnDef,
-} from '@/components/shared/DataTable'
-import { IoLocationSharp } from 'react-icons/io5'
-import { AiFillCreditCard } from 'react-icons/ai'
-import { formatDate } from '@/utils/formatDate'
+import { Field, FieldArray, useFormikContext } from 'formik'
+import { FormItem } from '@/components/ui/Form'
+import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import { HiMinus, HiPlus } from 'react-icons/hi'
+import AdaptableCard from '@/components/shared/AdaptableCard'
+import { NumericFormat } from 'react-number-format'
+import type { FormikErrors, FormikTouched, FieldProps } from 'formik'
+import { useMemo, useEffect } from 'react'
 
-type Proyek = {
-    id: string
-    pekerjaan: string
-    pic: string
-    client: string
-    nomor_kontrak: number
-    tanggal_service_po: string
-    tanggal_delivery: string
-    tanggal_kontrak: string
-    nilai_kontrak: number
-    uang_muka: number
-    progress: number
-    status: string
-    idKlien: string
-    Lokasis?: Array<{
-        lokasi: string
-        latitude: number
-        longitude: number
-    }>
+interface Termin {
+    keterangan: string
+    persen: number
 }
 
-const ActionColumn = ({ row }: { row: Proyek }) => {
-    const dispatch = useAppDispatch()
-    const { textTheme } = useThemeClass()
-    const navigate = useNavigate()
+type TerminFieldsProps = {
+    touched: FormikTouched<{
+        termin: Termin[]
+    }>
+    errors: FormikErrors<{
+        termin: Termin[]
+    }>
+    terminsList?: {
+        id: string
+        persen: number
+        tanggal: string
+        status: string
+        idProject: string
+        idFakturPajak: string
+        keterangan: string
+    }[]
+}
 
-    const onDetail = (e) => {
-        // Mencegah event klik menjalar ke baris tabel
-        e.stopPropagation()
-        navigate(`/manajemen-proyek-detail/${row.id}`)
-    }
+const TerminFields = (props: TerminFieldsProps) => {
+    const { touched, errors, terminsList = [] } = props
+    const { values, setFieldValue } = useFormikContext<{ termin: Termin[] }>()
 
-    const onEdit = (e) => {
-        // Mencegah event klik menjalar ke baris tabel
-        e.stopPropagation()
-        navigate(`/manajemen-proyek-edit/${row.id}`)
-    }
+    // Mengisi formik values dengan data dari terminsList saat komponen dimount
+    useEffect(() => {
+        if (terminsList && terminsList.length > 0) {
+            const formattedTermin = terminsList.map((item, index) => ({
+                // Gunakan keterangan dari data jika tersedia, atau generate otomatis jika tidak
+                keterangan: item.keterangan || `Termin ${index + 1}`,
+                persen: item.persen,
+            }))
+            setFieldValue('termin', formattedTermin)
+        }
+    }, [terminsList, setFieldValue])
 
-    const onDelete = (e) => {
-        // Mencegah event klik menjalar ke baris tabel
-        e.stopPropagation()
-        dispatch(toggleDeleteConfirmation(true))
-        dispatch(setSelectedProyek(row.id))
-    }
+    // Menghitung total persentase secara langsung saat render menggunakan useMemo
+    const totalPersen = useMemo(() => {
+        if (!values.termin || !Array.isArray(values.termin)) {
+            return 0
+        }
+
+        return values.termin.reduce((sum, item) => {
+            const value = parseFloat(String(item.persen)) || 0
+            return sum + value
+        }, 0)
+    }, [values.termin])
 
     return (
-        <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onDetail}
-            >
-                <TbReportSearch />
-            </span>
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
-            >
-                <HiOutlinePencil />
-            </span>
-            <span
-                className="cursor-pointer p-2 hover:text-red-500"
-                onClick={onDelete}
-            >
-                <HiOutlineTrash />
-            </span>
-        </div>
-    )
-}
+        <AdaptableCard divider className="mb-4">
+            <h5>Termin Pembayaran</h5>
+            <p className="mb-6">
+                Tambahkan data termin pembayaran beserta persentasenya
+            </p>
 
-const ProyekTable = () => {
-    const navigate = useNavigate()
-    const tableRef = useRef<DataTableResetHandle>(null)
-
-    const dispatch = useAppDispatch()
-
-    const { pageIndex, pageSize, sort, query, total } = useAppSelector(
-        (state) => state.proyekList.data.tableData
-    )
-
-    const filterData = useAppSelector(
-        (state) => state.proyekList.data.filterData
-    )
-
-    const loading = useAppSelector((state) => state.proyekList.data.loading)
-
-    const proyekData = useAppSelector(
-        (state) => state.proyekList.data.proyekList
-    )
-    const kliensList = useAppSelector(
-        (state) => state.proyekList.data.kliensList
-    )
-
-    // Handler for row click to navigate to detail page
-    const handleRowClick = (row: Proyek) => {
-        navigate(`/manajemen-proyek-detail/${row.id}`)
-    }
-
-    // Process the data to include client names
-    const data = useMemo(() => {
-        return proyekData.map((proyek) => {
-            // Find the matching client
-            const client = kliensList.find(
-                (client) => client.id === proyek.idKlien
-            )
-
-            // Return proyek object with client name from kliensList
-            return {
-                ...proyek,
-                klien: client ? client.nama : 'Klien Tidak Ditemukan',
-            }
-        })
-    }, [proyekData, kliensList])
-
-    useEffect(() => {
-        fetchData()
-        dispatch(getKliens()) // kliens
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
-
-    useEffect(() => {
-        if (tableRef) {
-            tableRef.current?.resetSorting()
-        }
-    }, [filterData])
-
-    const tableData = useMemo(
-        () => ({ pageIndex, pageSize, sort, query, total }),
-        [pageIndex, pageSize, sort, query, total]
-    )
-
-    const fetchData = () => {
-        dispatch(getProyeks({ pageIndex, pageSize, sort, query, filterData }))
-    }
-
-    const columns: ColumnDef<Proyek>[] = useMemo(
-        () => [
-            {
-                header: 'Pekerjaan',
-                accessorKey: 'pekerjaan',
-                row: 100,
-                minWidth: 350,
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <div className="flex flex-col gap-1">
-                            <div className="text-blue-600 text-xs font-semibold capitalize">
-                                {row.client}
-                            </div>
-                            <div className="text-base font-medium text-neutral-800 ">
-                                {row.pekerjaan}
-                            </div>
-                            <div className="text-blue-600 text-xs font-semibold">
-                                {row.pic}
-                            </div>
-                        </div>
-                    )
-                },
-            },
-            {
-                header: 'Nomor Kontrak',
-                accessorKey: 'nomor_kontrak',
-                minWidth: 200,
-                cell: (props) => {
-                    const row = props.row.original
+            <FieldArray name="termin">
+                {({ push, remove }) => {
                     return (
                         <div>
-                            <div className="capitalize mb-1">
-                                {row.nomor_kontrak}
-                            </div>
-                            <div className="bg-blue-600 text-xs rounded-md px-3 py-[3px] text-center text-white w-fit">
-                                {formatDate(row.tanggal_kontrak)}
-                            </div>
-                        </div>
-                    )
-                },
-            },
-            {
-                header: 'Lokasi',
-                accessorKey: 'lokasi',
-                minWidth: 200,
-                cell: (props) => {
-                    const row = props.row.original
-
-                    return (
-                        <div className="flex flex-col gap-1">
-                            {row.Lokasis && row.Lokasis.length > 0 ? (
-                                row.Lokasis.map((loc, index) => {
-                                    return (
-                                        <a
-                                            key={index}
-                                            href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group"
-                                            onClick={(e) => e.stopPropagation()} // Mencegah klik link juga memicu klik baris
-                                        >
-                                            <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
-                                                <div className="text-lg group-hover:scale-110 transition">
-                                                    <IoLocationSharp className="group-hover:text-blue-600 transition" />
-                                                </div>
-                                                <div className="text-blue-600">
-                                                    {loc.lokasi}
-                                                </div>
-                                            </div>
-                                        </a>
-                                    )
-                                })
-                            ) : (
-                                <span className="text-gray-400">
-                                    Tidak ada lokasi
-                                </span>
+                            {values.termin && values.termin.length > 0 && (
+                                <div className="flex mb-2">
+                                    <div className="flex-grow mr-4">
+                                        <p className="font-medium">
+                                            Keterangan
+                                        </p>
+                                    </div>
+                                    <div className="w-32">
+                                        <p className="font-medium">
+                                            Persentase (%)
+                                        </p>
+                                    </div>
+                                    <div className="w-10"></div>
+                                </div>
                             )}
-                        </div>
-                    )
-                },
-            },
-            {
-                header: 'Nilai Kontrak',
-                accessorKey: 'nilai_kontrak',
-                minWidth: 200,
-                cell: (props) => {
-                    const row = props.row.original
 
-                    // Determine the color based on conditions
-                    let textColorClass = 'text-yellow-600' // Default color
+                            {values.termin &&
+                                values.termin.map((_, index) => {
+                                    // Otomatis set keterangan sebagai "Termin {index+1}"
+                                    const terminName = `Termin ${index + 1}`
 
-                    if (row.uang_muka === 0) {
-                        textColorClass = 'text-red-500' // Red when realization is 0
-                    } else if (row.uang_muka === row.nilai_kontrak) {
-                        textColorClass = 'text-green-500' // Green when realization equals contract value
-                    }
+                                    // Jika keterangan kosong atau berbeda dengan format yang diharapkan, update
+                                    if (
+                                        values.termin[index].keterangan !==
+                                        terminName
+                                    ) {
+                                        setFieldValue(
+                                            `termin[${index}].keterangan`,
+                                            terminName
+                                        )
+                                    }
 
-                    return (
-                        <div className="flex flex-col">
-                            <div className="text-sm font-semibold text-neutral-700">
-                                Rp {row.nilai_kontrak.toLocaleString('id-ID')}
-                            </div>
-                            <div
-                                className={`text-xs font-semibold ${textColorClass} gap-1 flex items-center`}
+                                    const keteranganError =
+                                        errors.termin?.[index]?.keterangan &&
+                                        touched.termin?.[index]?.keterangan
+
+                                    const persenError =
+                                        errors.termin?.[index]?.persen &&
+                                        touched.termin?.[index]?.persen
+
+                                    return (
+                                        <div
+                                            className="flex items-start mb-4"
+                                            key={index}
+                                        >
+                                            <FormItem
+                                                className="flex-grow mb-0 mr-4"
+                                                invalid={Boolean(
+                                                    keteranganError
+                                                )}
+                                                errorMessage={
+                                                    typeof errors.termin?.[
+                                                        index
+                                                    ]?.keterangan === 'string'
+                                                        ? errors.termin?.[index]
+                                                              ?.keterangan
+                                                        : ''
+                                                }
+                                            >
+                                                <Input
+                                                    type="text"
+                                                    value={terminName}
+                                                    disabled
+                                                    readOnly
+                                                    className="bg-gray-100"
+                                                />
+                                                <Field
+                                                    type="hidden"
+                                                    name={`termin[${index}].keterangan`}
+                                                    value={terminName}
+                                                />
+                                            </FormItem>
+                                            <FormItem
+                                                className="w-32 mb-0 mr-2"
+                                                invalid={Boolean(persenError)}
+                                                errorMessage={
+                                                    typeof errors.termin?.[
+                                                        index
+                                                    ]?.persen === 'string'
+                                                        ? errors.termin?.[index]
+                                                              ?.persen
+                                                        : ''
+                                                }
+                                            >
+                                                <Field
+                                                    name={`termin[${index}].persen`}
+                                                >
+                                                    {({
+                                                        field,
+                                                        form,
+                                                    }: FieldProps) => (
+                                                        <NumericFormat
+                                                            {...field}
+                                                            customInput={Input}
+                                                            placeholder="%"
+                                                            suffix="%"
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                form.setFieldValue(
+                                                                    field.name,
+                                                                    Number(
+                                                                        values.value
+                                                                    )
+                                                                )
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Field>
+                                            </FormItem>
+
+                                            <div className="flex items-center h-10">
+                                                <Button
+                                                    type="button"
+                                                    shape="circle"
+                                                    variant="plain"
+                                                    size="sm"
+                                                    icon={<HiMinus />}
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        remove(index)
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+
+                            {/* Total Percentage Display */}
+                            {values.termin && values.termin.length > 0 && (
+                                <div className="flex justify-end mb-4">
+                                    <div className="w-32 mr-12">
+                                        <div
+                                            className={`font-medium ${
+                                                totalPersen !== 100
+                                                    ? 'text-red-500'
+                                                    : 'text-emerald-500'
+                                            }`}
+                                        >
+                                            Total: {totalPersen}%
+                                        </div>
+                                        {totalPersen !== 100 && (
+                                            <div className="text-xs text-red-500">
+                                                Total harus 100%
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            <Button
+                                type="button"
+                                variant="twoTone"
+                                icon={<HiPlus />}
+                                onClick={() => {
+                                    const nextIndex = values.termin
+                                        ? values.termin.length + 1
+                                        : 1
+                                    push({
+                                        keterangan: `Termin ${nextIndex}`,
+                                        persen: 0,
+                                    })
+                                }}
                             >
-                                <div className="text-lg">
-                                    <AiFillCreditCard className="group-hover:text-blue-600 transition" />
-                                </div>
-                                <span>
-                                    Rp {row.uang_muka.toLocaleString('id-ID')}
-                                </span>
-                            </div>
+                                Tambah Termin
+                            </Button>
                         </div>
                     )
-                },
-            },
-
-            {
-                header: 'Progress',
-                accessorKey: 'progress',
-                minWidth: 150,
-                cell: (props) => {
-                    const row = props.row.original
-                    const progress = row.progress || 0
-
-                    return (
-                        <div className="flex items-center justify-start">
-                            <div className="relative w-16 h-16">
-                                {/* Background circle */}
-                                <svg
-                                    className="w-full h-full"
-                                    viewBox="0 0 100 100"
-                                >
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r="40"
-                                        fill="none"
-                                        stroke="#a8e6d5"
-                                        strokeWidth="15"
-                                    />
-                                    {/* Progress circle */}
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r="40"
-                                        fill="none"
-                                        stroke="#3cbfa6"
-                                        strokeWidth="15"
-                                        strokeDasharray={`${
-                                            progress * 2.51
-                                        } 251`}
-                                        strokeDashoffset="0"
-                                        transform="rotate(-90 50 50)"
-                                    />
-                                </svg>
-                                {/* Percentage text in the middle */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-xs font-medium text-teal-500">
-                                        {progress}%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )
-                },
-            },
-            {
-                header: 'Status',
-                accessorKey: 'status',
-                cell: (props) => {
-                    const row = props.row.original
-                    return <span className="capitalize">{row.status}</span>
-                },
-            },
-            {
-                header: '',
-                id: 'action',
-                cell: (props) => <ActionColumn row={props.row.original} />,
-            },
-        ],
-        []
-    )
-
-    const onPaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        dispatch(setTableData(newTableData))
-    }
-
-    const onSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        dispatch(setTableData(newTableData))
-    }
-
-    const onSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        dispatch(setTableData(newTableData))
-    }
-
-    return (
-        <>
-            <DataTable
-                ref={tableRef}
-                columns={columns}
-                data={data}
-                skeletonAvatarColumns={[0]}
-                skeletonAvatarProps={{ className: 'rounded-md' }}
-                loading={loading}
-                pagingData={{
-                    total: tableData.total as number,
-                    pageIndex: tableData.pageIndex as number,
-                    pageSize: tableData.pageSize as number,
                 }}
-                onPaginationChange={onPaginationChange}
-                onSelectChange={onSelectChange}
-                onSort={onSort}
-                onRowClick={handleRowClick}
-            />
-            <ProyekDeleteConfirmation />
-        </>
+            </FieldArray>
+        </AdaptableCard>
     )
 }
 
-export default ProyekTable
+export default TerminFields

@@ -684,7 +684,7 @@ const PurchaseOrder = () => {
                                                             </span>
                                                             <p>
                                                                 Rp{' '}
-                                                                {purchase.harga.toLocaleString(
+                                                                {purchase.harga?.toLocaleString(
                                                                     'id-ID'
                                                                 )}
                                                             </p>
