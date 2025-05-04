@@ -13,6 +13,10 @@ import {
     apiGetSubkontraktors,
     apiGetSubkontraktorsByProject,
 } from '@/services/SubkontraktorService'
+import {
+    apiGetAdendum,
+    apiGetAdendumsByProyek,
+} from '@/services/AdendumService'
 
 export const SLICE_NAME = 'proyekDetail'
 
@@ -63,9 +67,21 @@ type SubkonByProyek = {
     idSubkon: string
 }
 
+type AdendumByProyek = {
+    id: string
+    dasar_adendum: string
+    nilai_adendum: number
+    nilai_sebelum_adendum: number
+    tanggal: string
+    idProject: string
+    idUser: string
+    status: string
+}
+
 type BerkasProyeks = BerkasProyekData[]
 type LokasiProyeks = LokasisByProyek[]
 type SubkonProyek = SubkonByProyek[]
+type AdendumProyek = AdendumByProyek[]
 type Subkontraktors = SubkonByProyek[]
 
 export type MasterProyekDetailState = {
@@ -77,6 +93,10 @@ export type MasterProyekDetailState = {
     loadingSubkonsByProyek: boolean
     loadingSubkonProyek: boolean
     loadingSubkontraktors: boolean
+    loadingAdendumsByProyek: boolean
+    loadingAdendum: boolean
+    adendumsByProyekData?: AdendumProyek
+    adendumData?: AdendumProyek
     berkasProyekData?: BerkasProyeks
     lokasiData?: LokasiProyeks
     lokasisByProyekData?: LokasiProyeks
@@ -86,6 +106,31 @@ export type MasterProyekDetailState = {
     subkonProyekData: SubkonProyek
     subkontraktorsData?: Subkontraktors
 }
+
+// get adendums by project
+export const getAdendumsByProyek = createAsyncThunk(
+    SLICE_NAME + '/getAdendumsByProyek',
+    async (data: { id: string }) => {
+        const response = await apiGetAdendumsByProyek<
+            AdendumProyek,
+            { id: string }
+        >(data)
+        return response.data
+    }
+)
+
+// get adendum
+export const getAdendum = createAsyncThunk(
+    SLICE_NAME + '/getAdendum',
+    async (data: { id: string }) => {
+        const response = await apiGetAdendum<AdendumProyek, { id: string }>(
+            data
+        )
+        return response.data
+    }
+)
+
+// ========================================================================
 
 // get subkopntraktors by project
 export const getSubkonsByProyek = createAsyncThunk(
@@ -210,10 +255,14 @@ const initialState: MasterProyekDetailState = {
     loadingSubkonsByProyek: true,
     loadingSubkonProyek: true,
     loadingSubkontraktors: true,
+    loadingAdendumsByProyek: true,
+    loadingAdendum: true,
     lokasisByProyekData: [],
     lokasiData: [],
     selectBerkasData: [],
     berkasProyekData: [],
+    adendumsByProyekData: [],
+    adendumData: [],
     berkasFakturPajaks: [],
     subkonByProyekData: [],
     subkonProyekData: [],
@@ -231,6 +280,20 @@ const proyekDetailSlice = createSlice({
             })
             .addCase(getBerkasProyek.pending, (state) => {
                 state.loadingBerkasProyeks = true
+            })
+            .addCase(getAdendumsByProyek.fulfilled, (state, action) => {
+                state.adendumsByProyekData = action.payload
+                state.loadingAdendumsByProyek = false
+            })
+            .addCase(getAdendumsByProyek.pending, (state) => {
+                state.loadingAdendumsByProyek = true
+            })
+            .addCase(getAdendum.fulfilled, (state, action) => {
+                state.adendumData = action.payload
+                state.loadingAdendum = false
+            })
+            .addCase(getAdendum.pending, (state) => {
+                state.loadingAdendum = true
             })
             .addCase(getLokasisByProyek.fulfilled, (state, action) => {
                 state.lokasisByProyekData = action.payload

@@ -1,824 +1,830 @@
-// {
-//     "nomor_surat": "05/2025",
-//     "waktu_mulai_pelaksanaan": "2025-05-03T17:00:00.000Z",
-//     "waktu_selesai_pelaksanaan": "2025-05-04T17:00:00.000Z",
-//     "keterangan": "-",
-//     "idProject": "f2a9f512-3123-4a52-987b-01914828e4f6",
-//     "nilai_subkontrak": "14.000.000", // number harusnya
-//     "nama": "Subkon5", // gaperlu
-//     "idSubkon": "05" // harusnya select option
-// }
+import React, { useState, useEffect } from 'react'
+import {
+    HiOutlineTrash,
+    HiOutlinePencil,
+    HiOutlineDocument,
+} from 'react-icons/hi'
+import { LuFilePlus2 } from 'react-icons/lu'
+import classNames from 'classnames'
+import isLastChild from '@/utils/isLastChild'
+import DescriptionSection from './DesriptionSection'
+import reducer, {
+    getAdendumsByProyek,
+    useAppDispatch,
+    useAppSelector,
+} from '../store'
+import { injectReducer } from '@/store'
+import { Field, FieldProps, Form, Formik } from 'formik'
+import { FormItem, FormContainer } from '@/components/ui/Form'
+import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import AdaptableCard from '@/components/shared/AdaptableCard'
+import { ConfirmDialog, Loading } from '@/components/shared'
+import * as Yup from 'yup'
+import { Notification, toast } from '@/components/ui'
+import DatePicker from '@/components/ui/DatePicker'
+import { NumericFormat } from 'react-number-format'
+import { extractNumberFromString } from '@/utils/extractNumberFromString'
+import {
+    apiCreateAdendum,
+    apiDeleteAdendum,
+    apiEditAdendum,
+    apiUpdateStatusAdendum,
+} from '@/services/AdendumService'
 
-// import React, { useState, useEffect } from 'react'
-// import {
-//     HiOutlineTrash,
-//     HiOutlinePencil,
-//     HiOutlineOfficeBuilding,
-// } from 'react-icons/hi'
-// import classNames from 'classnames'
-// import isLastChild from '@/utils/isLastChild'
-// import DescriptionSection from './DesriptionSection'
-// import reducer, {
-//     getSubkonsByProyek,
-//     getAllSubkontraktors,
-//     useAppDispatch,
-//     useAppSelector,
-// } from '../store'
-// import { injectReducer } from '@/store'
-// import { Field, FieldProps, Form, Formik } from 'formik'
-// import { FormItem, FormContainer } from '@/components/ui/Form'
-// import Input from '@/components/ui/Input'
-// import Button from '@/components/ui/Button'
-// import AdaptableCard from '@/components/shared/AdaptableCard'
-// import { ConfirmDialog, Loading } from '@/components/shared'
-// import * as Yup from 'yup'
-// import { Notification, toast, Select } from '@/components/ui'
-// import DatePicker from '@/components/ui/DatePicker'
-// import {
-//     apiCreateSubkontraktorProject,
-//     apiDeleteSubkontraktorsProject,
-//     apiUpdateSubkontraktorProject,
-// } from '@/services/SubkontraktorService'
-// import { NumericFormat } from 'react-number-format'
+type Adendum = {
+    id: string
+    dasar_adendum: string
+    nilai_sebelum_adendum: number
+    nilai_adendum: number
+    tanggal: string
+    idProject: string
+    status: string
+}
 
-// // Type definitions for subkontraktor data
-// type Subkontraktor = {
-//     id: string
-//     nama: string
-//     nomor_surat: string
-//     nilai_subkontrak: number
-//     waktu_mulai_pelaksanaan: string
-//     waktu_selesai_pelaksanaan: string
-//     keterangan: string
-//     idProject: string
-//     idSubkon: string
-// }
+// Form values type
+type FormValues = {
+    tempDasarAdendum: string
+    tempNilaiSebelumAdendum: number | string
+    tempNilaiAdendum: number | string
+    tempTanggal: Date | null
+    tempIdProject: string
+}
 
-// // Type for subkontraktor option in dropdown
-// type SubkonOption = {
-//     value: string
-//     label: string
-// }
+// Validation schema for the form fields
+const validationSchema = Yup.object().shape({
+    tempDasarAdendum: Yup.string().required('Dasar adendum harus diisi'),
+    tempNilaiSebelumAdendum: Yup.string().required(
+        'Nilai sebelum adendum harus diisi'
+    ),
+    tempNilaiAdendum: Yup.string().required('Nilai adendum harus diisi'),
+    tempTanggal: Yup.date()
+        .required('Tanggal harus diisi')
+        .typeError('Format tanggal tidak valid'),
+})
 
-// // Form values type
-// type FormValues = {
-//     tempNomorSurat: string
-//     tempNilaiSubkontrak: number | string
-//     tempWaktuMulai: Date | null
-//     tempWaktuSelesai: Date | null
-//     tempKeterangan: string
-//     tempIdProject: string
-//     tempIdSubkon: string
-// }
+injectReducer('proyekDetail', reducer)
 
-// // Validation schema for the form fields
-// const validationSchema = Yup.object().shape({
-//     tempNomorSurat: Yup.string().required('Nomor surat harus diisi'),
-//     tempNilaiSubkontrak: Yup.string().required('Nilai subkontrak harus diisi'),
-//     tempWaktuMulai: Yup.date()
-//         .required('Waktu mulai pelaksanaan harus diisi')
-//         .typeError('Format tanggal tidak valid'),
-//     tempWaktuSelesai: Yup.date()
-//         .required('Waktu selesai pelaksanaan harus diisi')
-//         .typeError('Format tanggal tidak valid')
-//         .min(
-//             Yup.ref('tempWaktuMulai'),
-//             'Waktu selesai harus setelah waktu mulai'
-//         ),
-//     tempIdSubkon: Yup.string().required('Subkontraktor harus dipilih'),
-// })
+export default function Adendum() {
+    const [showForm, setShowForm] = useState(false)
+    const [editIndex, setEditIndex] = useState<number | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
+    // New state for status confirmation dialog
+    const [statusDialogOpen, setStatusDialogOpen] = useState(false)
+    const [adendumToUpdateStatus, setAdendumToUpdateStatus] =
+        useState<Adendum | null>(null)
 
-// injectReducer('proyekDetail', reducer)
+    const dispatch = useAppDispatch()
+    const projectId = location.pathname.substring(
+        location.pathname.lastIndexOf('/') + 1
+    )
 
-// export default function Subkontraktor() {
-//     const [showForm, setShowForm] = useState(false)
-//     const [editIndex, setEditIndex] = useState<number | null>(null)
-//     const [isSubmitting, setIsSubmitting] = useState(false)
-//     const [dialogOpen, setDialogOpen] = useState(false)
-//     const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
-//     const [subkonOptions, setSubkonOptions] = useState<SubkonOption[]>([])
+    const adendumByProyekData = useAppSelector(
+        (state) => state.proyekDetail.data.adendumsByProyekData
+    )
 
-//     const dispatch = useAppDispatch()
-//     const projectId = location.pathname.substring(
-//         location.pathname.lastIndexOf('/') + 1
-//     )
+    const loading = useAppSelector(
+        (state) => state.proyekDetail.data.loadingAdendumsByProyek
+    )
 
-//     // Get subkontraktor data from state
-//     const subkontraktorByProyekData = useAppSelector(
-//         (state) => state.proyekDetail.data.subkonByProyekData?.data
-//     )
+    // Fetch adendums when component mounts
+    useEffect(() => {
+        const requestParam = { id: projectId }
+        dispatch(getAdendumsByProyek(requestParam))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, projectId])
 
-//     // Get all subkontraktor list for dropdown
-//     const allSubkontraktors = useAppSelector(
-//         (state) => state.proyekDetail.data.allSubkontraktors?.data
-//     )
+    // Format date for display
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString)
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        })
+    }
 
-//     const loading = useAppSelector(
-//         (state) => state.proyekDetail.data.loadingSubkonsByProyek
-//     )
+    // Format currency for display
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+        }).format(amount)
+    }
 
-//     const loadingAllSubkons = useAppSelector(
-//         (state) => state.proyekDetail.data.loadingAllSubkontraktors
-//     )
+    // Initialize form values
+    const initialValues: FormValues = {
+        tempDasarAdendum: '',
+        tempNilaiSebelumAdendum: '',
+        tempNilaiAdendum: '',
+        tempTanggal: null,
+        tempIdProject: projectId || '',
+    }
 
-//     // Fetch subkontraktors when component mounts
-//     useEffect(() => {
-//         const requestParam = { id: projectId }
-//         dispatch(getSubkonsByProyek(requestParam))
-//         dispatch(getAllSubkontraktors())
-//         // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, [dispatch, projectId])
+    // Success notification helper
+    const popNotification = (keyword: string) => {
+        toast.push(
+            <Notification
+                title={`Berhasil ${keyword}`}
+                type="success"
+                duration={2500}
+            >
+                Data adendum berhasil {keyword}
+            </Notification>,
+            {
+                placement: 'top-center',
+            }
+        )
+    }
 
-//     // Prepare subkontraktor options for dropdown
-//     useEffect(() => {
-//         if (allSubkontraktors && allSubkontraktors.length > 0) {
-//             const options = allSubkontraktors.map((subkon) => ({
-//                 value: subkon.id,
-//                 label: subkon.nama,
-//             }))
-//             setSubkonOptions(options)
-//         }
-//     }, [allSubkontraktors])
+    return (
+        <Loading loading={loading || isSubmitting}>
+            <Formik
+                enableReinitialize
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={() => {
+                    // Form submission is handled by save button
+                }}
+            >
+                {(formikProps) => {
+                    const { values, errors, touched, setFieldValue } =
+                        formikProps
 
-//     // Format date for display
-//     const formatDate = (dateString: string) => {
-//         const date = new Date(dateString)
-//         return date.toLocaleDateString('id-ID', {
-//             day: '2-digit',
-//             month: '2-digit',
-//             year: 'numeric',
-//         })
-//     }
+                    const handleAddAdendum = () => {
+                        setShowForm(true)
+                        setEditIndex(null)
 
-//     // Format currency for display
-//     const formatCurrency = (amount: number) => {
-//         return new Intl.NumberFormat('id-ID', {
-//             style: 'currency',
-//             currency: 'IDR',
-//             minimumFractionDigits: 0,
-//         }).format(amount)
-//     }
+                        // Reset temp values
+                        setFieldValue('tempDasarAdendum', '')
+                        setFieldValue('tempNilaiSebelumAdendum', '')
+                        setFieldValue('tempNilaiAdendum', '')
+                        setFieldValue('tempTanggal', null)
+                    }
 
-//     // Initialize form values
-//     const initialValues: FormValues = {
-//         tempNomorSurat: '',
-//         tempNilaiSubkontrak: '',
-//         tempWaktuMulai: null,
-//         tempWaktuSelesai: null,
-//         tempKeterangan: '',
-//         tempIdProject: projectId || '',
-//         tempIdSubkon: '',
-//     }
+                    const handleSave = async () => {
+                        // Validate fields
+                        if (
+                            !errors.tempDasarAdendum &&
+                            !errors.tempNilaiSebelumAdendum &&
+                            !errors.tempNilaiAdendum &&
+                            !errors.tempTanggal
+                        ) {
+                            setIsSubmitting(true)
 
-//     // Success notification helper
-//     const popNotification = (keyword: string) => {
-//         toast.push(
-//             <Notification
-//                 title={`Berhasil ${keyword}`}
-//                 type="success"
-//                 duration={2500}
-//             >
-//                 Data subkontraktor berhasil {keyword}
-//             </Notification>,
-//             {
-//                 placement: 'top-center',
-//             }
-//         )
-//     }
+                            const requestData = {
+                                dasar_adendum: values.tempDasarAdendum,
+                                nilai_sebelum_adendum: extractNumberFromString(
+                                    values.tempNilaiSebelumAdendum
+                                ),
+                                nilai_adendum: extractNumberFromString(
+                                    values.tempNilaiAdendum
+                                ),
+                                tanggal: values.tempTanggal?.toISOString(),
+                                idProject: values.tempIdProject,
+                            }
 
-//     return (
-//         <Loading loading={loading || loadingAllSubkons || isSubmitting}>
-//             <Formik
-//                 enableReinitialize
-//                 initialValues={initialValues}
-//                 validationSchema={validationSchema}
-//                 onSubmit={() => {
-//                     // Form submission is handled by save button
-//                 }}
-//             >
-//                 {(formikProps) => {
-//                     const { values, errors, touched, setFieldValue } =
-//                         formikProps
+                            try {
+                                let result
 
-//                     const handleAddSubkontraktor = () => {
-//                         setShowForm(true)
-//                         setEditIndex(null)
+                                if (editIndex !== null && adendumByProyekData) {
+                                    // Handle edit with API call
+                                    const adendumId =
+                                        adendumByProyekData[editIndex].id
+                                    result = await apiEditAdendum({
+                                        id: adendumId,
+                                        ...requestData,
+                                    })
+                                } else {
+                                    // Handle create with API call
+                                    result = await apiCreateAdendum(requestData)
+                                }
 
-//                         // Reset temp values
-//                         setFieldValue('tempNomorSurat', '')
-//                         setFieldValue('tempNilaiSubkontrak', '')
-//                         setFieldValue('tempWaktuMulai', null)
-//                         setFieldValue('tempWaktuSelesai', null)
-//                         setFieldValue('tempKeterangan', '')
-//                         setFieldValue('tempIdSubkon', '')
-//                     }
+                                setIsSubmitting(false)
 
-//                     const handleSave = async () => {
-//                         // Validate fields
-//                         if (
-//                             !errors.tempNomorSurat &&
-//                             !errors.tempNilaiSubkontrak &&
-//                             !errors.tempWaktuMulai &&
-//                             !errors.tempWaktuSelesai &&
-//                             !errors.tempIdSubkon
-//                         ) {
-//                             setIsSubmitting(true)
+                                if (
+                                    result &&
+                                    result.data?.statusCode >= 200 &&
+                                    result.data?.statusCode < 300
+                                ) {
+                                    // Refresh data
+                                    dispatch(
+                                        getAdendumsByProyek({ id: projectId })
+                                    )
 
-//                             // Cari informasi nama subkontraktor dari id yang dipilih
-//                             const selectedSubkon = allSubkontraktors?.find(
-//                                 (subkon) => subkon.id === values.tempIdSubkon
-//                             )
+                                    // Show success notification
+                                    popNotification(
+                                        editIndex !== null
+                                            ? 'diperbarui'
+                                            : 'ditambahkan'
+                                    )
 
-//                             const requestData = {
-//                                 nomor_surat: values.tempNomorSurat,
-//                                 nilai_subkontrak: values.tempNilaiSubkontrak,
-//                                 waktu_mulai_pelaksanaan:
-//                                     values.tempWaktuMulai?.toISOString(),
-//                                 waktu_selesai_pelaksanaan:
-//                                     values.tempWaktuSelesai?.toISOString(),
-//                                 keterangan: values.tempKeterangan || '-',
-//                                 idProject: values.tempIdProject,
-//                                 idSubkon: values.tempIdSubkon,
-//                                 // Tambahkan nama untuk kompatibilitas API
-//                                 nama: selectedSubkon?.nama || '',
-//                             }
+                                    // Reset form and close
+                                    resetFormFields()
+                                    setShowForm(false)
+                                    setEditIndex(null)
+                                } else {
+                                    // Show error notification
+                                    toast.push(
+                                        <Notification
+                                            title="Error"
+                                            type="danger"
+                                            duration={2500}
+                                        >
+                                            {result
+                                                ? result?.message
+                                                : 'Gagal menambahkan adendum'}
+                                        </Notification>,
+                                        { placement: 'top-center' }
+                                    )
+                                }
+                            } catch (error) {
+                                setIsSubmitting(false)
+                                console.error('Error:', error)
 
-//                             try {
-//                                 let result
+                                // Show generic error notification
+                                toast.push(
+                                    <Notification
+                                        title="Error"
+                                        type="danger"
+                                        duration={2500}
+                                    >
+                                        {error
+                                            ? error.response.data?.message
+                                            : 'Gagal menambahkan adendum'}
+                                    </Notification>,
+                                    { placement: 'top-center' }
+                                )
+                            }
+                        }
+                    }
 
-//                                 if (
-//                                     editIndex !== null &&
-//                                     subkontraktorByProyekData
-//                                 ) {
-//                                     // Handle edit with API call
-//                                     const subkontraktorId =
-//                                         subkontraktorByProyekData[editIndex].id
-//                                     result =
-//                                         await apiUpdateSubkontraktorProject({
-//                                             id: subkontraktorId,
-//                                             ...requestData,
-//                                         })
-//                                 } else {
-//                                     // Handle create with API call
-//                                     result =
-//                                         await apiCreateSubkontraktorProject(
-//                                             requestData
-//                                         )
-//                                 }
+                    // Helper function to reset form fields
+                    const resetFormFields = () => {
+                        setFieldValue('tempDasarAdendum', '')
+                        setFieldValue('tempNilaiSebelumAdendum', '')
+                        setFieldValue('tempNilaiAdendum', '')
+                        setFieldValue('tempTanggal', null)
+                    }
 
-//                                 setIsSubmitting(false)
+                    const handleCancel = () => {
+                        setShowForm(false)
+                        setEditIndex(null)
+                        resetFormFields()
+                    }
 
-//                                 if (
-//                                     result &&
-//                                     result.data?.statusCode >= 200 &&
-//                                     result.data?.statusCode < 300
-//                                 ) {
-//                                     // Refresh data
-//                                     dispatch(
-//                                         getSubkonsByProyek({
-//                                             id: projectId,
-//                                         })
-//                                     )
+                    const handleEdit = (index: number) => {
+                        if (adendumByProyekData) {
+                            const adendum = adendumByProyekData[index]
 
-//                                     // Show success notification
-//                                     popNotification(
-//                                         editIndex !== null
-//                                             ? 'diperbarui'
-//                                             : 'ditambahkan'
-//                                     )
+                            // Set temporary values for editing
+                            setFieldValue(
+                                'tempDasarAdendum',
+                                adendum.dasar_adendum
+                            )
+                            setFieldValue(
+                                'tempNilaiSebelumAdendum',
+                                adendum.nilai_sebelum_adendum
+                            )
+                            setFieldValue(
+                                'tempNilaiAdendum',
+                                adendum.nilai_adendum
+                            )
+                            setFieldValue(
+                                'tempTanggal',
+                                new Date(adendum.tanggal)
+                            )
+                            setFieldValue('tempIdProject', adendum.idProject)
 
-//                                     // Reset form and close
-//                                     resetFormFields()
-//                                     setShowForm(false)
-//                                     setEditIndex(null)
-//                                 } else {
-//                                     // Show error notification
-//                                     toast.push(
-//                                         <Notification
-//                                             title="Error"
-//                                             type="danger"
-//                                             duration={2500}
-//                                         >
-//                                             {result
-//                                                 ? result.data?.message
-//                                                 : 'Gagal menambahkan subkontraktor'}
-//                                         </Notification>,
-//                                         { placement: 'top-center' }
-//                                     )
-//                                 }
-//                             } catch (error) {
-//                                 setIsSubmitting(false)
-//                                 console.error('Error:', error)
+                            setEditIndex(index)
+                            setShowForm(true)
+                        }
+                    }
 
-//                                 // Show generic error notification
-//                                 toast.push(
-//                                     <Notification
-//                                         title="Error"
-//                                         type="danger"
-//                                         duration={2500}
-//                                     >
-//                                         Terjadi kesalahan saat memproses
-//                                         permintaan
-//                                     </Notification>,
-//                                     { placement: 'top-center' }
-//                                 )
-//                             }
-//                         }
-//                     }
+                    // Modified to open confirmation dialog first
+                    const handleOpenStatusConfirmation = (data: Adendum) => {
+                        setAdendumToUpdateStatus(data)
+                        setStatusDialogOpen(true)
+                    }
 
-//                     // Helper function to reset form fields
-//                     const resetFormFields = () => {
-//                         setFieldValue('tempNomorSurat', '')
-//                         setFieldValue('tempNilaiSubkontrak', '')
-//                         setFieldValue('tempWaktuMulai', null)
-//                         setFieldValue('tempWaktuSelesai', null)
-//                         setFieldValue('tempKeterangan', '')
-//                         setFieldValue('tempIdSubkon', '')
-//                     }
+                    // This function is now called only after confirmation
+                    const handleUpdateStatusAdendum = async () => {
+                        if (!adendumToUpdateStatus) return
 
-//                     const handleCancel = () => {
-//                         setShowForm(false)
-//                         setEditIndex(null)
-//                         resetFormFields()
-//                     }
+                        setIsSubmitting(true)
+                        try {
+                            let newStatus = ''
+                            let statusMessage = ''
 
-//                     const handleEdit = (index: number) => {
-//                         if (subkontraktorByProyekData) {
-//                             const subkon = subkontraktorByProyekData[index]
+                            if (
+                                adendumToUpdateStatus.status ===
+                                'BELUM_DISETUJUI'
+                            ) {
+                                newStatus = 'SUDAH_DISETUJUI'
+                                statusMessage = 'disetujui'
+                            } else if (
+                                adendumToUpdateStatus.status ===
+                                'SUDAH_DISETUJUI'
+                            ) {
+                                newStatus = 'BELUM_DISETUJUI'
+                                statusMessage = 'dibatalkan persetujuannya'
+                            }
 
-//                             // Set temporary values for editing
-//                             setFieldValue('tempNomorSurat', subkon.nomor_surat)
-//                             setFieldValue(
-//                                 'tempNilaiSubkontrak',
-//                                 subkon.nilai_subkontrak
-//                             )
-//                             setFieldValue(
-//                                 'tempWaktuMulai',
-//                                 new Date(subkon.waktu_mulai_pelaksanaan)
-//                             )
-//                             setFieldValue(
-//                                 'tempWaktuSelesai',
-//                                 new Date(subkon.waktu_selesai_pelaksanaan)
-//                             )
-//                             setFieldValue('tempKeterangan', subkon.keterangan)
-//                             setFieldValue('tempIdProject', subkon.idProject)
-//                             setFieldValue('tempIdSubkon', subkon.idSubkon)
+                            const res = await apiUpdateStatusAdendum({
+                                id: adendumToUpdateStatus.id,
+                                status: newStatus,
+                            })
 
-//                             setEditIndex(index)
-//                             setShowForm(true)
-//                         }
-//                     }
+                            // Success notification
+                            toast.push(
+                                <Notification
+                                    title="Status berhasil diperbarui"
+                                    type="success"
+                                    duration={2500}
+                                >
+                                    Adendum berhasil {statusMessage}
+                                </Notification>,
+                                {
+                                    placement: 'top-center',
+                                }
+                            )
 
-//                     // Function to open confirmation dialog
-//                     const handleConfirmDelete = (index: number) => {
-//                         setDeleteIndex(index)
-//                         setDialogOpen(true)
-//                     }
+                            // Refresh data after successful update
+                            dispatch(getAdendumsByProyek({ id: projectId }))
+                        } catch (error) {
+                            console.error(
+                                'Error updating status adendum:',
+                                error
+                            )
 
-//                     // Function to close confirmation dialog
-//                     const handleCancelDelete = () => {
-//                         setDialogOpen(false)
-//                         setDeleteIndex(null)
-//                     }
+                            // Error notification
+                            toast.push(
+                                <Notification
+                                    title="Gagal memperbarui status"
+                                    type="danger"
+                                    duration={2500}
+                                >
+                                    {error?.response?.data?.message ||
+                                        'Terjadi kesalahan saat memperbarui status adendum'}
+                                </Notification>,
+                                {
+                                    placement: 'top-center',
+                                }
+                            )
+                        } finally {
+                            setIsSubmitting(false)
+                            setStatusDialogOpen(false)
+                            setAdendumToUpdateStatus(null)
+                        }
+                    }
 
-//                     const handleDelete = async () => {
-//                         if (deleteIndex !== null && subkontraktorByProyekData) {
-//                             const subkonId =
-//                                 subkontraktorByProyekData[deleteIndex].id
+                    // Function to cancel status update
+                    const handleCancelStatusUpdate = () => {
+                        setStatusDialogOpen(false)
+                        setAdendumToUpdateStatus(null)
+                    }
 
-//                             setIsSubmitting(true)
-//                             try {
-//                                 // Call delete API with subkontraktor ID
-//                                 const success =
-//                                     await apiDeleteSubkontraktorsProject(
-//                                         subkonId
-//                                     )
+                    // Function to open confirmation dialog
+                    const handleConfirmDelete = (index: number) => {
+                        setDeleteIndex(index)
+                        setDialogOpen(true)
+                    }
 
-//                                 if (success) {
-//                                     // Refresh data after successful delete
-//                                     dispatch(
-//                                         getSubkonsByProyek({
-//                                             id: projectId,
-//                                         })
-//                                     )
-//                                     popNotification('dihapus')
-//                                 }
-//                             } catch (error) {
-//                                 console.error(
-//                                     'Error deleting subkontraktor:',
-//                                     error
-//                                 )
+                    // Function to close confirmation dialog
+                    const handleCancelDelete = () => {
+                        setDialogOpen(false)
+                        setDeleteIndex(null)
+                    }
 
-//                                 // Show error notification
-//                                 toast.push(
-//                                     <Notification
-//                                         title="Error"
-//                                         type="danger"
-//                                         duration={2500}
-//                                     >
-//                                         Gagal menghapus subkontraktor
-//                                     </Notification>,
-//                                     { placement: 'top-center' }
-//                                 )
-//                             } finally {
-//                                 setIsSubmitting(false)
-//                                 setDialogOpen(false)
-//                                 setDeleteIndex(null)
-//                             }
-//                         }
-//                     }
+                    const handleDelete = async () => {
+                        if (deleteIndex !== null && adendumByProyekData) {
+                            const adendumId = adendumByProyekData[deleteIndex]
 
-//                     return (
-//                         <Form>
-//                             <AdaptableCard divider>
-//                                 <div className="flex justify-between items-center mb-4">
-//                                     <DescriptionSection
-//                                         title="Informasi Subkontraktor"
-//                                         desc="Informasi subkontraktor proyek"
-//                                     />
-//                                     {!showForm && (
-//                                         <Button
-//                                             size="sm"
-//                                             variant="twoTone"
-//                                             onClick={handleAddSubkontraktor}
-//                                             className="w-fit text-xs"
-//                                             type="button"
-//                                         >
-//                                             Tambah Subkontraktor
-//                                         </Button>
-//                                     )}
-//                                 </div>
+                            setIsSubmitting(true)
+                            try {
+                                // Call delete API with adendum ID
+                                const success = await apiDeleteAdendum(
+                                    adendumId
+                                )
 
-//                                 {/* Form untuk input subkontraktor */}
-//                                 {showForm && (
-//                                     <div className="mb-4 border bg-slate-50 rounded-md p-4">
-//                                         <h6 className="mb-3">
-//                                             {editIndex !== null
-//                                                 ? 'Edit Subkontraktor'
-//                                                 : 'Tambah Subkontraktor Baru'}
-//                                         </h6>
+                                if (success) {
+                                    // Refresh data after successful delete
+                                    dispatch(
+                                        getAdendumsByProyek({ id: projectId })
+                                    )
+                                    popNotification('dihapus')
+                                }
+                            } catch (error) {
+                                console.error('Error deleting adendum:', error)
 
-//                                         <FormContainer>
-//                                             <div className="grid grid-cols-2 gap-4">
-//                                                 {/* Dropdown untuk memilih Subkontraktor */}
-//                                                 <FormItem
-//                                                     label="Nama Subkontraktor"
-//                                                     errorMessage={
-//                                                         errors.tempIdSubkon &&
-//                                                         touched.tempIdSubkon
-//                                                             ? errors.tempIdSubkon
-//                                                             : ''
-//                                                     }
-//                                                     invalid={
-//                                                         !!(
-//                                                             errors.tempIdSubkon &&
-//                                                             touched.tempIdSubkon
-//                                                         )
-//                                                     }
-//                                                 >
-//                                                     <Field name="tempIdSubkon">
-//                                                         {({
-//                                                             field,
-//                                                             form,
-//                                                         }: FieldProps) => {
-//                                                             const selectedOption =
-//                                                                 subkonOptions.find(
-//                                                                     (option) =>
-//                                                                         option.value ===
-//                                                                         field.value
-//                                                                 )
+                                // Show error notification
+                                toast.push(
+                                    <Notification
+                                        title="Error"
+                                        type="danger"
+                                        duration={2500}
+                                    >
+                                        Gagal menghapus adendum
+                                    </Notification>,
+                                    { placement: 'top-center' }
+                                )
+                            } finally {
+                                setIsSubmitting(false)
+                                setDialogOpen(false)
+                                setDeleteIndex(null)
+                            }
+                        }
+                    }
 
-//                                                             return (
-//                                                                 <Select
-//                                                                     placeholder="Pilih subkontraktor"
-//                                                                     options={
-//                                                                         subkonOptions
-//                                                                     }
-//                                                                     value={
-//                                                                         selectedOption
-//                                                                     }
-//                                                                     onChange={(
-//                                                                         option
-//                                                                     ) => {
-//                                                                         form.setFieldValue(
-//                                                                             field.name,
-//                                                                             option?.value ||
-//                                                                                 ''
-//                                                                         )
-//                                                                     }}
-//                                                                 />
-//                                                             )
-//                                                         }}
-//                                                     </Field>
-//                                                 </FormItem>
+                    return (
+                        <Form>
+                            <AdaptableCard divider>
+                                <div className="flex justify-between items-center mb-4">
+                                    <DescriptionSection
+                                        title="Informasi Adendum"
+                                        desc="Informasi adendum proyek"
+                                    />
+                                    {!showForm && (
+                                        <Button
+                                            size="sm"
+                                            variant="twoTone"
+                                            onClick={handleAddAdendum}
+                                            className="w-fit text-xs"
+                                            type="button"
+                                        >
+                                            Tambah Adendum
+                                        </Button>
+                                    )}
+                                </div>
 
-//                                                 {/* Nomor Surat */}
-//                                                 <FormItem
-//                                                     label="Nomor Surat"
-//                                                     errorMessage={
-//                                                         errors.tempNomorSurat &&
-//                                                         touched.tempNomorSurat
-//                                                             ? errors.tempNomorSurat
-//                                                             : ''
-//                                                     }
-//                                                     invalid={
-//                                                         !!(
-//                                                             errors.tempNomorSurat &&
-//                                                             touched.tempNomorSurat
-//                                                         )
-//                                                     }
-//                                                 >
-//                                                     <Field
-//                                                         type="text"
-//                                                         autoComplete="off"
-//                                                         name="tempNomorSurat"
-//                                                         placeholder="Contoh: 01/IV/2025"
-//                                                         component={Input}
-//                                                     />
-//                                                 </FormItem>
+                                {/* Form untuk input adendum */}
+                                {showForm && (
+                                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
+                                        <h6 className="mb-3">
+                                            {editIndex !== null
+                                                ? 'Edit Adendum'
+                                                : 'Tambah Adendum Baru'}
+                                        </h6>
 
-//                                                 {/* Nilai Subkontrak */}
-//                                                 <FormItem
-//                                                     label="Nilai Subkontrak"
-//                                                     className="mb-3"
-//                                                     errorMessage={
-//                                                         errors.tempNilaiSubkontrak &&
-//                                                         touched.tempNilaiSubkontrak
-//                                                             ? errors.tempNilaiSubkontrak
-//                                                             : ''
-//                                                     }
-//                                                     invalid={
-//                                                         !!(
-//                                                             errors.tempNilaiSubkontrak &&
-//                                                             touched.tempNilaiSubkontrak
-//                                                         )
-//                                                     }
-//                                                 >
-//                                                     <Field name="tempNilaiSubkontrak">
-//                                                         {({
-//                                                             field,
-//                                                             form,
-//                                                         }: FieldProps) => (
-//                                                             <NumericFormat
-//                                                                 {...field}
-//                                                                 placeholder="Nilai dalam Rupiah"
-//                                                                 customInput={
-//                                                                     Input
-//                                                                 }
-//                                                                 thousandSeparator="."
-//                                                                 decimalSeparator=","
-//                                                                 onValueChange={(
-//                                                                     val
-//                                                                 ) =>
-//                                                                     form.setFieldValue(
-//                                                                         field.name,
-//                                                                         val.value
-//                                                                     )
-//                                                                 }
-//                                                             />
-//                                                         )}
-//                                                     </Field>
-//                                                 </FormItem>
+                                        <FormContainer>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                {/* Dasar Adendum */}
+                                                <FormItem
+                                                    label="Dasar Adendum"
+                                                    errorMessage={
+                                                        errors.tempDasarAdendum &&
+                                                        touched.tempDasarAdendum
+                                                            ? errors.tempDasarAdendum
+                                                            : ''
+                                                    }
+                                                    invalid={
+                                                        !!(
+                                                            errors.tempDasarAdendum &&
+                                                            touched.tempDasarAdendum
+                                                        )
+                                                    }
+                                                >
+                                                    <Field
+                                                        type="text"
+                                                        autoComplete="off"
+                                                        name="tempDasarAdendum"
+                                                        placeholder="Contoh: Perubahan Spesifikasi Teknis"
+                                                        component={Input}
+                                                    />
+                                                </FormItem>
 
-//                                                 {/* Waktu Mulai */}
-//                                                 <FormItem
-//                                                     label="Waktu Mulai Pelaksanaan"
-//                                                     errorMessage={
-//                                                         errors.tempWaktuMulai &&
-//                                                         touched.tempWaktuMulai
-//                                                             ? errors.tempWaktuMulai
-//                                                             : ''
-//                                                     }
-//                                                     invalid={
-//                                                         !!(
-//                                                             errors.tempWaktuMulai &&
-//                                                             touched.tempWaktuMulai
-//                                                         )
-//                                                     }
-//                                                 >
-//                                                     <DatePicker
-//                                                         placeholder="Pilih tanggal mulai"
-//                                                         value={
-//                                                             values.tempWaktuMulai
-//                                                         }
-//                                                         onChange={(date) => {
-//                                                             setFieldValue(
-//                                                                 'tempWaktuMulai',
-//                                                                 date
-//                                                             )
-//                                                         }}
-//                                                     />
-//                                                 </FormItem>
+                                                {/* Tanggal */}
+                                                <FormItem
+                                                    label="Tanggal"
+                                                    errorMessage={
+                                                        errors.tempTanggal &&
+                                                        touched.tempTanggal
+                                                            ? errors.tempTanggal
+                                                            : ''
+                                                    }
+                                                    invalid={
+                                                        !!(
+                                                            errors.tempTanggal &&
+                                                            touched.tempTanggal
+                                                        )
+                                                    }
+                                                >
+                                                    <DatePicker
+                                                        placeholder="Pilih tanggal"
+                                                        value={
+                                                            values.tempTanggal
+                                                        }
+                                                        inputFormat="DD-MM-YYYY"
+                                                        onChange={(date) => {
+                                                            setFieldValue(
+                                                                'tempTanggal',
+                                                                date
+                                                            )
+                                                        }}
+                                                    />
+                                                </FormItem>
 
-//                                                 {/* Waktu Selesai */}
-//                                                 <FormItem
-//                                                     label="Waktu Selesai Pelaksanaan"
-//                                                     errorMessage={
-//                                                         errors.tempWaktuSelesai &&
-//                                                         touched.tempWaktuSelesai
-//                                                             ? errors.tempWaktuSelesai
-//                                                             : ''
-//                                                     }
-//                                                     invalid={
-//                                                         !!(
-//                                                             errors.tempWaktuSelesai &&
-//                                                             touched.tempWaktuSelesai
-//                                                         )
-//                                                     }
-//                                                 >
-//                                                     <DatePicker
-//                                                         placeholder="Pilih tanggal selesai"
-//                                                         value={
-//                                                             values.tempWaktuSelesai
-//                                                         }
-//                                                         onChange={(date) => {
-//                                                             setFieldValue(
-//                                                                 'tempWaktuSelesai',
-//                                                                 date
-//                                                             )
-//                                                         }}
-//                                                     />
-//                                                 </FormItem>
+                                                {/* Nilai Sebelum Adendum */}
+                                                <FormItem
+                                                    label="Nilai Sebelum Adendum"
+                                                    className="mb-3"
+                                                    errorMessage={
+                                                        errors.tempNilaiSebelumAdendum &&
+                                                        touched.tempNilaiSebelumAdendum
+                                                            ? errors.tempNilaiSebelumAdendum
+                                                            : ''
+                                                    }
+                                                    invalid={
+                                                        !!(
+                                                            errors.tempNilaiSebelumAdendum &&
+                                                            touched.tempNilaiSebelumAdendum
+                                                        )
+                                                    }
+                                                >
+                                                    <Field name="tempNilaiSebelumAdendum">
+                                                        {({
+                                                            field,
+                                                            form,
+                                                        }: FieldProps) => (
+                                                            <NumericFormat
+                                                                {...field}
+                                                                placeholder="Nilai dalam Rupiah"
+                                                                customInput={
+                                                                    Input
+                                                                }
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                onValueChange={(
+                                                                    val
+                                                                ) =>
+                                                                    form.setFieldValue(
+                                                                        field.name,
+                                                                        val.value
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
+                                                    </Field>
+                                                </FormItem>
 
-//                                                 {/* Keterangan */}
-//                                                 <FormItem
-//                                                     label="Keterangan"
-//                                                     className="col-span-2"
-//                                                 >
-//                                                     <Field
-//                                                         type="text"
-//                                                         autoComplete="off"
-//                                                         name="tempKeterangan"
-//                                                         placeholder="Keterangan (opsional)"
-//                                                         component={Input}
-//                                                     />
-//                                                 </FormItem>
-//                                             </div>
+                                                {/* Nilai Adendum */}
+                                                <FormItem
+                                                    label="Nilai Adendum"
+                                                    className="mb-3"
+                                                    errorMessage={
+                                                        errors.tempNilaiAdendum &&
+                                                        touched.tempNilaiAdendum
+                                                            ? errors.tempNilaiAdendum
+                                                            : ''
+                                                    }
+                                                    invalid={
+                                                        !!(
+                                                            errors.tempNilaiAdendum &&
+                                                            touched.tempNilaiAdendum
+                                                        )
+                                                    }
+                                                >
+                                                    <Field name="tempNilaiAdendum">
+                                                        {({
+                                                            field,
+                                                            form,
+                                                        }: FieldProps) => (
+                                                            <NumericFormat
+                                                                {...field}
+                                                                placeholder="Nilai dalam Rupiah"
+                                                                customInput={
+                                                                    Input
+                                                                }
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                onValueChange={(
+                                                                    val
+                                                                ) =>
+                                                                    form.setFieldValue(
+                                                                        field.name,
+                                                                        val.value
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
+                                                    </Field>
+                                                </FormItem>
+                                            </div>
 
-//                                             <div className="flex justify-end space-x-2 mt-4">
-//                                                 <Button
-//                                                     size="sm"
-//                                                     variant="plain"
-//                                                     onClick={handleCancel}
-//                                                     type="button"
-//                                                 >
-//                                                     Batal
-//                                                 </Button>
-//                                                 <Button
-//                                                     size="sm"
-//                                                     variant="solid"
-//                                                     onClick={handleSave}
-//                                                     type="button"
-//                                                     loading={isSubmitting}
-//                                                 >
-//                                                     Simpan
-//                                                 </Button>
-//                                             </div>
-//                                         </FormContainer>
-//                                     </div>
-//                                 )}
+                                            <div className="flex justify-end space-x-2 mt-4">
+                                                <Button
+                                                    size="sm"
+                                                    variant="plain"
+                                                    onClick={handleCancel}
+                                                    type="button"
+                                                >
+                                                    Batal
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="solid"
+                                                    onClick={handleSave}
+                                                    type="button"
+                                                    loading={isSubmitting}
+                                                >
+                                                    Simpan
+                                                </Button>
+                                            </div>
+                                        </FormContainer>
+                                    </div>
+                                )}
 
-//                                 {/* Daftar subkontraktor */}
-//                                 {subkontraktorByProyekData &&
-//                                 subkontraktorByProyekData.length > 0 ? (
-//                                     <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-//                                         {subkontraktorByProyekData.map(
-//                                             (
-//                                                 data: Subkontraktor,
-//                                                 index: number
-//                                             ) => {
-//                                                 // If currently editing this item, don't show it in the list
-//                                                 if (editIndex === index) {
-//                                                     return null
-//                                                 }
+                                {/* Daftar adendum */}
+                                {adendumByProyekData &&
+                                adendumByProyekData.length > 0 ? (
+                                    <div className="rounded-lg border border-gray-200 dark:border-gray-600">
+                                        {adendumByProyekData.map(
+                                            (data: Adendum, index: number) => {
+                                                // If currently editing this item, don't show it in the list
+                                                if (editIndex === index) {
+                                                    return null
+                                                }
 
-//                                                 return (
-//                                                     <div
-//                                                         key={data.id}
-//                                                         className={classNames(
-//                                                             'flex items-center justify-between px-4 py-6',
-//                                                             !isLastChild(
-//                                                                 subkontraktorByProyekData,
-//                                                                 index
-//                                                             ) &&
-//                                                                 'border-b border-gray-200 dark:border-gray-600'
-//                                                         )}
-//                                                     >
-//                                                         <div className="flex items-center flex-grow">
-//                                                             <div className="text-3xl">
-//                                                                 <HiOutlineOfficeBuilding className="text-indigo-500" />
-//                                                             </div>
-//                                                             <div className="ml-3 rtl:mr-3">
-//                                                                 <div className="flex items-center">
-//                                                                     <div className="text-gray-900 dark:text-gray-100 font-semibold">
-//                                                                         {
-//                                                                             data.nama
-//                                                                         }
-//                                                                     </div>
-//                                                                 </div>
-//                                                                 <div className="text-gray-500 text-sm mt-1">
-//                                                                     <div>
-//                                                                         No.
-//                                                                         Surat:{' '}
-//                                                                         {
-//                                                                             data.nomor_surat
-//                                                                         }
-//                                                                     </div>
-//                                                                     <div>
-//                                                                         Nilai:{' '}
-//                                                                         {formatCurrency(
-//                                                                             data.nilai_subkontrak
-//                                                                         )}
-//                                                                     </div>
-//                                                                     <div>
-//                                                                         Periode:{' '}
-//                                                                         {formatDate(
-//                                                                             data.waktu_mulai_pelaksanaan
-//                                                                         )}{' '}
-//                                                                         -{' '}
-//                                                                         {formatDate(
-//                                                                             data.waktu_selesai_pelaksanaan
-//                                                                         )}
-//                                                                     </div>
-//                                                                     {data.keterangan !==
-//                                                                         '-' && (
-//                                                                         <div>
-//                                                                             Keterangan:{' '}
-//                                                                             {
-//                                                                                 data.keterangan
-//                                                                             }
-//                                                                         </div>
-//                                                                     )}
-//                                                                 </div>
-//                                                             </div>
-//                                                         </div>
+                                                return (
+                                                    <div
+                                                        key={data.id}
+                                                        className={classNames(
+                                                            'flex items-center justify-between px-4 py-6',
+                                                            !isLastChild(
+                                                                adendumByProyekData,
+                                                                index
+                                                            ) &&
+                                                                'border-b border-gray-200 dark:border-gray-600'
+                                                        )}
+                                                    >
+                                                        <div className="flex items-center flex-grow ">
+                                                            <div className="text-3xl">
+                                                                <HiOutlineDocument className="text-indigo-500" />
+                                                            </div>
+                                                            <div className="ml-3 rtl:mr-3">
+                                                                <div className="flex items-center">
+                                                                    <div className="text-gray-900 dark:text-gray-100 font-semibold">
+                                                                        {
+                                                                            data.dasar_adendum
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-gray-500 text-sm mt-1">
+                                                                    <div>
+                                                                        Tanggal:{' '}
+                                                                        {formatDate(
+                                                                            data.tanggal
+                                                                        )}
+                                                                    </div>
+                                                                    <div>
+                                                                        Nilai
+                                                                        Sebelum:{' '}
+                                                                        {formatCurrency(
+                                                                            data.nilai_sebelum_adendum
+                                                                        )}
+                                                                    </div>
+                                                                    <div>
+                                                                        Nilai
+                                                                        Adendum:{' '}
+                                                                        {formatCurrency(
+                                                                            data.nilai_adendum
+                                                                        )}
+                                                                    </div>
+                                                                    <div>
+                                                                        Selisih:{' '}
+                                                                        {formatCurrency(
+                                                                            data.nilai_adendum -
+                                                                                data.nilai_sebelum_adendum
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-//                                                         <div className="flex space-x-2">
-//                                                             <Button
-//                                                                 type="button"
-//                                                                 shape="circle"
-//                                                                 variant="plain"
-//                                                                 size="sm"
-//                                                                 icon={
-//                                                                     <HiOutlinePencil />
-//                                                                 }
-//                                                                 className="text-indigo-500"
-//                                                                 onClick={() =>
-//                                                                     handleEdit(
-//                                                                         index
-//                                                                     )
-//                                                                 }
-//                                                             />
-//                                                             <Button
-//                                                                 type="button"
-//                                                                 shape="circle"
-//                                                                 variant="plain"
-//                                                                 size="sm"
-//                                                                 className="text-red-500"
-//                                                                 icon={
-//                                                                     <HiOutlineTrash />
-//                                                                 }
-//                                                                 onClick={() =>
-//                                                                     handleConfirmDelete(
-//                                                                         index
-//                                                                     )
-//                                                                 }
-//                                                             />
-//                                                         </div>
-//                                                     </div>
-//                                                 )
-//                                             }
-//                                         )}
-//                                     </div>
-//                                 ) : (
-//                                     <div className="text-center py-8 text-gray-500">
-//                                         Belum ada data subkontraktor. Klik
-//                                         'Tambah Subkontraktor' untuk
-//                                         menambahkan.
-//                                     </div>
-//                                 )}
-//                             </AdaptableCard>
+                                                        <div className="flex space-x-2 ">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="solid"
+                                                                color={
+                                                                    data?.status ===
+                                                                    'SUDAH_DISETUJUI'
+                                                                        ? 'red'
+                                                                        : ''
+                                                                }
+                                                                onClick={() =>
+                                                                    handleOpenStatusConfirmation(
+                                                                        data
+                                                                    )
+                                                                }
+                                                                className="w-fit text-xs "
+                                                                type="button"
+                                                            >
+                                                                {data?.status ===
+                                                                'SUDAH_DISETUJUI'
+                                                                    ? 'Batalkan Persetujuan'
+                                                                    : 'Setujui Adendum'}
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                shape="circle"
+                                                                variant="plain"
+                                                                size="sm"
+                                                                icon={
+                                                                    <HiOutlinePencil />
+                                                                }
+                                                                className="text-indigo-500"
+                                                                onClick={() =>
+                                                                    handleEdit(
+                                                                        index
+                                                                    )
+                                                                }
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                shape="circle"
+                                                                variant="plain"
+                                                                size="sm"
+                                                                className="text-red-500"
+                                                                icon={
+                                                                    <HiOutlineTrash />
+                                                                }
+                                                                onClick={() =>
+                                                                    handleConfirmDelete(
+                                                                        index
+                                                                    )
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                        Belum ada data adendum. Klik 'Tambah
+                                        Adendum' untuk menambahkan.
+                                    </div>
+                                )}
+                            </AdaptableCard>
 
-//                             {/* Dialog Konfirmasi Hapus */}
-//                             <ConfirmDialog
-//                                 isOpen={dialogOpen}
-//                                 type="danger"
-//                                 title="Hapus Subkontraktor"
-//                                 confirmButtonColor="red-600"
-//                                 onClose={handleCancelDelete}
-//                                 onRequestClose={handleCancelDelete}
-//                                 onCancel={handleCancelDelete}
-//                                 onConfirm={handleDelete}
-//                             >
-//                                 <p>
-//                                     Apakah kamu yakin ingin menghapus
-//                                     subkontraktor ini?
-//                                 </p>
-//                             </ConfirmDialog>
-//                         </Form>
-//                     )
-//                 }}
-//             </Formik>
-//         </Loading>
-//     )
-// }
+                            {/* Dialog Konfirmasi Hapus */}
+                            <ConfirmDialog
+                                isOpen={dialogOpen}
+                                type="danger"
+                                title="Hapus Adendum"
+                                confirmButtonColor="red-600"
+                                onClose={handleCancelDelete}
+                                onRequestClose={handleCancelDelete}
+                                onCancel={handleCancelDelete}
+                                onConfirm={handleDelete}
+                            >
+                                <p>
+                                    Apakah kamu yakin ingin menghapus adendum
+                                    ini?
+                                </p>
+                            </ConfirmDialog>
+
+                            {/* Dialog Konfirmasi Perubahan Status */}
+                            <ConfirmDialog
+                                isOpen={statusDialogOpen}
+                                type={
+                                    adendumToUpdateStatus?.status ===
+                                    'SUDAH_DISETUJUI'
+                                        ? 'danger'
+                                        : 'success'
+                                }
+                                title={
+                                    adendumToUpdateStatus?.status ===
+                                    'SUDAH_DISETUJUI'
+                                        ? 'Batalkan Persetujuan Adendum'
+                                        : 'Setujui Adendum'
+                                }
+                                confirmButtonColor={
+                                    adendumToUpdateStatus?.status ===
+                                    'SUDAH_DISETUJUI'
+                                        ? 'red-600'
+                                        : 'emerald-600'
+                                }
+                                onClose={handleCancelStatusUpdate}
+                                onRequestClose={handleCancelStatusUpdate}
+                                onCancel={handleCancelStatusUpdate}
+                                onConfirm={handleUpdateStatusAdendum}
+                            >
+                                <p>
+                                    {adendumToUpdateStatus?.status ===
+                                    'SUDAH_DISETUJUI'
+                                        ? 'Apakah kamu yakin ingin membatalkan persetujuan adendum ini?'
+                                        : 'Apakah kamu yakin ingin menyetujui adendum ini?'}
+                                </p>
+                            </ConfirmDialog>
+                        </Form>
+                    )
+                }}
+            </Formik>
+        </Loading>
+    )
+}
