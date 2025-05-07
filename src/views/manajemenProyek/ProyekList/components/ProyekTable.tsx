@@ -265,7 +265,7 @@ const ProyekTable = () => {
                                     <AiFillCreditCard className="group-hover:text-blue-600 transition" />
                                 </div>
                                 <span>
-                                    Rp {row.uang_muka.toLocaleString('id-ID')}
+                                    Rp {row.realisasi.toLocaleString('id-ID')}
                                     {/* Rp {row.uang_muka} */}
                                 </span>
                             </div>
