@@ -20,6 +20,7 @@ export const protectedRoutes = [
         authority: [],
     },
     {
+        added: 'detailProyek',
         key: 'apps.manajemenProyek',
         path: '/manajemen-proyek-detail/:proyekId',
         component: lazy(() => import('@/views/manajemenProyek/ProyekDetail')),

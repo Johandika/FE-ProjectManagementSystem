@@ -69,6 +69,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             <h5>Informasi Dasar</h5>
             <p className="mb-6">Sesi untuk mengatur informasi dasar proyek</p>
 
+            {/* Pekerjaan */}
             <FormItem
                 label="Pekerjaan"
                 invalid={(errors.pekerjaan && touched.pekerjaan) as boolean}
@@ -83,8 +84,8 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 />
             </FormItem>
 
-            {/* Client Select Field */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
+                {/* Client Select Field */}
                 <div className="col-span-1">
                     <FormItem
                         label="Klien"
@@ -139,23 +140,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </Field>
                     </FormItem>
                 </div>
-                <div className="col-span-1">
-                    <FormItem
-                        label="PIC"
-                        invalid={(errors.pic && touched.pic) as boolean}
-                        errorMessage={errors.pic}
-                    >
-                        <Field
-                            type="text"
-                            autoComplete="off"
-                            name="pic"
-                            placeholder="Person in charge"
-                            component={Input}
-                        />
-                    </FormItem>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
+                {/* Nomor Kontrak */}
                 <div className="col-span-1">
                     <FormItem
                         label="Nomor Kontrak"
@@ -174,6 +159,9 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         />
                     </FormItem>
                 </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
+                {/* Tanggal Kontrak */}
                 <div className="col-span-1">
                     <FormItem
                         label="Tanggal Kontrak"
@@ -207,85 +195,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </Field>
                     </FormItem>
                 </div>
-            </div>
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
-                {type === 'new' && (
-                    <>
-                        <div className="col-span-1">
-                            <FormItem
-                                label="Tanggal PO"
-                                invalid={
-                                    (errors.tanggal_service_po &&
-                                        touched.tanggal_service_po) as boolean
-                                }
-                                errorMessage={errors.tanggal_service_po}
-                            >
-                                <Field name="tanggal_service_po">
-                                    {({ field, form }: FieldProps) => (
-                                        <DatePicker
-                                            placeholder="Pilih Tanggal"
-                                            value={
-                                                field.value
-                                                    ? new Date(field.value)
-                                                    : null
-                                            }
-                                            inputFormat="DD-MM-YYYY"
-                                            onChange={(date) => {
-                                                const formattedDate = date
-                                                    ? dayjs(date).format(
-                                                          'YYYY-MM-DD'
-                                                      )
-                                                    : ''
-                                                form.setFieldValue(
-                                                    field.name,
-                                                    formattedDate
-                                                )
-                                            }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
-                        </div>
-                        <div className="col-span-1">
-                            <FormItem
-                                label="Tanggal Delivery"
-                                invalid={
-                                    (errors.tanggal_delivery &&
-                                        touched.tanggal_delivery) as boolean
-                                }
-                                errorMessage={errors.tanggal_delivery}
-                            >
-                                <Field name="tanggal_delivery">
-                                    {({ field, form }: FieldProps) => (
-                                        <DatePicker
-                                            placeholder="Pilih Tanggal"
-                                            value={
-                                                field.value
-                                                    ? new Date(field.value)
-                                                    : null
-                                            }
-                                            inputFormat="DD-MM-YYYY"
-                                            onChange={(date) => {
-                                                const formattedDate = date
-                                                    ? dayjs(date).format(
-                                                          'YYYY-MM-DD'
-                                                      )
-                                                    : ''
-                                                form.setFieldValue(
-                                                    field.name,
-                                                    formattedDate
-                                                )
-                                            }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
-                        </div>
-                    </>
-                )}
-            </div> */}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
+                {/* Nilai Kontrak */}
                 <div className="col-span-1">
                     <FormItem
                         label="Nilai Kontrak"
@@ -314,33 +224,10 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </Field>
                     </FormItem>
                 </div>
-                <div className="col-span-1">
-                    <FormItem
-                        label="Uang Muka"
-                        invalid={
-                            (errors.uang_muka && touched.uang_muka) as boolean
-                        }
-                        errorMessage={errors.uang_muka}
-                    >
-                        <Field name="uang_muka">
-                            {({ field, form }: FieldProps) => (
-                                <NumericFormat
-                                    {...field}
-                                    customInput={Input}
-                                    placeholder="Uang Muka"
-                                    thousandSeparator="."
-                                    decimalSeparator=","
-                                    onValueChange={(values) => {
-                                        form.setFieldValue(
-                                            field.name,
-                                            values.value
-                                        )
-                                    }}
-                                />
-                            )}
-                        </Field>
-                    </FormItem>
-                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
+                {/* Timeline */}
                 <div className="col-span-1">
                     <FormItem
                         label="Timeline (hari)"
@@ -368,7 +255,52 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </Field>
                     </FormItem>
                 </div>
+                {/* PIC */}
                 <div className="col-span-1">
+                    <FormItem
+                        label="PIC"
+                        invalid={(errors.pic && touched.pic) as boolean}
+                        errorMessage={errors.pic}
+                    >
+                        <Field
+                            type="text"
+                            autoComplete="off"
+                            name="pic"
+                            placeholder="Person in charge"
+                            component={Input}
+                        />
+                    </FormItem>
+                </div>
+                {/* Uang Muka */}
+                {/* <div className="col-span-1">
+                    <FormItem
+                        label="Uang Muka"
+                        invalid={
+                            (errors.uang_muka && touched.uang_muka) as boolean
+                        }
+                        errorMessage={errors.uang_muka}
+                    >
+                        <Field name="uang_muka">
+                            {({ field, form }: FieldProps) => (
+                                <NumericFormat
+                                    {...field}
+                                    customInput={Input}
+                                    placeholder="Uang Muka"
+                                    thousandSeparator="."
+                                    decimalSeparator=","
+                                    onValueChange={(values) => {
+                                        form.setFieldValue(
+                                            field.name,
+                                            values.value
+                                        )
+                                    }}
+                                />
+                            )}
+                        </Field>
+                    </FormItem>
+                </div> */}
+                {/* Berkas BASTP */}
+                {/* <div className="col-span-1">
                     {type === 'new' && (
                         <FormItem
                             label="Berkas BASTP"
@@ -453,7 +385,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                             </Field>
                         </FormItem>
                     )}
-                </div>
+                </div> */}
             </div>
 
             <FormItem

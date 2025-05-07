@@ -10,6 +10,9 @@ import type { CommonProps } from '@/@types/common'
 import type { Meta } from '@/@types/routes'
 import type { ElementType, ComponentPropsWithRef } from 'react'
 import type { FooterPageContainerType } from '@/components/template/Footer'
+import { Button } from '../ui'
+import { IoIosArrowBack } from 'react-icons/io'
+import { useNavigate } from 'react-router-dom'
 
 export interface PageContainerProps extends CommonProps, Meta {
     contained?: boolean
@@ -34,6 +37,11 @@ const PageContainer = (props: PageContainerProps) => {
         extraHeader,
         footer = true,
     } = props
+    const navigate = useNavigate()
+
+    const handleBackClick = () => {
+        navigate(-1) // Go back to the previous page
+    }
 
     return (
         <div className="h-full flex flex-auto flex-col justify-between">
@@ -53,7 +61,16 @@ const PageContainer = (props: PageContainerProps) => {
                                 'flex items-center justify-between mb-4'
                             )}
                         >
-                            <div>
+                            <div className="flex flex-row items-center gap-2">
+                                <Button
+                                    variant="plain"
+                                    shape="circle"
+                                    size="sm"
+                                    icon={
+                                        <IoIosArrowBack className="text-xl" />
+                                    }
+                                    onClick={handleBackClick}
+                                />
                                 {header && typeof header === 'string' && (
                                     <h3>{header}</h3>
                                 )}

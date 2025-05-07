@@ -77,6 +77,7 @@ const LocationFields = (props: LocationFieldsProps) => {
                                                 }}
                                             />
                                         </div>
+                                        {/* Nama Lokasi */}
                                         <div className="mb-3">
                                             <FormItem
                                                 className="w-full mb-0"
@@ -101,6 +102,7 @@ const LocationFields = (props: LocationFieldsProps) => {
                                             </FormItem>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
+                                            {/* Latitude */}
                                             <FormItem
                                                 className="mb-0"
                                                 label="Latitude"
@@ -123,6 +125,7 @@ const LocationFields = (props: LocationFieldsProps) => {
                                                     component={Input}
                                                 />
                                             </FormItem>
+                                            {/* Longitude */}
                                             <FormItem
                                                 className="mb-0"
                                                 label="Longitude"

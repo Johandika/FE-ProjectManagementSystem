@@ -86,6 +86,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 mb-3">
+                                            {/* Nomor Surat */}
                                             <FormItem
                                                 className="w-full mb-0"
                                                 label="Nomor Surat"
@@ -105,7 +106,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                                     component={Input}
                                                 />
                                             </FormItem>
-
+                                            {/* Nama Vendor Subkon */}
                                             <FormItem
                                                 label="Nama Vendor Subkon"
                                                 className="w-full mb-0"
@@ -181,6 +182,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 mb-3">
+                                            {/* Nilai Subkon */}
                                             <FormItem
                                                 className="mb-0"
                                                 label="Nilai Subkon"
@@ -217,7 +219,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                                     )}
                                                 </Field>
                                             </FormItem>
-
+                                            {/* Waktu Pelaksanaan Kerja */}
                                             <FormItem
                                                 className="mb-0"
                                                 label="Waktu Pelaksanaan Kerja"
@@ -294,7 +296,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                                 />
                                             </FormItem>
                                         </div>
-
+                                        {/* Keterangan */}
                                         <FormItem
                                             className="mb-0"
                                             label="Keterangan"

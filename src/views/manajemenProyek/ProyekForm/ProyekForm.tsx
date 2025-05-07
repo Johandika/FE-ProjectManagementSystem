@@ -241,11 +241,6 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                                 touched={touched}
                                                 errors={errors}
                                             />
-                                            <TerminFields
-                                                touched={touched}
-                                                errors={errors}
-                                                terminsList={terminsList}
-                                            />
                                             <SubkontraktorFields
                                                 touched={touched}
                                                 errors={errors}
@@ -265,6 +260,11 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                                         ? subkontraktorsList
                                                         : []
                                                 }
+                                            />
+                                            <TerminFields
+                                                touched={touched}
+                                                errors={errors}
+                                                terminsList={terminsList}
                                             />
                                         </>
                                     )}

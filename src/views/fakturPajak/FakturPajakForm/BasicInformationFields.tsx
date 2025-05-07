@@ -20,11 +20,6 @@ type BasicInformationFields = {
     values?: FormFieldsName
 }
 
-// const statuses = [
-//     { label: 'Lunas', value: 'Lunas' },
-//     { label: 'Belum Lunas', value: 'Belum Lunas' },
-// ]
-
 const BasicInformationFields = (props: BasicInformationFields) => {
     const { touched, errors } = props
 

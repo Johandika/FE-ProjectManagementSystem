@@ -94,6 +94,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                             />
                                         </div>
 
+                                        {/* Nama Item */}
                                         <FormItem
                                             label="Nama Item"
                                             invalid={
@@ -143,6 +144,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                         ] as
                                                                             | FormikErrors<ItemDetail>
                                                                             | undefined
+
                                                                     const detailTouched =
                                                                         itemTouched
                                                                             ?.detail?.[

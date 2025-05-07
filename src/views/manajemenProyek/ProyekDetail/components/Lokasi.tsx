@@ -420,7 +420,7 @@ export default function Lokasi() {
                                                 : 'Tambah Lokasi Baru'}
                                         </h6>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="flex flex-col gap-4">
                                             {/* Input Nama Lokasi */}
                                             <FormItem
                                                 className="mb-3"
@@ -447,57 +447,59 @@ export default function Lokasi() {
                                                 />
                                             </FormItem>
 
-                                            {/* Latitude */}
-                                            <FormItem
-                                                className="mb-3"
-                                                label="Latitude"
-                                                errorMessage={
-                                                    errors.tempLatitude &&
-                                                    touched.tempLatitude
-                                                        ? errors.tempLatitude
-                                                        : ''
-                                                }
-                                                invalid={
-                                                    !!(
+                                            <div className="grid sm:grid-cols-2 gap-4">
+                                                {/* Latitude */}
+                                                <FormItem
+                                                    className="mb-3"
+                                                    label="Latitude"
+                                                    errorMessage={
                                                         errors.tempLatitude &&
                                                         touched.tempLatitude
-                                                    )
-                                                }
-                                            >
-                                                <Field
-                                                    type="text"
-                                                    autoComplete="off"
-                                                    name="tempLatitude"
-                                                    placeholder="Contoh: -6.2088"
-                                                    component={Input}
-                                                />
-                                            </FormItem>
+                                                            ? errors.tempLatitude
+                                                            : ''
+                                                    }
+                                                    invalid={
+                                                        !!(
+                                                            errors.tempLatitude &&
+                                                            touched.tempLatitude
+                                                        )
+                                                    }
+                                                >
+                                                    <Field
+                                                        type="text"
+                                                        autoComplete="off"
+                                                        name="tempLatitude"
+                                                        placeholder="Contoh: -6.2088"
+                                                        component={Input}
+                                                    />
+                                                </FormItem>
 
-                                            {/* Longitude */}
-                                            <FormItem
-                                                className="mb-3"
-                                                label="Longitude"
-                                                errorMessage={
-                                                    errors.tempLongitude &&
-                                                    touched.tempLongitude
-                                                        ? errors.tempLongitude
-                                                        : ''
-                                                }
-                                                invalid={
-                                                    !!(
+                                                {/* Longitude */}
+                                                <FormItem
+                                                    className="mb-3"
+                                                    label="Longitude"
+                                                    errorMessage={
                                                         errors.tempLongitude &&
                                                         touched.tempLongitude
-                                                    )
-                                                }
-                                            >
-                                                <Field
-                                                    type="text"
-                                                    autoComplete="off"
-                                                    name="tempLongitude"
-                                                    placeholder="Contoh: 106.8456"
-                                                    component={Input}
-                                                />
-                                            </FormItem>
+                                                            ? errors.tempLongitude
+                                                            : ''
+                                                    }
+                                                    invalid={
+                                                        !!(
+                                                            errors.tempLongitude &&
+                                                            touched.tempLongitude
+                                                        )
+                                                    }
+                                                >
+                                                    <Field
+                                                        type="text"
+                                                        autoComplete="off"
+                                                        name="tempLongitude"
+                                                        placeholder="Contoh: 106.8456"
+                                                        component={Input}
+                                                    />
+                                                </FormItem>
+                                            </div>
                                         </div>
 
                                         <div className="flex justify-end space-x-2 mt-4">
