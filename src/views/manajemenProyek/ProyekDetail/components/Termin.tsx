@@ -597,6 +597,8 @@ export default function Termin() {
         (state) => state.proyekEdit.data.loadingFakturPajakByProyekData
     )
 
+    console.log('terminsData', terminsData)
+
     const openDialog = (termin: any, isEdit = false) => {
         setSelectedTermin(termin)
         setIsEditMode(isEdit)

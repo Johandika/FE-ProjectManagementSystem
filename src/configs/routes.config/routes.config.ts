@@ -149,7 +149,7 @@ export const protectedRoutes = [
         component: lazy(() => import('@/views/master/Berkas/BerkasEdit')),
         authority: [],
         meta: {
-            header: 'Ubah Berkas BASTP',
+            header: 'Ubah Berkas Tagihan',
         },
     },
     {
@@ -158,7 +158,7 @@ export const protectedRoutes = [
         component: lazy(() => import('@/views/master/Berkas/BerkasNew')),
         authority: [],
         meta: {
-            header: 'Tambah Berkas BASTP',
+            header: 'Tambah Berkas Tagihan',
         },
     },
     // Subkontraktor

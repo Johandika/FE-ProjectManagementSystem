@@ -19,7 +19,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
         <AdaptableCard divider className="mb-4">
             <h5>Informasi Dasar</h5>
             <p className="mb-6">
-                Sesi untuk mengatur informasi dasar berkas BASTP
+                Sesi untuk mengatur informasi dasar berkas Tagihan
             </p>
             <FormItem
                 label="Nama berkas"

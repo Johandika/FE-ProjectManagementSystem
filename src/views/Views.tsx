@@ -108,7 +108,6 @@ const { authenticatedEntryPath } = appConfig
 const AllRoutes = (props: AllRoutesProps) => {
     const userAuthority = useAppSelector((state) => state.auth.user?.authority)
 
-    console.log('proyekData1', proyeksData)
     return (
         <Routes>
             <Route path="/" element={<ProtectedRoute />}>

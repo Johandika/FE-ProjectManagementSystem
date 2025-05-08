@@ -25,10 +25,6 @@ export default function Detail() {
         (state) => state.proyekEdit.data.proyekData
     )
 
-    // const terminsData = useAppSelector(
-    //     (state) => state.proyekEdit.data.terminsData
-    // )
-
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
         dispatch(getTermins(data))
@@ -93,12 +89,7 @@ export default function Detail() {
                                 )}
                             </div>
                         </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Uang Muka :</div>
-                            <div>
-                                {proyekData.uang_muka?.toLocaleString('id-ID')}
-                            </div>
-                        </div>
+
                         <div className="flex flex-row gap-2">
                             <div className="font-semibold">Progress (%) :</div>
                             <div>{proyekData.progress}</div>
@@ -109,8 +100,10 @@ export default function Detail() {
                             </div>
                             <div>{proyekData.timeline}</div>
                         </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Berkas BASTP :</div>
+                        {/* <div className="flex flex-row gap-2">
+                            <div className="font-semibold">
+                                Berkas Tagihan :
+                            </div>
                             <div>
                                 {proyekData.BerkasProjects &&
                                     proyekData.BerkasProjects.map(
@@ -127,7 +120,7 @@ export default function Detail() {
                                         )
                                     )}
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="flex flex-col sm:flex-row gap-0 sm:gap-2">
                             <div className="font-semibold flex-0">

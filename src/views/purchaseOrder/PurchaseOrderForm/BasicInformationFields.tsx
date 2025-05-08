@@ -93,7 +93,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 />
             </FormItem>
             <FormItem
-                label="Estimasi Pengerjaan(hari)"
+                label="Estimasi Delivery (hari)"
                 invalid={
                     (errors.estimasi_pengerjaan &&
                         touched.estimasi_pengerjaan) as boolean
@@ -104,7 +104,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     type="text"
                     autoComplete="off"
                     name="estimasi_pengerjaan"
-                    placeholder="Estimasi pengerjaan"
+                    placeholder="Estimasi Delivery"
                     component={Input}
                 />
             </FormItem>

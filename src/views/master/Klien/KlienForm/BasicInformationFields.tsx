@@ -1,8 +1,7 @@
 import AdaptableCard from '@/components/shared/AdaptableCard'
-import RichTextEditor from '@/components/shared/RichTextEditor'
 import Input from '@/components/ui/Input'
 import { FormItem } from '@/components/ui/Form'
-import { Field, FormikErrors, FormikTouched, FieldProps } from 'formik'
+import { Field, FormikErrors, FormikTouched } from 'formik'
 
 type FormFieldsName = {
     nama: string

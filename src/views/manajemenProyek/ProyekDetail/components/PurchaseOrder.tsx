@@ -72,12 +72,6 @@ type FormValues = {
 const validationSchema = Yup.object().shape({
     tempPabrik: Yup.string().required('Pabrik harus diisi'),
     tempNama: Yup.string().required('Pabrik harus diisi'),
-    tempNomorPo: Yup.string().required('Nomor PO harus diisi'),
-    tempEstimasi: Yup.number()
-        .required('Estimasi pengerjaan harus diisi')
-        .min(1, 'Estimasi minimal 1 hari'),
-    tempIdProject: Yup.string().required('ID Project harus diisi'),
-    tempTanggalPo: Yup.string().required('Tanggal PO harus diisi'),
 })
 
 const PurchaseOrder = () => {
@@ -422,7 +416,7 @@ const PurchaseOrder = () => {
                                             {/* Edit Nama*/}
                                             <FormItem
                                                 className="mb-3"
-                                                label="Nama"
+                                                label="Nama Barang"
                                                 errorMessage={
                                                     errors.tempNama &&
                                                     touched.tempNama
@@ -559,10 +553,10 @@ const PurchaseOrder = () => {
                                                 </Field>
                                             </FormItem>
 
-                                            {/* Edit Estimasi Pengerjaan*/}
+                                            {/* Edit Estimasi Delivery*/}
                                             <FormItem
                                                 className="mb-3"
-                                                label="Estimasi Pengerjaan (hari)"
+                                                label="Estimasi Delivery (hari)"
                                                 errorMessage={
                                                     errors.tempEstimasi &&
                                                     touched.tempEstimasi
@@ -672,7 +666,7 @@ const PurchaseOrder = () => {
                                                         </div>
                                                         <div>
                                                             <span className="text-xs font-bold text-gray-500">
-                                                                Nama:
+                                                                Nama Barang:
                                                             </span>
                                                             <p>
                                                                 {purchase.nama}
@@ -731,8 +725,9 @@ const PurchaseOrder = () => {
                                     purchaseOrdersData.length === 0) &&
                                     !showForm && (
                                         <div className="text-center py-8 text-gray-500">
-                                            Belum ada data faktur. Klik 'Tambah
-                                            Faktur' untuk menambahkan.
+                                            Belum ada data purchase order. Klik
+                                            'Tambah Purchase Order' untuk
+                                            menambahkan.
                                         </div>
                                     )}
                             </AdaptableCard>

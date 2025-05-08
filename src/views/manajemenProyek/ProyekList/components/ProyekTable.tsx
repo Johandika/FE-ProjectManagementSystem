@@ -208,7 +208,6 @@ const ProyekTable = () => {
                         <div className="flex flex-col gap-1">
                             {row.Lokasis && row.Lokasis.length > 0 ? (
                                 row.Lokasis.map((loc, index) => {
-                                    console.log('row', row)
                                     return (
                                         <a
                                             key={index}

@@ -461,8 +461,8 @@ export default function Items() {
                             <AdaptableCard divider>
                                 <div className="flex justify-between items-center mb-4">
                                     <DescriptionSection
-                                        title="Informasi Item"
-                                        desc="Daftar item dan detail item proyek"
+                                        title="Informasi RAB"
+                                        desc="Daftar RAB dan detail RAB proyek"
                                     />
                                     {!showItemForm && (
                                         <Button

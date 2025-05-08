@@ -40,7 +40,6 @@ type KlienForm = {
 
 const validationSchema = Yup.object().shape({
     nama: Yup.string().required('Nama wajib diisi'),
-    keterangan: Yup.string().required('Keterangan wajib diisi'),
 })
 
 const DeleteKlienButton = ({ onDelete }: { onDelete: OnDelete }) => {

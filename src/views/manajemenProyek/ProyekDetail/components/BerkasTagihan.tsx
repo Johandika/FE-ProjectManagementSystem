@@ -288,14 +288,14 @@ export default function BerkasTagihan() {
                                     </div>
                                 ))
                             ) : (
-                                <div>Tidak ada data berkas BASTP</div>
+                                <div>Tidak ada data berkas Tagihan</div>
                             )}
                         </>
                     )}
                 </div>
                 <div className="w-full flex justify-end">
                     <Button size="sm" variant="solid" onClick={openDialog}>
-                        Tambah BASTP
+                        Tambah Berkas Tagihan
                     </Button>
                 </div>
 
@@ -308,7 +308,7 @@ export default function BerkasTagihan() {
                     title="Delete BASTP"
                     onConfirm={onDelete}
                 >
-                    <p>Apakah kamu yakin ingin menghapus berkas BASTP ini?</p>
+                    <p>Apakah kamu yakin ingin menghapus berkas Tagihan ini?</p>
                 </ConfirmDialog>
 
                 {/* Dialog Form for adding BASTP */}
@@ -331,7 +331,7 @@ export default function BerkasTagihan() {
                                     {/* Nama */}
 
                                     <FormItem
-                                        label="Pilih Berkas BASTP"
+                                        label="Pilih Berkas Tagihan"
                                         invalid={
                                             (errors.idBerkas &&
                                                 touched.idBerkas) as boolean

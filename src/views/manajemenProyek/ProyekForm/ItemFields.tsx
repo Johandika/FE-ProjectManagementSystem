@@ -52,10 +52,8 @@ const ItemFields = (props: ItemFieldsProps) => {
 
     return (
         <AdaptableCard divider className="mb-4">
-            <h5>Item Pekerjaan</h5>
-            <p className="mb-6">
-                Tambahkan item-item pekerjaan untuk proyek ini
-            </p>
+            <h5>RAB</h5>
+            <p className="mb-6">Tambahkan RAB untuk proyek ini</p>
 
             <FieldArray name="item">
                 {({ push: pushItem, remove: removeItem, form }) => {
@@ -108,7 +106,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                 type="text"
                                                 autoComplete="off"
                                                 name={`item[${itemIndex}].item`}
-                                                placeholder="Nama item pekerjaan"
+                                                placeholder="Nama RAB"
                                                 component={Input}
                                             />
                                         </FormItem>
@@ -659,7 +657,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                     })
                                 }
                             >
-                                Tambah Item
+                                Tambah RAB
                             </Button>
                         </div>
                     )

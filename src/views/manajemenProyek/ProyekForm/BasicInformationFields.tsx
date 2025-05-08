@@ -122,7 +122,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                         value={
                                             selectedClient
                                                 ? {
-                                                      value: selectedClient.id,
+                                                      value: selectedClient.nama,
                                                       label: `${selectedClient.nama}`,
                                                   }
                                                 : null
@@ -299,11 +299,11 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </Field>
                     </FormItem>
                 </div> */}
-                {/* Berkas BASTP */}
+                {/* Berkas Tagihan */}
                 {/* <div className="col-span-1">
                     {type === 'new' && (
                         <FormItem
-                            label="Berkas BASTP"
+                            label="Berkas Tagihan"
                             invalid={
                                 (errors.berkas && touched.berkas) as boolean
                             }
