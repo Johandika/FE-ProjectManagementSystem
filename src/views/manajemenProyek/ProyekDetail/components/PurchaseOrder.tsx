@@ -3,13 +3,16 @@ import { Field, FieldProps, Form, Formik } from 'formik'
 import { FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi'
+import { HiOutlineTrash, HiOutlinePencil, HiPlusCircle } from 'react-icons/hi'
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import { ConfirmDialog, Loading } from '@/components/shared'
 import * as Yup from 'yup'
 import {
     apiCreatePurchaseOrder,
     apiPutPurchaseOrder,
+    apiCreateDetailPurchase,
+    apiUpdateDetailPurchase,
+    apiDeleteDetailPurchaseOrder,
 } from '@/services/PurchaseOrderService'
 import {
     deletePurchase,
@@ -24,54 +27,64 @@ import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 import DescriptionSection from './DesriptionSection'
 
-// Define types for your PO data
-type PurchaseOrder = {
+// Define types for your PO data structure according to the new API response
+type DetailPurchase = {
     id: string
-    nomor_po: string
-    nama: string
-    tanggal_po: string
-    pabrik: string
+    nama_barang: string
     harga: number
-    status: string
-    estimasi_pengerjaan: number
-    idProject: string
+    estimasi_delivery: number
+    idPurchase: string
     createdAt: string
     updatedAt: string
 }
 
-// Create request format
-type CreatePurchaseOrderRequest = {
+type PurchaseOrder = {
+    id: string
+    nomor_po: string
+    tanggal_po: string
     pabrik: string
-    harga: number
-    estimasi_pengerjaan: number
+    status: string
     idProject: string
+    createdAt: string
+    updatedAt: string
+    DetailPurchases: DetailPurchase[]
 }
 
-// Update request format
-type UpdatePurchaseOrderRequest = {
-    id: string
-    pabrik: string
-    harga: number
-    estimasi_pengerjaan: number
+// Type for detail item in the form
+type DetailItem = {
+    id?: string
+    nama_barang: string
+    harga: number | string
+    estimasi_delivery: number | string
 }
 
 // Form values type
 type FormValues = {
     purchases: PurchaseOrder[]
     tempPabrik: string
-    tempHarga: number | string
-    tempEstimasi: number | string
     tempIdProject: string
     tempTanggalPo: string
     tempStatus: string
     tempNomorPo: string
-    tempNama: string
+    tempDetails: DetailItem[]
 }
 
 // Validation schema for the form fields
 const validationSchema = Yup.object().shape({
     tempPabrik: Yup.string().required('Pabrik harus diisi'),
-    tempNama: Yup.string().required('Pabrik harus diisi'),
+    tempNomorPo: Yup.string().required('Nomor PO harus diisi'),
+    tempTanggalPo: Yup.string().required('Tanggal PO harus diisi'),
+    tempDetails: Yup.array()
+        .of(
+            Yup.object().shape({
+                nama_barang: Yup.string().required('Nama barang harus diisi'),
+                harga: Yup.string().required('Harga harus diisi'),
+                estimasi_delivery: Yup.string().required(
+                    'Estimasi pengerjaan harus diisi'
+                ),
+            })
+        )
+        .min(1, 'Minimal satu detail barang harus diisi'),
 })
 
 const PurchaseOrder = () => {
@@ -87,15 +100,23 @@ const PurchaseOrder = () => {
     )
     const [dialogOpen, setDialogOpen] = useState(false)
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
+    const [detailDialogOpen, setDetailDialogOpen] = useState(false)
+    const [deleteDetailId, setDeleteDetailId] = useState<
+        string | number | null
+    >(null)
+    const [deleteDetailInfo, setDeleteDetailInfo] = useState<{
+        purchaseIndex: number
+        detailIndex: number
+    } | null>(null)
 
     const popNotification = (keyword: string) => {
         toast.push(
             <Notification
-                title={`Successfuly ${keyword}`}
+                title={`Successfully ${keyword}`}
                 type="success"
                 duration={2500}
             >
-                Faktur successfuly {keyword}
+                Purchase Order successfully {keyword}
             </Notification>,
             {
                 placement: 'top-center',
@@ -110,17 +131,15 @@ const PurchaseOrder = () => {
         }
     }, [dispatch, projectId])
 
-    // Initialize form values
+    // Initialize form values with empty details array
     const initialValues: FormValues = {
         purchases: purchaseOrdersData || [],
         tempPabrik: '',
         tempNomorPo: '',
-        tempNama: '',
-        tempHarga: '',
-        tempEstimasi: '',
-        tempIdProject: projectId || '',
         tempTanggalPo: '',
+        tempIdProject: projectId || '',
         tempStatus: '',
+        tempDetails: [{ nama_barang: '', harga: '', estimasi_delivery: '' }],
     }
 
     return (
@@ -148,145 +167,264 @@ const PurchaseOrder = () => {
 
                         // Reset temp values
                         setFieldValue('tempPabrik', '')
-                        setFieldValue('tempHarga', '')
-                        setFieldValue('tempEstimasi', '')
                         setFieldValue('tempNomorPo', '')
                         setFieldValue('tempTanggalPo', '')
-                        setFieldValue('tempNama', '')
+                        setFieldValue('tempDetails', [
+                            {
+                                nama_barang: '',
+                                harga: '',
+                                estimasi_delivery: '',
+                            },
+                        ])
                     }
 
-                    const handleSave = async () => {
-                        // Validate fields first (your existing validation code)
+                    // Add a new detail item to the form
+                    const handleAddDetail = () => {
+                        const currentDetails = [...values.tempDetails]
+                        currentDetails.push({
+                            nama_barang: '',
+                            harga: '',
+                            estimasi_delivery: '',
+                        })
+                        setFieldValue('tempDetails', currentDetails)
+                    }
 
-                        if (
-                            !errors.tempPabrik &&
-                            !errors.tempHarga &&
-                            !errors.tempNomorPo &&
-                            !errors.tempNama &&
-                            !errors.tempTanggalPo &&
-                            !errors.tempEstimasi
-                        ) {
+                    // confirmasi
+                    const handleRemoveDetail = (
+                        idDetailPurchase: string | number
+                    ) => {
+                        setDeleteDetailId(idDetailPurchase)
+                        setDetailDialogOpen(true)
+                    }
+
+                    // Remove a detail item from the form
+                    const handleConfirmDeleteDetail = async () => {
+                        if (deleteDetailId !== null) {
                             setIsSubmitting(true)
-
-                            const requestData = {
-                                pabrik: values.tempPabrik,
-                                harga: extractNumberFromString(
-                                    values.tempHarga
-                                ),
-                                estimasi_pengerjaan: extractNumberFromString(
-                                    values.tempEstimasi
-                                ),
-                                idProject: values.tempIdProject,
-                                nomor_po: values.tempNomorPo,
-                                nama: values.tempNama,
-                                tanggal_po: values.tempTanggalPo,
-                            }
-
+                            const data = { id: deleteDetailId }
                             try {
-                                let result
+                                const success =
+                                    await apiDeleteDetailPurchaseOrder(data)
 
-                                if (editIndex !== null && purchaseOrdersData) {
-                                    // Handle edit with API call
-                                    const purchaseId =
-                                        purchaseOrdersData[editIndex].id
-                                    // Your existing update code
-                                    result = await apiPutPurchaseOrder({
-                                        id: purchaseId,
-                                        ...requestData,
-                                    })
-                                } else {
-                                    // Handle create with API call
-                                    result = await apiCreatePurchaseOrder(
-                                        requestData
-                                    )
-                                }
-
-                                setIsSubmitting(false)
-
-                                console.log('result1', result)
-                                if (
-                                    result &&
-                                    result.data.statusCode >= 200 &&
-                                    result.data.statusCode < 300
-                                ) {
-                                    console.log('result2', result)
-                                    // Refresh data
+                                if (success) {
+                                    // Refresh data setelah delete berhasil
                                     dispatch(
                                         getPurchaseByProyek({ id: projectId })
                                     )
-
-                                    // Show success notification
-                                    toast.push(
-                                        <Notification
-                                            title="Purchase Order added"
-                                            type="success"
-                                            duration={2500}
-                                        >
-                                            Purchase Order berhasil ditambahkan
-                                        </Notification>,
-                                        { placement: 'top-center' }
-                                    )
-
-                                    // Reset form and close
-                                    resetFormFields()
-                                    setShowForm(false)
-                                    setEditIndex(null)
-                                } else {
-                                    // Show error notification
-                                    toast.push(
-                                        <Notification
-                                            title="Error"
-                                            type="danger"
-                                            duration={2500}
-                                        >
-                                            {result
-                                                ? result.message
-                                                : 'Failed to add purchase order'}
-                                        </Notification>,
-                                        { placement: 'top-center' }
-                                    )
+                                    popNotification('deleted')
                                 }
                             } catch (error) {
-                                setIsSubmitting(false)
-                                console.error('Error:', error)
+                                console.error(
+                                    'Error deleting detail purchase:',
+                                    error
+                                )
 
-                                // Show generic error notification
+                                // Show error notification
                                 toast.push(
                                     <Notification
                                         title="Error"
                                         type="danger"
                                         duration={2500}
                                     >
-                                        Terjadi kesalahan saat memproses
-                                        permintaan
+                                        {error.response?.data?.message ||
+                                            'Gagal menghapus detail purchase'}
                                     </Notification>,
                                     { placement: 'top-center' }
                                 )
+                            } finally {
+                                setIsSubmitting(false)
+                                setDetailDialogOpen(false)
+                                setDeleteDetailId(null)
                             }
+                        }
+                    }
+
+                    const handleSave = async () => {
+                        // Validate all fields first
+                        try {
+                            await validateField('tempPabrik')
+                            await validateField('tempNomorPo')
+                            await validateField('tempTanggalPo')
+                            await validateField('tempDetails')
+
+                            if (
+                                !errors.tempPabrik &&
+                                !errors.tempNomorPo &&
+                                !errors.tempTanggalPo &&
+                                !errors.tempDetails
+                            ) {
+                                setIsSubmitting(true)
+
+                                // Process detail items
+                                const detailItems = values.tempDetails.map(
+                                    (item) => ({
+                                        nama_barang: item.nama_barang,
+                                        harga: extractNumberFromString(
+                                            item.harga
+                                        ),
+                                        estimasi_delivery:
+                                            extractNumberFromString(
+                                                item.estimasi_delivery
+                                            ),
+                                    })
+                                )
+
+                                try {
+                                    let result
+
+                                    if (
+                                        editIndex !== null &&
+                                        purchaseOrdersData
+                                    ) {
+                                        // Handle edit with API call
+                                        const purchaseId =
+                                            purchaseOrdersData[editIndex].id
+
+                                        // Update main purchase order
+                                        result = await apiPutPurchaseOrder({
+                                            id: purchaseId,
+                                            nomor_po: values.tempNomorPo,
+                                            tanggal_po: values.tempTanggalPo,
+                                            pabrik: values.tempPabrik,
+                                            status: purchaseOrdersData[
+                                                editIndex
+                                            ].status, // keep existing status
+                                        })
+
+                                        // Handle detail items (would need additional logic for updating existing details)
+                                        // This is simplified - you may need more complex logic to determine which to update/create
+                                        for (const detail of values.tempDetails) {
+                                            if (detail.id) {
+                                                // Update existing detail
+                                                await apiUpdateDetailPurchase({
+                                                    id: detail.id,
+                                                    nama_barang:
+                                                        detail.nama_barang,
+                                                    harga: extractNumberFromString(
+                                                        detail.harga
+                                                    ),
+                                                    estimasi_delivery:
+                                                        extractNumberFromString(
+                                                            detail.estimasi_delivery
+                                                        ),
+                                                })
+                                            } else {
+                                                // Create new detail
+                                                await apiCreateDetailPurchase({
+                                                    idPurchase: purchaseId,
+                                                    nama_barang:
+                                                        detail.nama_barang,
+                                                    harga: extractNumberFromString(
+                                                        detail.harga
+                                                    ),
+                                                    estimasi_delivery:
+                                                        extractNumberFromString(
+                                                            detail.estimasi_delivery
+                                                        ),
+                                                })
+                                            }
+                                        }
+                                    } else {
+                                        // Handle create with API call
+                                        const requestData = {
+                                            idProject: values.tempIdProject,
+                                            nomor_po: values.tempNomorPo,
+                                            pabrik: values.tempPabrik,
+                                            tanggal_po: values.tempTanggalPo,
+                                            detail: detailItems,
+                                        }
+
+                                        result = await apiCreatePurchaseOrder(
+                                            requestData
+                                        )
+                                    }
+
+                                    setIsSubmitting(false)
+
+                                    if (
+                                        result &&
+                                        result.data.statusCode >= 200 &&
+                                        result.data.statusCode < 300
+                                    ) {
+                                        // Refresh data
+                                        dispatch(
+                                            getPurchaseByProyek({
+                                                id: projectId,
+                                            })
+                                        )
+
+                                        // Show success notification
+                                        toast.push(
+                                            <Notification
+                                                title="Purchase Order saved"
+                                                type="success"
+                                                duration={2500}
+                                            >
+                                                Purchase Order berhasil disimpan
+                                            </Notification>,
+                                            { placement: 'top-center' }
+                                        )
+
+                                        // Reset form and close
+                                        resetFormFields()
+                                        setShowForm(false)
+                                        setEditIndex(null)
+                                    } else {
+                                        // Show error notification
+                                        toast.push(
+                                            <Notification
+                                                title="Error"
+                                                type="danger"
+                                                duration={2500}
+                                            >
+                                                {result
+                                                    ? result.message
+                                                    : 'Failed to save purchase order'}
+                                            </Notification>,
+                                            { placement: 'top-center' }
+                                        )
+                                    }
+                                } catch (error) {
+                                    setIsSubmitting(false)
+                                    console.error('Error:', error)
+
+                                    // Show generic error notification
+                                    toast.push(
+                                        <Notification
+                                            title="Error"
+                                            type="danger"
+                                            duration={2500}
+                                        >
+                                            Terjadi kesalahan saat memproses
+                                            permintaan
+                                        </Notification>,
+                                        { placement: 'top-center' }
+                                    )
+                                }
+                            }
+                        } catch (validationError) {
+                            console.error('Validation error:', validationError)
                         }
                     }
 
                     // Helper function to reset form fields
                     const resetFormFields = () => {
                         setFieldValue('tempPabrik', '')
-                        setFieldValue('tempHarga', '')
-                        setFieldValue('tempEstimasi', '')
                         setFieldValue('tempNomorPo', '')
-                        setFieldValue('tempNama', '')
                         setFieldValue('tempTanggalPo', '')
+                        setFieldValue('tempDetails', [
+                            {
+                                nama_barang: '',
+                                harga: '',
+                                estimasi_delivery: '',
+                            },
+                        ])
                     }
 
                     const handleCancel = () => {
                         setShowForm(false)
                         setEditIndex(null)
-
-                        // Reset temp values
-                        setFieldValue('tempPabrik', '')
-                        setFieldValue('tempHarga', '')
-                        setFieldValue('tempEstimasi', '')
-                        setFieldValue('tempNomorPo', '')
-                        setFieldValue('tempNama', '')
-                        setFieldValue('tempTanggalPo', '')
+                        resetFormFields()
                     }
 
                     const handleEdit = (index: number) => {
@@ -295,22 +433,37 @@ const PurchaseOrder = () => {
 
                             // Set temporary values for editing
                             setFieldValue('tempPabrik', purchase.pabrik)
-                            setFieldValue('tempHarga', purchase.harga)
-                            setFieldValue(
-                                'tempEstimasi',
-                                purchase.estimasi_pengerjaan
-                            )
-                            setFieldValue('tempIdProject', purchase.idProject)
                             setFieldValue('tempNomorPo', purchase.nomor_po)
-                            setFieldValue('tempNama', purchase.nama)
                             setFieldValue('tempTanggalPo', purchase.tanggal_po)
+                            setFieldValue('tempIdProject', purchase.idProject)
 
+                            // Map the detail purchases to form format
+                            const details =
+                                purchase.DetailPurchases.length > 0
+                                    ? purchase.DetailPurchases.map(
+                                          (detail) => ({
+                                              id: detail.id,
+                                              nama_barang: detail.nama_barang,
+                                              harga: detail.harga,
+                                              estimasi_delivery:
+                                                  detail.estimasi_delivery,
+                                          })
+                                      )
+                                    : [
+                                          {
+                                              nama_barang: '',
+                                              harga: '',
+                                              estimasi_delivery: '',
+                                          },
+                                      ]
+
+                            setFieldValue('tempDetails', details)
                             setEditIndex(index)
                             setShowForm(true)
                         }
                     }
 
-                    // Fungsi untuk membuka dialog konfirmasi
+                    // Fungsi untuk membuka dialog konfirmasi delete purchase
                     const handleConfirmDelete = (index: number) => {
                         setDeleteIndex(index)
                         setDialogOpen(true)
@@ -320,6 +473,12 @@ const PurchaseOrder = () => {
                     const handleCancelDelete = () => {
                         setDialogOpen(false)
                         setDeleteIndex(null)
+                    }
+
+                    const handleCancelDeleteDetail = () => {
+                        setDetailDialogOpen(false)
+                        // setDeleteDetailInfo(null)
+                        setDeleteDetailId(null)
                     }
 
                     const handleDelete = async () => {
@@ -346,6 +505,16 @@ const PurchaseOrder = () => {
                                     'Error deleting purchase order:',
                                     error
                                 )
+                                toast.push(
+                                    <Notification
+                                        title="Error"
+                                        type="danger"
+                                        duration={2500}
+                                    >
+                                        Gagal menghapus purchase order
+                                    </Notification>,
+                                    { placement: 'top-center' }
+                                )
                             } finally {
                                 setIsSubmitting(false)
                                 setDialogOpen(false)
@@ -358,11 +527,9 @@ const PurchaseOrder = () => {
                         <Form>
                             <AdaptableCard divider>
                                 <div className="flex justify-between items-center mb-4">
-                                    {/* <div className="flex flex-col gap-4 border-b border-gray-200 py-6"></div> */}
                                     <DescriptionSection
                                         title="Purchase Order"
-                                        desc="Tambahkan data
-                                            purchase order"
+                                        desc="Tambahkan data purchase order"
                                     />
                                     {!showForm && (
                                         <Button
@@ -386,10 +553,9 @@ const PurchaseOrder = () => {
                                                 : 'Tambah Purchase Order Baru'}
                                         </h6>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 mb-4 gap-x-4">
                                             {/* Edit Nomor PO */}
                                             <FormItem
-                                                className="mb-3"
                                                 label="Nomor PO"
                                                 errorMessage={
                                                     errors.tempNomorPo &&
@@ -413,67 +579,17 @@ const PurchaseOrder = () => {
                                                 />
                                             </FormItem>
 
-                                            {/* Edit Nama*/}
-                                            <FormItem
-                                                className="mb-3"
-                                                label="Nama Barang"
-                                                errorMessage={
-                                                    errors.tempNama &&
-                                                    touched.tempNama
-                                                        ? errors.tempNama
-                                                        : ''
-                                                }
-                                                invalid={
-                                                    !!(
-                                                        errors.tempNama &&
-                                                        touched.tempNama
-                                                    )
-                                                }
-                                            >
-                                                <Field
-                                                    type="text"
-                                                    autoComplete="off"
-                                                    name="tempNama"
-                                                    placeholder="Nama"
-                                                    component={Input}
-                                                />
-                                            </FormItem>
-
-                                            {/* Edit Pabrik*/}
-                                            <FormItem
-                                                className="mb-3"
-                                                label="Pabrik"
-                                                errorMessage={
-                                                    errors.tempPabrik &&
-                                                    touched.tempPabrik
-                                                        ? errors.tempPabrik
-                                                        : ''
-                                                }
-                                                invalid={
-                                                    !!(
-                                                        errors.tempPabrik &&
-                                                        touched.tempPabrik
-                                                    )
-                                                }
-                                            >
-                                                <Field
-                                                    type="text"
-                                                    autoComplete="off"
-                                                    name="tempPabrik"
-                                                    placeholder="Nama pabrik"
-                                                    component={Input}
-                                                />
-                                            </FormItem>
-
                                             {/* Edit Tanggal PO */}
                                             <FormItem
                                                 label="Tanggal PO"
                                                 invalid={
-                                                    (errors.tempTanggalPo &&
-                                                        touched.tempTanggalPo) as boolean
+                                                    !!(
+                                                        errors.tempTanggalPo &&
+                                                        touched.tempTanggalPo
+                                                    )
                                                 }
                                                 errorMessage={
-                                                    errors.tempTanggalPo
+                                                    errors.tempTanggalPo as string
                                                 }
                                             >
                                                 <Field name="tempTanggalPo">
@@ -512,72 +628,228 @@ const PurchaseOrder = () => {
                                                 </Field>
                                             </FormItem>
 
-                                            {/* Edit Harga*/}
+                                            {/* Edit Pabrik*/}
                                             <FormItem
-                                                className="mb-3"
-                                                label="Harga"
+                                                label="Pabrik"
                                                 errorMessage={
-                                                    errors.tempHarga &&
-                                                    touched.tempHarga
-                                                        ? errors.tempHarga
+                                                    errors.tempPabrik &&
+                                                    touched.tempPabrik
+                                                        ? errors.tempPabrik
                                                         : ''
                                                 }
                                                 invalid={
                                                     !!(
-                                                        errors.tempHarga &&
-                                                        touched.tempHarga
-                                                    )
-                                                }
-                                            >
-                                                <Field name="tempHarga">
-                                                    {({
-                                                        field,
-                                                        form,
-                                                    }: FieldProps) => (
-                                                        <NumericFormat
-                                                            {...field}
-                                                            customInput={Input}
-                                                            placeholder="Harga"
-                                                            thousandSeparator="."
-                                                            decimalSeparator=","
-                                                            onValueChange={(
-                                                                values
-                                                            ) => {
-                                                                form.setFieldValue(
-                                                                    field.name,
-                                                                    values.value
-                                                                )
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Field>
-                                            </FormItem>
-
-                                            {/* Edit Estimasi Delivery*/}
-                                            <FormItem
-                                                className="mb-3"
-                                                label="Estimasi Delivery (hari)"
-                                                errorMessage={
-                                                    errors.tempEstimasi &&
-                                                    touched.tempEstimasi
-                                                        ? errors.tempEstimasi
-                                                        : ''
-                                                }
-                                                invalid={
-                                                    !!(
-                                                        errors.tempEstimasi &&
-                                                        touched.tempEstimasi
+                                                        errors.tempPabrik &&
+                                                        touched.tempPabrik
                                                     )
                                                 }
                                             >
                                                 <Field
-                                                    type="number"
+                                                    type="text"
                                                     autoComplete="off"
-                                                    name="tempEstimasi"
-                                                    placeholder="Estimasi dalam hari"
+                                                    name="tempPabrik"
+                                                    placeholder="Nama pabrik"
                                                     component={Input}
                                                 />
                                             </FormItem>
+                                        </div>
+
+                                        {/* Detail Barang Section */}
+                                        <div className="mt-6">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h6>Detail Barang</h6>
+                                                <Button
+                                                    size="sm"
+                                                    variant="twoTone"
+                                                    onClick={handleAddDetail}
+                                                    className="w-fit text-xs"
+                                                    type="button"
+                                                    icon={<HiPlusCircle />}
+                                                >
+                                                    Tambah Detail
+                                                </Button>
+                                            </div>
+
+                                            {values.tempDetails.map(
+                                                (detail, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="border rounded-md p-3 mb-3 bg-white"
+                                                    >
+                                                        <div className="flex justify-between items-center mb-2">
+                                                            <h6>
+                                                                Item {idx + 1}
+                                                            </h6>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 sm:gap-4">
+                                                            {/* Nama Barang */}
+                                                            <FormItem
+                                                                label="Nama Barang"
+                                                                errorMessage={
+                                                                    errors
+                                                                        .tempDetails?.[
+                                                                        idx
+                                                                    ]
+                                                                        ?.nama_barang &&
+                                                                    touched
+                                                                        .tempDetails?.[
+                                                                        idx
+                                                                    ]
+                                                                        ?.nama_barang
+                                                                        ? errors
+                                                                              .tempDetails[
+                                                                              idx
+                                                                          ]
+                                                                              .nama_barang
+                                                                        : ''
+                                                                }
+                                                                invalid={
+                                                                    !!(
+                                                                        errors
+                                                                            .tempDetails?.[
+                                                                            idx
+                                                                        ]
+                                                                            ?.nama_barang &&
+                                                                        touched
+                                                                            .tempDetails?.[
+                                                                            idx
+                                                                        ]
+                                                                            ?.nama_barang
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Field
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    name={`tempDetails.${idx}.nama_barang`}
+                                                                    placeholder="Nama barang"
+                                                                    component={
+                                                                        Input
+                                                                    }
+                                                                />
+                                                            </FormItem>
+
+                                                            {/* Harga */}
+                                                            <FormItem
+                                                                label="Harga"
+                                                                errorMessage={
+                                                                    errors
+                                                                        .tempDetails?.[
+                                                                        idx
+                                                                    ]?.harga &&
+                                                                    touched
+                                                                        .tempDetails?.[
+                                                                        idx
+                                                                    ]?.harga
+                                                                        ? errors
+                                                                              .tempDetails[
+                                                                              idx
+                                                                          ]
+                                                                              .harga
+                                                                        : ''
+                                                                }
+                                                                invalid={
+                                                                    !!(
+                                                                        errors
+                                                                            .tempDetails?.[
+                                                                            idx
+                                                                        ]
+                                                                            ?.harga &&
+                                                                        touched
+                                                                            .tempDetails?.[
+                                                                            idx
+                                                                        ]?.harga
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Field
+                                                                    name={`tempDetails.${idx}.harga`}
+                                                                >
+                                                                    {({
+                                                                        field,
+                                                                        form,
+                                                                    }: FieldProps) => (
+                                                                        <NumericFormat
+                                                                            {...field}
+                                                                            customInput={
+                                                                                Input
+                                                                            }
+                                                                            placeholder="Harga"
+                                                                            thousandSeparator="."
+                                                                            decimalSeparator=","
+                                                                            onValueChange={(
+                                                                                values
+                                                                            ) => {
+                                                                                form.setFieldValue(
+                                                                                    field.name,
+                                                                                    values.value
+                                                                                )
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                </Field>
+                                                            </FormItem>
+
+                                                            {/* Estimasi Delivery */}
+                                                            <FormItem
+                                                                label="Estimasi Delivery (hari)"
+                                                                errorMessage={
+                                                                    errors
+                                                                        .tempDetails?.[
+                                                                        idx
+                                                                    ]
+                                                                        ?.estimasi_delivery &&
+                                                                    touched
+                                                                        .tempDetails?.[
+                                                                        idx
+                                                                    ]
+                                                                        ?.estimasi_delivery
+                                                                        ? errors
+                                                                              .tempDetails[
+                                                                              idx
+                                                                          ]
+                                                                              .estimasi_delivery
+                                                                        : ''
+                                                                }
+                                                                invalid={
+                                                                    !!(
+                                                                        errors
+                                                                            .tempDetails?.[
+                                                                            idx
+                                                                        ]
+                                                                            ?.estimasi_delivery &&
+                                                                        touched
+                                                                            .tempDetails?.[
+                                                                            idx
+                                                                        ]
+                                                                            ?.estimasi_delivery
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Field
+                                                                    type="number"
+                                                                    autoComplete="off"
+                                                                    name={`tempDetails.${idx}.estimasi_delivery`}
+                                                                    placeholder="Estimasi dalam hari"
+                                                                    component={
+                                                                        Input
+                                                                    }
+                                                                />
+                                                            </FormItem>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )}
+
+                                            {Array.isArray(
+                                                errors.tempDetails
+                                            ) &&
+                                                typeof errors.tempDetails ===
+                                                    'string' && (
+                                                    <div className="text-red-500 text-xs mt-1">
+                                                        {errors.tempDetails}
+                                                    </div>
+                                                )}
                                         </div>
 
                                         <div className="flex justify-end space-x-2 mt-4">
@@ -614,137 +886,223 @@ const PurchaseOrder = () => {
                                             return (
                                                 <div
                                                     key={purchase.id}
-                                                    className="mb-4 border bg-slate-50 rounded-md p-4"
+                                                    className="overflow-x-scroll sm:overflow-auto"
                                                 >
-                                                    <div className="flex justify-between items-center mb-2">
-                                                        <h6>
-                                                            {purchase.pabrik}
-                                                        </h6>
-                                                        <div className="flex space-x-2">
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                icon={
-                                                                    <HiOutlinePencil />
-                                                                }
-                                                                className="text-indigo-500"
-                                                                onClick={() =>
-                                                                    handleEdit(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                className="text-red-500"
-                                                                icon={
-                                                                    <HiOutlineTrash />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleConfirmDelete(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div>
-                                                            <span className="text-xs font-bold text-gray-500">
-                                                                Nomor PO:
-                                                            </span>
-                                                            <p>
+                                                    <div className="mb-4 border bg-slate-50 rounded-md p-4 min-w-[500px]">
+                                                        <div className="flex justify-between items-center mb-2">
+                                                            <h6>
                                                                 {
-                                                                    purchase.nomor_po
+                                                                    purchase.pabrik
                                                                 }
-                                                            </p>
+                                                            </h6>
+                                                            <div className="flex space-x-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    icon={
+                                                                        <HiOutlinePencil />
+                                                                    }
+                                                                    className="text-indigo-500"
+                                                                    onClick={() =>
+                                                                        handleEdit(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    className="text-red-500"
+                                                                    icon={
+                                                                        <HiOutlineTrash />
+                                                                    }
+                                                                    onClick={() =>
+                                                                        handleConfirmDelete(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <span className="text-xs font-bold text-gray-500">
-                                                                Nama Barang:
-                                                            </span>
-                                                            <p>
-                                                                {purchase.nama}
-                                                            </p>
+                                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Nomor PO:
+                                                                </span>
+                                                                <p>
+                                                                    {
+                                                                        purchase.nomor_po
+                                                                    }
+                                                                </p>
+                                                            </div>
+
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Tanggal PO:
+                                                                </span>
+                                                                <p>
+                                                                    {formatDate(
+                                                                        purchase.tanggal_po
+                                                                    )}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <span className="text-xs font-bold text-gray-500">
-                                                                Harga:
-                                                            </span>
-                                                            <p>
-                                                                Rp{' '}
-                                                                {purchase.harga?.toLocaleString(
-                                                                    'id-ID'
-                                                                )}
-                                                            </p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-xs font-bold text-gray-500">
-                                                                Estimasi
-                                                                Pengerjaan:
-                                                            </span>
-                                                            <p>
-                                                                {
-                                                                    purchase.estimasi_pengerjaan
-                                                                }{' '}
-                                                                hari
-                                                            </p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-xs font-bold text-gray-500">
-                                                                Status:
-                                                            </span>
-                                                            <p>
-                                                                {
-                                                                    purchase.status
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-xs font-bold text-gray-500">
-                                                                Tanggal PO:
-                                                            </span>
-                                                            <p>
-                                                                {formatDate(
-                                                                    purchase.tanggal_po
-                                                                )}
-                                                            </p>
-                                                        </div>
+
+                                                        {/* Detail Items */}
+                                                        {purchase.DetailPurchases &&
+                                                            purchase
+                                                                .DetailPurchases
+                                                                .length > 0 && (
+                                                                <div className="mt-3">
+                                                                    <h6 className="text-sm font-semibold mb-2">
+                                                                        Detail
+                                                                        Barang:
+                                                                    </h6>
+                                                                    <div>
+                                                                        {purchase.DetailPurchases?.map(
+                                                                            (
+                                                                                detail,
+                                                                                detailIdx
+                                                                            ) => (
+                                                                                <div
+                                                                                    key={
+                                                                                        detail.id
+                                                                                    }
+                                                                                    className={`${
+                                                                                        detailIdx ===
+                                                                                        purchase
+                                                                                            .DetailPurchases
+                                                                                            .length -
+                                                                                            1
+                                                                                            ? 'border-y rounded-b'
+                                                                                            : 'border-t rounded-t'
+                                                                                    } border-x  bg-white p-3`}
+                                                                                >
+                                                                                    <div className="flex gap-2">
+                                                                                        <div className="flex items-center mr-5">
+                                                                                            {detailIdx +
+                                                                                                1}
+                                                                                            {
+                                                                                                ' .'
+                                                                                            }
+                                                                                        </div>
+                                                                                        <div className="flex-auto">
+                                                                                            <span className="text-xs font-bold text-gray-500">
+                                                                                                Nama
+                                                                                                Barang:
+                                                                                            </span>
+                                                                                            <p className="text-sm">
+                                                                                                {
+                                                                                                    detail.nama_barang
+                                                                                                }
+                                                                                            </p>
+                                                                                        </div>
+                                                                                        <div className="flex-auto">
+                                                                                            <span className="text-xs font-bold text-gray-500">
+                                                                                                Harga:
+                                                                                            </span>
+                                                                                            <p className="text-sm">
+                                                                                                Rp{' '}
+                                                                                                {detail.harga?.toLocaleString(
+                                                                                                    'id-ID'
+                                                                                                )}
+                                                                                            </p>
+                                                                                        </div>
+                                                                                        <div className="flex-auto">
+                                                                                            <span className="text-xs font-bold text-gray-500">
+                                                                                                Estimasi
+                                                                                                Delivery:
+                                                                                            </span>
+                                                                                            <p className="text-sm">
+                                                                                                {
+                                                                                                    detail.estimasi_delivery
+                                                                                                }{' '}
+                                                                                                hari
+                                                                                            </p>
+                                                                                        </div>
+                                                                                        <div className="flex">
+                                                                                            <Button
+                                                                                                type="button"
+                                                                                                shape="circle"
+                                                                                                variant="plain"
+                                                                                                size="sm"
+                                                                                                className="text-red-500"
+                                                                                                icon={
+                                                                                                    <HiOutlineTrash />
+                                                                                                }
+                                                                                                onClick={() => {
+                                                                                                    console.log(
+                                                                                                        'detail22',
+                                                                                                        detail
+                                                                                                    )
+                                                                                                    handleRemoveDetail(
+                                                                                                        detail?.id
+                                                                                                    )
+                                                                                                }}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            )
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                     </div>
                                                 </div>
                                             )
                                         }
                                     )}
 
-                                {(!purchaseOrdersData ||
-                                    purchaseOrdersData.length === 0) &&
+                                {/* Display message if no purchase orders exist */}
+                                {purchaseOrdersData &&
+                                    purchaseOrdersData.length === 0 &&
                                     !showForm && (
-                                        <div className="text-center py-8 text-gray-500">
-                                            Belum ada data purchase order. Klik
-                                            'Tambah Purchase Order' untuk
-                                            menambahkan.
+                                        <div className="text-center py-5">
+                                            <p className="text-gray-500">
+                                                Belum ada data purchase order.
+                                                Silahkan tambahkan data.
+                                            </p>
                                         </div>
                                     )}
                             </AdaptableCard>
-                            {/* Dialog Konfirmasi Hapus */}
+
+                            {/* Confirmation dialog for deleting purchase order */}
                             <ConfirmDialog
                                 isOpen={dialogOpen}
-                                type="danger"
-                                title="Hapus Purchase Order"
-                                confirmButtonColor="red-600"
                                 onClose={handleCancelDelete}
                                 onRequestClose={handleCancelDelete}
+                                type="danger"
+                                title="Hapus Purchase Order"
                                 onCancel={handleCancelDelete}
                                 onConfirm={handleDelete}
+                                confirmButtonColor="red-600"
                             >
                                 <p>
-                                    Apakah kamu yakin ingin menghapus purchase
-                                    order ini ?
+                                    Apakah Anda yakin ingin menghapus purchase
+                                    order ini? Tindakan ini tidak dapat
+                                    dibatalkan.
+                                </p>
+                            </ConfirmDialog>
+
+                            <ConfirmDialog
+                                isOpen={detailDialogOpen}
+                                onClose={handleCancelDeleteDetail}
+                                onRequestClose={handleCancelDeleteDetail}
+                                type="danger"
+                                title="Hapus Detail Barang"
+                                onCancel={handleCancelDeleteDetail}
+                                onConfirm={handleConfirmDeleteDetail}
+                                confirmButtonColor="red-600"
+                            >
+                                <p>
+                                    Apakah Anda yakin ingin menghapus detail
+                                    barang ini? Tindakan ini tidak dapat
+                                    dibatalkan.
                                 </p>
                             </ConfirmDialog>
                         </Form>

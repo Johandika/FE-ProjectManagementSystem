@@ -248,7 +248,6 @@ export const getPurchaseByProyek = createAsyncThunk(
             { id: string }
         >(data)
 
-        console.log('getPurchaseByProyek', getPurchaseByProyek)
         return response.data
     }
 )

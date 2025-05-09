@@ -304,6 +304,8 @@ export default function Adendum() {
                     const handleOpenStatusConfirmation = (data: Adendum) => {
                         setAdendumToUpdateStatus(data)
                         setStatusDialogOpen(true)
+                        // Refresh data after update
+                        dispatch(getAdendumsByProyek({ id: projectId }))
                     }
 
                     // This function is now called only after confirmation
