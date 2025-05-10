@@ -3,17 +3,13 @@ import reducer, {
     getProyek,
     useAppSelector,
     getTermins,
+    setPekerjaanActive,
 } from '../../ProyekEdit/store'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import DescriptionSection from './DesriptionSection'
-import { IoLocationSharp } from 'react-icons/io5'
-import { BiHardHat } from 'react-icons/bi'
-import isLastChild from '@/utils/isLastChild'
-import classNames from 'classnames'
 import { injectReducer } from '@/store'
 import { formatDate } from '@/utils/formatDate'
-import { format } from 'path'
 
 injectReducer('proyekEdit', reducer)
 
@@ -21,12 +17,19 @@ export default function Detail() {
     const dispatch = useAppDispatch()
     const location = useLocation()
 
-    const proyekData = useAppSelector(
-        (state) => state.proyekEdit.data.proyekData
+    const { proyekData, pekerjaanActive } = useAppSelector(
+        (state) => state.proyekEdit.data
     )
 
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
+            .unwrap()
+            .then((result) => {
+                // Only set pekerjaanActive after proyekData is loaded
+                if (result && result.pekerjaan) {
+                    dispatch(setPekerjaanActive(result.pekerjaan))
+                }
+            })
         dispatch(getTermins(data))
     }
 
@@ -37,10 +40,17 @@ export default function Detail() {
         const rquestParam = { id: path }
         fetchData(rquestParam)
 
+        // Cleanup function to reset pekerjaanActive when component unmounts
+        return () => {
+            dispatch(setPekerjaanActive(''))
+        }
+
         // dispatch(getKliens()) // kliens
         // dispatch(getBerkases()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
+
+    console.log('pekerjaanActive', pekerjaanActive)
 
     return (
         <section className=" ">

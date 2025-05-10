@@ -158,6 +158,7 @@ type GetPurchaseByProyekResponse = {
 }
 
 export type MasterProyekEditState = {
+    pekerjaanActive: string
     loading: boolean
     loadingKliens: boolean
     loadingBerkases: boolean
@@ -365,7 +366,15 @@ export const deletePurchase = async <T, U extends Record<string, unknown>>(
     return response.data
 }
 
+export const setPekerjaanActive = createAsyncThunk(
+    SLICE_NAME + '/setPekerjaanActive',
+    async (pekerjaan: string) => {
+        return pekerjaan
+    }
+)
+
 const initialState: MasterProyekEditState = {
+    pekerjaanActive: '',
     loading: true,
     loadingKliens: true,
     loadingBerkases: true,
@@ -392,6 +401,9 @@ const proyekEditSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            .addCase(setPekerjaanActive.fulfilled, (state, action) => {
+                state.pekerjaanActive = action.payload
+            })
             .addCase(getProyek.fulfilled, (state, action) => {
                 state.proyekData = action.payload
                 state.loading = false

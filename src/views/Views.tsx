@@ -87,19 +87,20 @@ import { protectedRoutes, publicRoutes } from '@/configs/routes.config'
 import appConfig from '@/configs/app.config'
 import PageContainer from '@/components/template/PageContainer'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useAppSelector } from '@/store'
+import { injectReducer, useAppDispatch, useAppSelector } from '@/store'
 import ProtectedRoute from '@/components/route/ProtectedRoute'
 import PublicRoute from '@/components/route/PublicRoute'
 import AuthorityGuard from '@/components/route/AuthorityGuard'
 import AppRoute from '@/components/route/AppRoute'
 import type { LayoutType } from '@/@types/theme'
-import { proyeksData } from '@/mock/data/proyekData'
-import { Button } from '@/components/ui'
+import reducer from './manajemenProyek/ProyekEdit/store'
 
 interface ViewsProps {
     pageContainerType?: 'default' | 'gutterless' | 'contained'
     layout?: LayoutType
 }
+
+injectReducer('proyekEdit', reducer)
 
 type AllRoutesProps = ViewsProps
 
@@ -108,6 +109,11 @@ const { authenticatedEntryPath } = appConfig
 const AllRoutes = (props: AllRoutesProps) => {
     const userAuthority = useAppSelector((state) => state.auth.user?.authority)
 
+    const { pekerjaanActive, loading } = useAppSelector(
+        (state) => state.proyekEdit.data
+    )
+
+    console.log('pekerjaanActive', pekerjaanActive)
     return (
         <Routes>
             <Route path="/" element={<ProtectedRoute />}>
@@ -121,10 +127,12 @@ const AllRoutes = (props: AllRoutesProps) => {
                     const custRouteMeta = route.added
                         ? {
                               ...route.meta,
-                              header: `Detail Proyek ${proyeksData[index]?.pekerjaan}`,
+                              header: `Detail Proyek ${pekerjaanActive}`,
                           }
                         : routeMeta
 
+                    // console.log('proyekData dalammmm', proyekData)
+                    // console.log(custRouteMeta)
                     return (
                         <Route
                             key={route.key + index}
