@@ -40,17 +40,10 @@ export default function Detail() {
         const rquestParam = { id: path }
         fetchData(rquestParam)
 
-        // Cleanup function to reset pekerjaanActive when component unmounts
-        return () => {
-            dispatch(setPekerjaanActive(''))
-        }
-
         // dispatch(getKliens()) // kliens
         // dispatch(getBerkases()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
-
-    console.log('pekerjaanActive', pekerjaanActive)
 
     return (
         <section className=" ">

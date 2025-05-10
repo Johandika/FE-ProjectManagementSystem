@@ -6,7 +6,12 @@ import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import { useNavigate } from 'react-router-dom'
 import { apiCreateProyek } from '@/services/ProyekService'
-import reducer, { getBerkases, getKliens, getSubkontraktors } from './store'
+import reducer, {
+    getBerkases,
+    getKliens,
+    getSatuans,
+    getSubkontraktors,
+} from './store'
 import { useEffect } from 'react'
 import { injectReducer, useAppDispatch, useAppSelector } from '@/store'
 import isEmpty from 'lodash/isEmpty'
@@ -24,10 +29,6 @@ const ProyekNew = () => {
         (state: any) => state.proyekNew.data.kliensData?.data || []
     )
 
-    const loadingKliens = useAppSelector(
-        (state: any) => state.proyekNew.data.loadingKliens
-    )
-
     // berkases data
     const berkasesData = useAppSelector(
         (state: any) => state.proyekNew.data.berkasesData?.data || []
@@ -38,15 +39,19 @@ const ProyekNew = () => {
         (state: any) => state.proyekNew.data.subkontraktorsData?.data || []
     )
 
-    const loadingBerkases = useAppSelector(
-        (state: any) => state.proyekNew.data.loadingBerkases
+    // satuans data
+    const satuansData = useAppSelector(
+        (state: any) => state.proyekNew.data.satuansData?.data || []
     )
 
-    const loadingSubkontraktors = useAppSelector(
-        (state: any) => state.proyekNew.data.loadingSubkontraktors
-    )
+    const {
+        loadingBerkases,
+        loadingSubkontraktors,
+        loadingSatuans,
+        loadingKliens,
+    } = useAppSelector((state: any) => state.proyekNew.data)
 
-    const addProyek = async (data: FormModel) => {
+    const addProyek = async (data: FormModel, setSubmitting: any) => {
         const processedData = {
             ...data,
             nilai_kontrak: extractNumberFromString(
@@ -85,11 +90,28 @@ const ProyekNew = () => {
             })),
         }
 
-        const response = await apiCreateProyek<boolean, FormModel>(
-            processedData
-        )
-
-        return response.data
+        try {
+            const response = await apiCreateProyek<boolean, FormModel>(
+                processedData
+            )
+            return response.data
+        } catch (error) {
+            if (error) {
+                setSubmitting(false)
+                toast.push(
+                    <Notification
+                        title={'Error Added'}
+                        type="danger"
+                        duration={2500}
+                    >
+                        {error.response.data.message}
+                    </Notification>,
+                    {
+                        placement: 'top-center',
+                    }
+                )
+            }
+        }
     }
 
     const handleFormSubmit = async (
@@ -97,8 +119,9 @@ const ProyekNew = () => {
         setSubmitting: SetSubmitting
     ) => {
         setSubmitting(true)
-        const success = await addProyek(values)
+        const success = await addProyek(values, setSubmitting)
         setSubmitting(false)
+
         if (success) {
             toast.push(
                 <Notification
@@ -124,14 +147,19 @@ const ProyekNew = () => {
         dispatch(getKliens()) // kliens
         dispatch(getBerkases()) // kliens
         dispatch(getSubkontraktors()) // kliens
+        dispatch(getSatuans())
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
     // Di ProyekNew.tsx
+
     return (
         <>
             <Loading
                 loading={
-                    loadingKliens || loadingBerkases || loadingSubkontraktors
+                    loadingKliens ||
+                    loadingBerkases ||
+                    loadingSubkontraktors ||
+                    loadingSatuans
                 }
             >
                 {!isEmpty(kliensData && berkasesData) && (
@@ -141,6 +169,7 @@ const ProyekNew = () => {
                             kliensList={kliensData}
                             berkasesList={berkasesData}
                             subkontraktorsList={subkontraktorsData}
+                            satuansList={satuansData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                         />

@@ -12,6 +12,7 @@ import isLastChild from '@/utils/isLastChild'
 import DescriptionSection from './DesriptionSection'
 import reducer, {
     getItemsByProyek,
+    getSatuans,
     useAppDispatch,
     useAppSelector,
 } from '../store'
@@ -24,7 +25,7 @@ import Button from '@/components/ui/Button'
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import { ConfirmDialog, Loading } from '@/components/shared'
 import * as Yup from 'yup'
-import { Checkbox, Notification, toast } from '@/components/ui'
+import { Checkbox, Notification, Select, toast } from '@/components/ui'
 import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 import {
@@ -120,18 +121,21 @@ export default function Items() {
         location.pathname.lastIndexOf('/') + 1
     )
 
-    const itemsByProyekData = useAppSelector(
-        (state) => state.proyekDetail.data.itemsByProyekData
-    )
+    const {
+        loadingItemsByProyek,
+        itemsByProyekData,
+        satuansData,
+        loadingSatuan,
+    } = useAppSelector((state) => state.proyekDetail.data)
 
-    const loading = useAppSelector(
-        (state) => state.proyekDetail.data.loadingItemsByProyek
-    )
+    const test = useAppSelector((state) => state.proyekDetail.data)
+    console.log('satuansData', satuansData)
 
     // Fetch items when component mounts
     useEffect(() => {
         const requestParam = { id: projectId }
         dispatch(getItemsByProyek(requestParam))
+        dispatch(getSatuans())
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, projectId])
 
@@ -183,10 +187,6 @@ export default function Items() {
     const onCheck =
         (item: any) =>
         async (checked: boolean, e: ChangeEvent<HTMLInputElement>) => {
-            // console.log('e', e)
-            // console.log('item', item)
-            // console.log('checked', checked)
-            // Buat objek baru dengan status yang diperbarui
             const updatedItem = {
                 ...item,
                 status: checked,
@@ -198,7 +198,6 @@ export default function Items() {
             try {
                 // Dispatch action untuk update
                 const result = await apiUpdateStatusItemProyek(data)
-                console.log('result', result)
                 // Show success notification if update was successful
                 if (result.data?.statusCode === 200) {
                     popNotification('updated')
@@ -271,7 +270,9 @@ export default function Items() {
     }
 
     return (
-        <Loading loading={loading || isSubmitting}>
+        <Loading
+            loading={loadingItemsByProyek || loadingSatuan || isSubmitting}
+        >
             <Formik
                 enableReinitialize
                 initialValues={initialItemValues}
@@ -1052,7 +1053,7 @@ export default function Items() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    <Field
+                                                                    {/* <Field
                                                                         type="text"
                                                                         autoComplete="off"
                                                                         name="tempSatuan"
@@ -1060,7 +1061,69 @@ export default function Items() {
                                                                         component={
                                                                             Input
                                                                         }
-                                                                    />
+                                                                    /> */}
+                                                                    <Field name="tempSatuan">
+                                                                        {({
+                                                                            field,
+                                                                            form,
+                                                                        }: FieldProps) => {
+                                                                            // Find the selected client based on current idClient value
+                                                                            const selectedSatuan =
+                                                                                field.value
+                                                                                    ? satuansData.data?.find(
+                                                                                          (
+                                                                                              satuan
+                                                                                          ) =>
+                                                                                              satuan.id ===
+                                                                                              field.value
+                                                                                      )
+                                                                                    : null
+
+                                                                            const satuanOptions =
+                                                                                satuansData.data?.map(
+                                                                                    (
+                                                                                        satuan
+                                                                                    ) => ({
+                                                                                        value: satuan.id,
+                                                                                        label: `${satuan.satuan}`,
+                                                                                    })
+                                                                                )
+                                                                            // console.log(
+                                                                            //     'selectedSatuan',
+                                                                            //     selectedSatuan
+                                                                            // )
+                                                                            return (
+                                                                                <Select
+                                                                                    field={
+                                                                                        field
+                                                                                    }
+                                                                                    form={
+                                                                                        form
+                                                                                    }
+                                                                                    options={
+                                                                                        satuanOptions
+                                                                                    }
+                                                                                    value={
+                                                                                        selectedSatuan
+                                                                                            ? {
+                                                                                                  value: selectedSatuan.satuan,
+                                                                                                  label: `${selectedSatuan.satuan}`,
+                                                                                              }
+                                                                                            : null
+                                                                                    }
+                                                                                    placeholder="Pilih satuan"
+                                                                                    onChange={(
+                                                                                        option
+                                                                                    ) => {
+                                                                                        form.setFieldValue(
+                                                                                            field.name,
+                                                                                            option?.value
+                                                                                        )
+                                                                                    }}
+                                                                                />
+                                                                            )
+                                                                        }}
+                                                                    </Field>
                                                                 </FormItem>
 
                                                                 {/* Volume */}
@@ -1528,93 +1591,100 @@ export default function Items() {
                                                                                             (
                                                                                                 detail,
                                                                                                 detailIndex
-                                                                                            ) => (
-                                                                                                <div
-                                                                                                    key={
-                                                                                                        detail.id
-                                                                                                    }
-                                                                                                    className={classNames(
-                                                                                                        'grid grid-cols-10 gap-4 px-4 py-4 text-sm bg-white border-b',
-                                                                                                        {
-                                                                                                            'rounded-b-md border-b-0':
-                                                                                                                isLastChild(
-                                                                                                                    item.DetailItemProjects,
-                                                                                                                    detailIndex
-                                                                                                                ),
+                                                                                            ) => {
+                                                                                                console.log(
+                                                                                                    'detail',
+                                                                                                    detail
+                                                                                                )
+                                                                                                return (
+                                                                                                    <div
+                                                                                                        key={
+                                                                                                            detail.id
                                                                                                         }
-                                                                                                    )}
-                                                                                                >
-                                                                                                    <div className="col-span-2 truncate">
-                                                                                                        {
-                                                                                                            detail.uraian
-                                                                                                        }
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1">
-                                                                                                        {
-                                                                                                            detail.satuan
-                                                                                                        }
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1">
-                                                                                                        {detail.volume.toLocaleString(
-                                                                                                            'id-ID'
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1">
-                                                                                                        {formatCurrency(
-                                                                                                            detail.harga_satuan_material
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1">
-                                                                                                        {formatCurrency(
-                                                                                                            detail.harga_satuan_jasa
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1">
-                                                                                                        {formatCurrency(
-                                                                                                            detail.jumlah_harga_material
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1">
-                                                                                                        {formatCurrency(
-                                                                                                            detail.jumlah_harga_jasa
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1">
-                                                                                                        {formatCurrency(
-                                                                                                            detail.jumlah
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                    <div className="col-span-1 flex justify-end space-x-2">
-                                                                                                        <Button
-                                                                                                            size="xs"
-                                                                                                            variant="twoTone"
-                                                                                                            onClick={() =>
-                                                                                                                handleEditDetail(
-                                                                                                                    index,
-                                                                                                                    detailIndex
-                                                                                                                )
+                                                                                                        className={classNames(
+                                                                                                            'grid grid-cols-10 gap-4 px-4 py-4 text-sm bg-white border-b',
+                                                                                                            {
+                                                                                                                'rounded-b-md border-b-0':
+                                                                                                                    isLastChild(
+                                                                                                                        item.DetailItemProjects,
+                                                                                                                        detailIndex
+                                                                                                                    ),
                                                                                                             }
-                                                                                                            icon={
-                                                                                                                <HiOutlinePencil />
+                                                                                                        )}
+                                                                                                    >
+                                                                                                        <div className="col-span-2 truncate">
+                                                                                                            {
+                                                                                                                detail.uraian
                                                                                                             }
-                                                                                                        />
-                                                                                                        <Button
-                                                                                                            size="xs"
-                                                                                                            variant="twoTone"
-                                                                                                            color="red"
-                                                                                                            onClick={() =>
-                                                                                                                handleConfirmDeleteDetail(
-                                                                                                                    index,
-                                                                                                                    detailIndex
-                                                                                                                )
+                                                                                                        </div>
+                                                                                                        {/* satuan */}
+                                                                                                        <div className="col-span-1">
+                                                                                                            {
+                                                                                                                detail.satuan
                                                                                                             }
-                                                                                                            icon={
-                                                                                                                <HiOutlineTrash />
-                                                                                                            }
-                                                                                                        />
+                                                                                                        </div>
+                                                                                                        <div className="col-span-1">
+                                                                                                            {detail.volume.toLocaleString(
+                                                                                                                'id-ID'
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                        <div className="col-span-1">
+                                                                                                            {formatCurrency(
+                                                                                                                detail.harga_satuan_material
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                        <div className="col-span-1">
+                                                                                                            {formatCurrency(
+                                                                                                                detail.harga_satuan_jasa
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                        <div className="col-span-1">
+                                                                                                            {formatCurrency(
+                                                                                                                detail.jumlah_harga_material
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                        <div className="col-span-1">
+                                                                                                            {formatCurrency(
+                                                                                                                detail.jumlah_harga_jasa
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                        <div className="col-span-1">
+                                                                                                            {formatCurrency(
+                                                                                                                detail.jumlah
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                        <div className="col-span-1 flex justify-end space-x-2">
+                                                                                                            <Button
+                                                                                                                size="xs"
+                                                                                                                variant="twoTone"
+                                                                                                                onClick={() =>
+                                                                                                                    handleEditDetail(
+                                                                                                                        index,
+                                                                                                                        detailIndex
+                                                                                                                    )
+                                                                                                                }
+                                                                                                                icon={
+                                                                                                                    <HiOutlinePencil />
+                                                                                                                }
+                                                                                                            />
+                                                                                                            <Button
+                                                                                                                size="xs"
+                                                                                                                variant="twoTone"
+                                                                                                                color="red"
+                                                                                                                onClick={() =>
+                                                                                                                    handleConfirmDeleteDetail(
+                                                                                                                        index,
+                                                                                                                        detailIndex
+                                                                                                                    )
+                                                                                                                }
+                                                                                                                icon={
+                                                                                                                    <HiOutlineTrash />
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                            )
+                                                                                                )
+                                                                                            }
                                                                                         )}
                                                                                     </div>
                                                                                 )}

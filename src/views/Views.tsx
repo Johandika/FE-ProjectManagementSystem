@@ -109,9 +109,7 @@ const { authenticatedEntryPath } = appConfig
 const AllRoutes = (props: AllRoutesProps) => {
     const userAuthority = useAppSelector((state) => state.auth.user?.authority)
 
-    const { pekerjaanActive, loading } = useAppSelector(
-        (state) => state.proyekEdit.data
-    )
+    const { pekerjaanActive } = useAppSelector((state) => state.proyekEdit.data)
 
     console.log('pekerjaanActive', pekerjaanActive)
     return (

@@ -18,6 +18,7 @@ import {
     apiGetAdendumsByProyek,
 } from '@/services/AdendumService'
 import { apiGetItem, apiGetItemsByProyek } from '@/services/ItemService'
+import { apiGetSatuans } from '@/services/SatuanService'
 
 export const SLICE_NAME = 'proyekDetail'
 
@@ -99,6 +100,12 @@ type ItemByProyek = {
     DetailItemProjects: ItemProject[]
 }
 
+type SatuanData = {
+    id: string
+    satuan: string
+}
+
+type SatuansData = SatuanData[]
 type BerkasProyeks = BerkasProyekData[]
 type LokasiProyeks = LokasisByProyek[]
 type SubkonProyek = SubkonByProyek[]
@@ -119,6 +126,8 @@ export type MasterProyekDetailState = {
     loadingAdendum: boolean
     loadingItemsByProyek: boolean
     loadingItem: boolean
+    loadingSatuan: boolean
+    satuansData?: SatuansData
     itemsByProyekData?: ItemProyek
     itemData?: ItemProyek
     adendumsByProyekData?: AdendumProyek
@@ -294,6 +303,18 @@ export const updateBerkasProyekStatus = createAsyncThunk(
     }
 )
 
+// ========================================================================
+
+// get all satuans
+export const getSatuans = createAsyncThunk(
+    SLICE_NAME + '/getSatuans',
+    async () => {
+        const response = await apiGetSatuans<SatuanData[]>()
+
+        return response.data
+    }
+)
+
 const initialState: MasterProyekDetailState = {
     loadingBerkasProyeks: true,
     loadingFakturPajaks: true,
@@ -307,6 +328,8 @@ const initialState: MasterProyekDetailState = {
     loadingAdendum: true,
     loadingItemsByProyek: true,
     loadingItem: true,
+    loadingSatuan: true,
+    satuansData: [],
     lokasisByProyekData: [],
     lokasiData: [],
     itemsByProyekData: [],
@@ -332,6 +355,13 @@ const proyekDetailSlice = createSlice({
             })
             .addCase(getBerkasProyek.pending, (state) => {
                 state.loadingBerkasProyeks = true
+            })
+            .addCase(getSatuans.fulfilled, (state, action) => {
+                state.satuansData = action.payload
+                state.loadingSatuan = false
+            })
+            .addCase(getSatuans.pending, (state) => {
+                state.loadingSatuan = true
             })
             .addCase(getAdendumsByProyek.fulfilled, (state, action) => {
                 state.adendumsByProyekData = action.payload

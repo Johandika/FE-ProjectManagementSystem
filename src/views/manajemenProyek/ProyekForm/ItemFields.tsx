@@ -6,6 +6,7 @@ import { HiMinus, HiPlus } from 'react-icons/hi'
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import type { FormikErrors, FormikTouched } from 'formik'
 import { NumericFormat } from 'react-number-format'
+import { Select } from '@/components/ui'
 
 interface ItemDetail {
     uraian: string
@@ -30,10 +31,13 @@ type FormFieldsName = {
 type ItemFieldsProps = {
     touched: FormikTouched<FormFieldsName>
     errors: FormikErrors<FormFieldsName>
+    satuansList?: { id: string; satuan: string }[]
 }
 
 const ItemFields = (props: ItemFieldsProps) => {
-    const { touched, errors } = props
+    const { touched, errors, satuansList = [] } = props
+
+    console.log('satuansList', satuansList)
 
     const calculateJumlahHargaMaterial = (
         volume: number,
@@ -215,14 +219,69 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                     }
                                                                                 >
                                                                                     <Field
-                                                                                        type="text"
-                                                                                        autoComplete="off"
                                                                                         name={`item[${itemIndex}].detail[${detailIndex}].satuan`}
-                                                                                        placeholder="Satuan"
-                                                                                        component={
-                                                                                            Input
-                                                                                        }
-                                                                                    />
+                                                                                    >
+                                                                                        {({
+                                                                                            field,
+                                                                                            form,
+                                                                                        }: FieldProps) => {
+                                                                                            // Find the selected client based on current idClient value
+                                                                                            const selectedSatuan =
+                                                                                                field.value
+                                                                                                    ? satuansList.find(
+                                                                                                          (
+                                                                                                              satuan
+                                                                                                          ) =>
+                                                                                                              satuan.id ===
+                                                                                                              field.value
+                                                                                                      )
+                                                                                                    : null
+
+                                                                                            const satuanOptions =
+                                                                                                satuansList.map(
+                                                                                                    (
+                                                                                                        satuan
+                                                                                                    ) => ({
+                                                                                                        value: satuan.id,
+                                                                                                        label: `${satuan.satuan}`,
+                                                                                                    })
+                                                                                                )
+                                                                                            console.log(
+                                                                                                'selectedSatuan',
+                                                                                                selectedSatuan
+                                                                                            )
+                                                                                            return (
+                                                                                                <Select
+                                                                                                    field={
+                                                                                                        field
+                                                                                                    }
+                                                                                                    form={
+                                                                                                        form
+                                                                                                    }
+                                                                                                    options={
+                                                                                                        satuanOptions
+                                                                                                    }
+                                                                                                    value={
+                                                                                                        selectedSatuan
+                                                                                                            ? {
+                                                                                                                  value: selectedSatuan.satuan,
+                                                                                                                  label: `${selectedSatuan.satuan}`,
+                                                                                                              }
+                                                                                                            : null
+                                                                                                    }
+                                                                                                    placeholder="Pilih satuan"
+                                                                                                    onChange={(
+                                                                                                        option
+                                                                                                    ) => {
+                                                                                                        form.setFieldValue(
+                                                                                                            field.name,
+                                                                                                            option?.value
+                                                                                                        )
+                                                                                                    }}
+                                                                                                />
+                                                                                            )
+                                                                                        }}
+                                                                                    </Field>
                                                                                 </FormItem>
                                                                             </div>
 

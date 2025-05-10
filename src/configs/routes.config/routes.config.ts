@@ -47,70 +47,6 @@ export const protectedRoutes = [
             header: 'Tambah Proyek',
         },
     },
-    // edit detail menus
-    // {
-    //     key: 'apps.manajemenProyek',
-    //     path: '/manajemen-proyek-edit/:proyekId',
-    //     component: lazy(() => import('@/views/manajemenProyek/ProyekEdit')),
-    //     authority: [],
-    //     meta: {
-    //         header: 'Ubah Proyek',
-    //     },
-    // },
-    // Purchase Order
-    // {
-    //     key: 'apps.purchaseOrder',
-    //     path: '/purchase-order',
-    //     component: lazy(
-    //         () => import('@/views/purchaseOrder/PurchaseOrderList')
-    //     ),
-    //     authority: [],
-    // },
-    // {
-    //     key: 'apps.purchaseOrder',
-    //     path: '/purchase-order-edit/:orderId',
-    //     component: lazy(
-    //         () => import('@/views/purchaseOrder/PurchaseOrderEdit')
-    //     ),
-    //     authority: [],
-    //     meta: {
-    //         header: 'Ubah Purchase Order',
-    //     },
-    // },
-    // {
-    //     key: 'apps.purchaseOrder',
-    //     path: '/purchase-order-new',
-    //     component: lazy(() => import('@/views/purchaseOrder/PurchaseOrderNew')),
-    //     authority: [],
-    //     meta: {
-    //         header: 'Tambah Purchase Order',
-    //     },
-    // },
-    // Faktur Pajak
-    // {
-    //     key: 'apps.fakturPajak',
-    //     path: '/faktur-pajak',
-    //     component: lazy(() => import('@/views/fakturPajak/FakturPajakList')),
-    //     authority: [],
-    // },
-    // {
-    //     key: 'apps.fakturPajak',
-    //     path: '/faktur-pajak-edit/:klienId',
-    //     component: lazy(() => import('@/views/fakturPajak/FakturPajakEdit')),
-    //     authority: [],
-    //     meta: {
-    //         header: 'Ubah Faktur Pajak',
-    //     },
-    // },
-    // {
-    //     key: 'apps.fakturPajak',
-    //     path: '/faktur-pajak-new',
-    //     component: lazy(() => import('@/views/fakturPajak/FakturPajakNew')),
-    //     authority: [],
-    //     meta: {
-    //         header: 'Tambah Faktur Pajak',
-    //     },
-    // },
     // Klien
     {
         key: 'apps.klien',
@@ -134,6 +70,31 @@ export const protectedRoutes = [
         authority: [],
         meta: {
             header: 'Tambah Klien',
+        },
+    },
+    // Satuan
+    {
+        key: 'apps.satuan',
+        path: '/master/satuan',
+        component: lazy(() => import('@/views/master/Satuan/SatuanList')),
+        authority: [],
+    },
+    {
+        key: 'apps.satuan',
+        path: '/master/satuan-edit/:satuanId',
+        component: lazy(() => import('@/views/master/Satuan/SatuanEdit')),
+        authority: [],
+        meta: {
+            header: 'Ubah Satuan',
+        },
+    },
+    {
+        key: 'apps.satuan',
+        path: '/master/satuan-new',
+        component: lazy(() => import('@/views/master/Satuan/SatuanNew')),
+        authority: [],
+        meta: {
+            header: 'Tambah Satuan',
         },
     },
     // Berkas
