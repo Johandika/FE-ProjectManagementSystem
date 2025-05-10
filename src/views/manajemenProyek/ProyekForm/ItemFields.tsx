@@ -10,7 +10,7 @@ import { Select } from '@/components/ui'
 
 interface ItemDetail {
     uraian: string
-    satuan: string
+    idSatuan: string
     volume: number
     harga_satuan_material: number
     harga_satuan_jasa: number
@@ -219,7 +219,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                     }
                                                                                 >
                                                                                     <Field
-                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].satuan`}
+                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].idSatuan`}
                                                                                     >
                                                                                         {({
                                                                                             field,
@@ -673,7 +673,8 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                 onClick={() =>
                                                                     pushDetail({
                                                                         uraian: '',
-                                                                        satuan: '',
+                                                                        idSatuan:
+                                                                            '',
                                                                         volume: 0,
                                                                         harga_satuan_material: 0,
                                                                         harga_satuan_jasa: 0,
@@ -704,7 +705,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                         detail: [
                                             {
                                                 uraian: '',
-                                                satuan: '',
+                                                idSatuan: '',
                                                 volume: 0,
                                                 harga_satuan_material: 0,
                                                 harga_satuan_jasa: 0,

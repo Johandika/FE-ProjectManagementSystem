@@ -129,7 +129,6 @@ export default function Items() {
     } = useAppSelector((state) => state.proyekDetail.data)
 
     const test = useAppSelector((state) => state.proyekDetail.data)
-    console.log('satuansData', satuansData)
 
     // Fetch items when component mounts
     useEffect(() => {
@@ -661,7 +660,8 @@ export default function Items() {
 
                                                 const requestData = {
                                                     uraian: detailValues.tempUraian,
-                                                    satuan: detailValues.tempSatuan,
+                                                    idSatuan:
+                                                        detailValues.tempSatuan,
                                                     volume: extractNumberFromString(
                                                         detailValues.tempVolume
                                                     ),
@@ -688,10 +688,6 @@ export default function Items() {
                                                         detailValues.tempIdItem,
                                                 }
 
-                                                console.log(
-                                                    'requestData',
-                                                    requestData
-                                                )
                                                 try {
                                                     let result
 
@@ -880,7 +876,7 @@ export default function Items() {
                                                 )
                                                 setDetailField(
                                                     'tempSatuan',
-                                                    detail.satuan
+                                                    detail.idSatuan
                                                 )
                                                 setDetailField(
                                                     'tempVolume',
@@ -1053,15 +1049,6 @@ export default function Items() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    {/* <Field
-                                                                        type="text"
-                                                                        autoComplete="off"
-                                                                        name="tempSatuan"
-                                                                        placeholder="Contoh: kg, ton, m3"
-                                                                        component={
-                                                                            Input
-                                                                        }
-                                                                    /> */}
                                                                     <Field name="tempSatuan">
                                                                         {({
                                                                             field,
@@ -1074,6 +1061,7 @@ export default function Items() {
                                                                                           (
                                                                                               satuan
                                                                                           ) =>
+                                                                                              // field.value = kg
                                                                                               satuan.id ===
                                                                                               field.value
                                                                                       )
@@ -1088,10 +1076,14 @@ export default function Items() {
                                                                                         label: `${satuan.satuan}`,
                                                                                     })
                                                                                 )
-                                                                            // console.log(
-                                                                            //     'selectedSatuan',
-                                                                            //     selectedSatuan
-                                                                            // )
+                                                                            console.log(
+                                                                                'field',
+                                                                                field
+                                                                            )
+                                                                            console.log(
+                                                                                'satuansData.data?',
+                                                                                satuansData.data
+                                                                            )
                                                                             return (
                                                                                 <Select
                                                                                     field={
@@ -1106,7 +1098,7 @@ export default function Items() {
                                                                                     value={
                                                                                         selectedSatuan
                                                                                             ? {
-                                                                                                  value: selectedSatuan.satuan,
+                                                                                                  value: selectedSatuan.id,
                                                                                                   label: `${selectedSatuan.satuan}`,
                                                                                               }
                                                                                             : null
