@@ -36,7 +36,7 @@ export async function apiGetBastp<T, U extends Record<string, unknown>>(
 }
 
 // edit bastp
-export async function apiPutBastp<T, U extends Record<string, unknown>>(
+export async function apiEditBastp<T, U extends Record<string, unknown>>(
     data: U
 ) {
     return ApiService.fetchData<T>({

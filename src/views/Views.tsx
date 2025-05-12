@@ -111,7 +111,6 @@ const AllRoutes = (props: AllRoutesProps) => {
 
     const { pekerjaanActive } = useAppSelector((state) => state.proyekEdit.data)
 
-    console.log('pekerjaanActive', pekerjaanActive)
     return (
         <Routes>
             <Route path="/" element={<ProtectedRoute />}>

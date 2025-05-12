@@ -19,6 +19,7 @@ import {
 } from '@/services/AdendumService'
 import { apiGetItem, apiGetItemsByProyek } from '@/services/ItemService'
 import { apiGetSatuans } from '@/services/SatuanService'
+import { apiGetBastps } from '@/services/BastpService'
 
 export const SLICE_NAME = 'proyekDetail'
 
@@ -49,6 +50,13 @@ type LokasisByProyek = {
     lokasi: string
     latitude: number
     longitude: string
+    idProject: string
+}
+
+type BastpsByProyek = {
+    id: string
+    tanggal: string
+    keterangan: string
     idProject: string
 }
 
@@ -127,6 +135,8 @@ export type MasterProyekDetailState = {
     loadingItemsByProyek: boolean
     loadingItem: boolean
     loadingSatuan: boolean
+    loadingBastpProyeks: boolean
+    bastpProyekData?: BastpsByProyek
     satuansData?: SatuansData
     itemsByProyekData?: ItemProyek
     itemData?: ItemProyek
@@ -315,6 +325,20 @@ export const getSatuans = createAsyncThunk(
     }
 )
 
+// ========================================================================
+
+// get all bastp
+export const getBastpsByProyek = createAsyncThunk(
+    SLICE_NAME + '/getBastpsByProyek',
+    async (data: { id: string }) => {
+        const response = await apiGetBastps<BastpsByProyek[], { id: string }>(
+            data
+        )
+
+        return response.data
+    }
+)
+
 const initialState: MasterProyekDetailState = {
     loadingBerkasProyeks: true,
     loadingFakturPajaks: true,
@@ -329,6 +353,8 @@ const initialState: MasterProyekDetailState = {
     loadingItemsByProyek: true,
     loadingItem: true,
     loadingSatuan: true,
+    loadingBastpProyeks: true,
+    bastpProyekData: [],
     satuansData: [],
     lokasisByProyekData: [],
     lokasiData: [],
@@ -349,6 +375,13 @@ const proyekDetailSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            .addCase(getBastpsByProyek.fulfilled, (state, action) => {
+                state.bastpProyekData = action.payload
+                state.loadingBastpProyeks = false
+            })
+            .addCase(getBastpsByProyek.pending, (state) => {
+                state.loadingBastpProyeks = true
+            })
             .addCase(getBerkasProyek.fulfilled, (state, action) => {
                 state.berkasProyekData = action.payload
                 state.loadingBerkasProyeks = false
