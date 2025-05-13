@@ -44,7 +44,8 @@ type FormFieldsName = {
     tanggal_kontrak: string
     tanggal_delivery: string
     nilai_kontrak: number
-    timeline: number
+    timeline_awal: string
+    timeline_akhir: string
     keterangan: string
     idClient: string
     berkas: string[]
@@ -225,27 +226,67 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
-                {/* Timeline */}
+                {/* Timeline Awal  */}
                 <div className="col-span-1">
                     <FormItem
-                        label="Timeline (hari)"
+                        label="Timeline Awal"
                         invalid={
-                            (errors.timeline && touched.timeline) as boolean
+                            (errors.timeline_awal &&
+                                touched.timeline_awal) as boolean
                         }
-                        errorMessage={errors.timeline}
+                        errorMessage={errors.timeline_awal}
                     >
-                        <Field name="timeline">
+                        <Field name="timeline_awal">
                             {({ field, form }: FieldProps) => (
-                                <NumericFormat
-                                    {...field}
-                                    name={field.name}
-                                    customInput={Input}
-                                    placeholder="Sisa waktu dalam hari"
-                                    suffix=" hari"
-                                    onValueChange={(values) => {
+                                <DatePicker
+                                    placeholder="Pilih Tanggal"
+                                    value={
+                                        field.value
+                                            ? new Date(field.value)
+                                            : null
+                                    }
+                                    inputFormat="DD-MM-YYYY"
+                                    onChange={(date) => {
+                                        const formattedDate = date
+                                            ? dayjs(date).format('YYYY-MM-DD')
+                                            : ''
                                         form.setFieldValue(
                                             field.name,
-                                            Number(values.value)
+                                            formattedDate
+                                        )
+                                    }}
+                                />
+                            )}
+                        </Field>
+                    </FormItem>
+                </div>
+                {/* Timeline Akhir  */}
+                <div className="col-span-1">
+                    <FormItem
+                        label="Timeline Akhir"
+                        invalid={
+                            (errors.timeline_akhir &&
+                                touched.timeline_akhir) as boolean
+                        }
+                        errorMessage={errors.timeline_akhir}
+                    >
+                        <Field name="timeline_akhir">
+                            {({ field, form }: FieldProps) => (
+                                <DatePicker
+                                    placeholder="Pilih Tanggal"
+                                    value={
+                                        field.value
+                                            ? new Date(field.value)
+                                            : null
+                                    }
+                                    inputFormat="DD-MM-YYYY"
+                                    onChange={(date) => {
+                                        const formattedDate = date
+                                            ? dayjs(date).format('YYYY-MM-DD')
+                                            : ''
+                                        form.setFieldValue(
+                                            field.name,
+                                            formattedDate
                                         )
                                     }}
                                 />
@@ -269,21 +310,22 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         />
                     </FormItem>
                 </div>
+                <FormItem
+                    label="Keterangan"
+                    labelClass="!justify-start"
+                    invalid={
+                        (errors.keterangan && touched.keterangan) as boolean
+                    }
+                    errorMessage={errors.keterangan}
+                >
+                    <Field
+                        textArea
+                        name="keterangan"
+                        placeholder="Masukkan keterangan"
+                        component={Input}
+                    />
+                </FormItem>
             </div>
-
-            <FormItem
-                label="Keterangan"
-                labelClass="!justify-start"
-                invalid={(errors.keterangan && touched.keterangan) as boolean}
-                errorMessage={errors.keterangan}
-            >
-                <Field
-                    textArea
-                    name="keterangan"
-                    placeholder="Masukkan keterangan"
-                    component={Input}
-                />
-            </FormItem>
         </AdaptableCard>
     )
 }

@@ -80,7 +80,13 @@ export const getProyeks = createAsyncThunk(
             GetMasterProyekResponse,
             GetMasterProyekData
         >(data)
-        return response.data
+        console.log('data', data)
+
+        return {
+            data: response.data,
+            total: response.data.totaldataProject, // Simpan total data dari API baru
+            totalPage: response.data.totalPage, // Opsional jika Anda perlu totalPage
+        }
     }
 )
 
@@ -161,7 +167,8 @@ const proyekListSlice = createSlice({
         builder
             .addCase(getProyeks.fulfilled, (state, action) => {
                 state.proyekList = action.payload.data
-                state.tableData.total = action.payload.total
+                state.tableData.total = action.payload.data.totaldataProject
+                state.tableData.totalPage = action.payload.data.totalPage
                 state.loading = false
             })
             .addCase(getProyeks.pending, (state) => {

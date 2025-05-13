@@ -1,13 +1,64 @@
 import ApiService from './ApiService'
 
 // get all proyeks
-export async function apiGetProyeks<T, U extends Record<string, unknown>>(
-    data: U
-) {
+// export async function apiGetProyeks<T, U extends Record<string, unknown>>(
+//     data: U
+// ) {
+//     return ApiService.fetchData<T>({
+//         url: `/project`,
+//         method: 'get',
+//         data,
+//     })
+// }
+export interface GetProyeksRequest {
+    page?: number
+    limit?: number
+    query?: string
+    sort?: {
+        key?: string
+        order?: string
+    }
+    filterData?: {
+        name?: string
+        category?: string[]
+        status?: number[]
+        proyekStatus?: number
+    }
+}
+
+export async function apiGetProyeks<T, U extends GetProyeksRequest>(data: U) {
+    // Membangun query string parameters
+    const params = new URLSearchParams()
+
+    console.log('datasssss', data)
+
+    // Menangani pagination
+    if (data.page) params.append('page', data.page.toString())
+    if (data.limit) params.append('limit', data.limit.toString())
+
+    // Menangani pencarian
+    if (data.query && data.query.trim() !== '')
+        params.append('search', data.query)
+
+    // Menangani pengurutan
+    if (data.sort?.key && data.sort.order) {
+        params.append('sortBy', data.sort.key)
+        params.append('sortOrder', data.sort.order)
+    }
+
+    // // Menangani filter jika diperlukan
+    // if (data.filterData?.proyekStatus)
+    //     params.append('status', data.filterData.proyekStatus.toString())
+
+    // // Jika ada filter tambahan yang perlu diterapkan
+    // if (data.filterData?.name) params.append('name', data.filterData.name)
+
+    // URL dengan query parameters
+    const url = `/project${params.toString() ? `?${params.toString()}` : ''}`
+    console.log('url', url)
     return ApiService.fetchData<T>({
-        url: '/project',
+        url,
         method: 'get',
-        data,
     })
 }
 
@@ -102,45 +153,3 @@ export async function apiCreateProyek<T, U extends Record<string, unknown>>(
         data,
     })
 }
-
-// {
-//   "pekerjaan": "asgasgsadfsadg",
-//   "pic": "asgsagas",
-//   "nomor_kontrak": "asgsa",
-//   "tanggal_service_po": "2025-04-16",
-//   "tanggal_kontrak": "2025-04-16",
-//   "tanggal_delivery": "2025-04-16",
-//   "nilai_kontrak": 30000000,
-//   "timeline": 122,
-//   "idClient": "c5d2c9ab-9982-4fbd-b6f5-0dfc969af334",
-//   "keterangan": "sfagagasdg",
-//   "berkas": [
-//     "d8ff8b1f-e88d-4461-a29d-aec9fb0de0c0",
-//     "51341491-5119-4b0d-a527-066d4bb00ed6"
-//   ],
-//   "lokasi": [
-//     {
-//       "lokasi": "asdgasgsa",
-//       "latitude": 1111,
-//       "longitude": 1111
-//     }
-//   ],
-//   "termin": [
-//     {
-//       "keterangan": "asgasgsadg",
-//       "persen": 100
-//     }
-//   ],
-//   "subkontraktor": [
-//     {
-//       "id": "c82dfca3-3ef0-454f-95ac-3aaa9a59cf13",
-//       "nomor_surat": "1124121",
-//       "nilai_subkontrak": 1234124,
-//       "waktu_mulai_pelaksanaan": "2025-04-16",
-//       "waktu_selesai_pelaksanaan": "2025-04-23",
-//       "keterangan": "asdgasgsaddasg"
-//     }
-//   ]
-
-//   "klien": "CLIENT 4",
-// }

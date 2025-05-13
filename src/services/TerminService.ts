@@ -1,27 +1,26 @@
 import ApiService from './ApiService'
 
-// // create
-// export async function apiCreateBerkasProyek<
-//     T,
-//     U extends Record<string, unknown>
-// >(data: U) {
-//     return ApiService.fetchData<T>({
-//         url: '/berkasProyeks/create',
-//         method: 'post',
-//         data,
-//     })
-// }
+// create
+export async function apiCreateTermin<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: '/terminProject',
+        method: 'post',
+        data,
+    })
+}
 
 // get by id
-// export async function apiGetTermin<T, U extends Record<string, unknown>>(
-//     params: U
-// ) {
-//     return ApiService.fetchData<T>({
-//         url: '/termin',
-//         method: 'get',
-//         params,
-//     })
-// }
+export async function apiGetOneTermin<T, U extends Record<string, unknown>>(
+    params: U
+) {
+    return ApiService.fetchData<T>({
+        url: `/termin/${params.id}`,
+        method: 'get',
+        params,
+    })
+}
 
 // get termin by project
 export async function apiGetTermin<T, U extends Record<string, unknown>>(
@@ -36,24 +35,25 @@ export async function apiGetTermin<T, U extends Record<string, unknown>>(
 }
 
 // update
-// export async function apiEditTermin<T, U extends Record<string, unknown>>(
-//     data: U
-// ) {
-//     return ApiService.fetchData<T>({
-//         url: '/termin/update',
-//         method: 'put',
-//         data,
-//     })
-// }
+export async function apiEditTermin<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    console.log('dataapi', data)
 
-// // delete
-// export async function apiDeleteBerkasProyeks<
-//     T,
-//     U extends Record<string, unknown>
-// >(data: U) {
-//     return ApiService.fetchData<T>({
-//         url: '/berkasProyeks/delete',
-//         method: 'delete',
-//         data,
-//     })
-// }
+    return ApiService.fetchData<T>({
+        url: `/terminProject/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// delete
+export async function apiDeleteTermin<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: `/terminProject/${data.id}`,
+        method: 'delete',
+        data,
+    })
+}

@@ -170,6 +170,8 @@ export default function Bastp() {
                                     result.data?.statusCode >= 200 &&
                                     result.data?.statusCode < 300
                                 ) {
+                                    console.log('result', result)
+
                                     // Refresh data
                                     dispatch(
                                         getBastpsByProyek({ id: projectId })
@@ -275,9 +277,18 @@ export default function Bastp() {
                                 })
 
                                 if (success) {
-                                    // Refresh data after successful delete
+                                    // Refresh data aft'er successful delete
+                                    console.log(
+                                        'projectId sebelum refresh',
+                                        projectId
+                                    )
+
                                     dispatch(
                                         getBastpsByProyek({ id: projectId })
+                                    )
+                                    console.log(
+                                        'projectId setelah refresh',
+                                        projectId
                                     )
                                     popNotification('dihapus')
                                 }

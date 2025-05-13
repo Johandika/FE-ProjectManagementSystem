@@ -24,7 +24,17 @@ import {
     apiCreateFakturPajak,
     apiDeleteFakturPajaks,
 } from '@/services/FakturPajakService'
-import { extractIntegerFromStringAndFloat } from '@/utils/extractNumberFromString'
+import {
+    apiCreateTermin,
+    apiGetOneTermin,
+    apiEditTermin,
+    apiDeleteTermin,
+    apiGetTermin,
+} from '@/services/TerminService'
+import {
+    extractIntegerFromStringAndFloat,
+    extractNumberFromString,
+} from '@/utils/extractNumberFromString'
 import DescriptionSection from './DesriptionSection'
 import { formatDate } from '@/utils/formatDate'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
@@ -49,7 +59,7 @@ const FakturSchema = Yup.object().shape({
     keterangan: Yup.string(),
 })
 
-// Interface untuk nilai awal form
+// Interface untuk nilai awal form faktur
 interface FakturFormValues {
     nomor: string
     nominal: number | string
@@ -57,8 +67,25 @@ interface FakturFormValues {
     keterangan?: string
 }
 
+// Schema validasi untuk form termin
+const TerminSchema = Yup.object().shape({
+    // persen: Yup.number()
+    //     .required('Persentase wajib diisi')
+    //     .min(0, 'Persentase minimal 0')
+    //     .max(100, 'Persentase maksimal 100'),
+    // nilai_termin: Yup.number().required('Nilai termin wajib diisi'),
+    keterangan: Yup.string().required('Keterangan wajib diisi'),
+})
+
+// Interface untuk nilai awal form termin
+interface TerminFormValues {
+    persen: number | string
+    keterangan: string
+}
+
 export default function Termin() {
     const dispatch = useAppDispatch()
+    // Faktur states
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [isEditMode, setIsEditMode] = useState(false)
     const [selectedTermin, setSelectedTermin] = useState<any>(null)
@@ -74,6 +101,26 @@ export default function Termin() {
             keterangan: '',
         })
 
+    // Termin states
+    const [terminDialogIsOpen, setTerminDialogIsOpen] = useState(false)
+    const [isEditTerminMode, setIsEditTerminMode] = useState(false)
+    const [selectedTerminToEdit, setSelectedTerminToEdit] = useState<any>(null)
+    const [terminDeleteConfirmOpen, setTerminDeleteConfirmOpen] =
+        useState(false)
+    const [terminFormInitialValues, setTerminFormInitialValues] =
+        useState<TerminFormValues>({
+            persen: 0,
+            keterangan: '',
+        })
+
+    // Get project ID from path
+    const getProjectId = () => {
+        return location.pathname.substring(
+            location.pathname.lastIndexOf('/') + 1
+        )
+    }
+
+    // Redux state
     const terminsData = useAppSelector(
         (state) => state.proyekEdit.data.terminsData
     )
@@ -90,7 +137,19 @@ export default function Termin() {
         (state) => state.proyekEdit.data.loadingFakturPajakByProyekData
     )
 
-    console.log('terminsData', terminsData)
+    // Calculate total percentage used
+    const calculateTotalPercentage = () => {
+        if (!terminsData || terminsData.length === 0) return 0
+        return terminsData.reduce(
+            (sum, termin) => sum + (termin.persen || 0),
+            0
+        )
+    }
+
+    const totalPercentageUsed = calculateTotalPercentage()
+    const remainingPercentage = 100 - totalPercentageUsed
+
+    /* ========================= FAKTUR HANDLING ========================= */
 
     const openDialog = (termin: any, isEdit = false) => {
         setSelectedTermin(termin)
@@ -128,14 +187,15 @@ export default function Termin() {
         setIsEditMode(false)
     }
 
-    const popNotification = (keyword: string) => {
+    // Notification helper
+    const popNotification = (action: string, type: string = 'Faktur') => {
         toast.push(
             <Notification
-                title={`Successfully ${keyword}`}
+                title={`Successfully ${action}`}
                 type="success"
                 duration={2500}
             >
-                Faktur successfully {keyword}
+                {type} successfully {action}
             </Notification>,
             {
                 placement: 'top-center',
@@ -148,6 +208,7 @@ export default function Termin() {
         { setSubmitting }: { setSubmitting: SetSubmitting }
     ) => {
         setSubmitting(true)
+
         const processedData = {
             ...values,
             nominal: extractIntegerFromStringAndFloat(
@@ -162,7 +223,6 @@ export default function Termin() {
             if (isEditMode) {
                 // Update existing faktur
                 const fakturId = selectedTermin?.FakturPajak
-                console.log('fakturId', fakturId)
 
                 const updateData = {
                     ...processedData,
@@ -172,7 +232,6 @@ export default function Termin() {
                 success = await updateFakturPajak<boolean, FormModel>({
                     ...updateData,
                 })
-                console.log('success', success)
                 if (success) {
                     popNotification('updated')
                 }
@@ -188,11 +247,7 @@ export default function Termin() {
 
             if (success) {
                 // Refresh termins data if needed
-                const path = location.pathname.substring(
-                    location.pathname.lastIndexOf('/') + 1
-                )
-                dispatch(getTermins({ id: path }))
-                dispatch(getFakturPajakByProyekId({ id: path }))
+                fetchData({ id: getProjectId() })
             }
         } catch (error) {
             console.error(
@@ -218,38 +273,23 @@ export default function Termin() {
     }
 
     // Fungsi untuk mengedit faktur
-    const handleEdit = (termin: any) => {
+    const handleEditFaktur = (termin: any) => {
         openDialog(termin, true)
     }
 
-    // Fungsi untuk membuka dialog konfirmasi delete
-    const handleConfirmDelete = (fakturData: any) => {
+    // Fungsi untuk membuka dialog konfirmasi delete faktur
+    const handleConfirmDeleteFaktur = (fakturData: any) => {
         setSelectedFakturId(fakturData)
         setDeleteConfirmOpen(true)
     }
 
     // Fungsi untuk menutup dialog konfirmasi
-    const handleCancelDelete = () => {
+    const handleCancelDeleteFaktur = () => {
         setDeleteConfirmOpen(false)
         setSelectedFakturId(null)
     }
 
-    const fetchData = (data: { id: string }) => {
-        dispatch(getTermins(data)) // by id
-        dispatch(getFakturPajakByProyekId(data))
-    }
-
-    useEffect(() => {
-        const path = location.pathname.substring(
-            location.pathname.lastIndexOf('/') + 1
-        )
-        const requestParam = { id: path }
-        fetchData(requestParam)
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.pathname])
-
-    const handleDelete = async () => {
+    const handleDeleteFaktur = async () => {
         if (!selectedFakturId) return
 
         try {
@@ -263,12 +303,7 @@ export default function Termin() {
 
             if (success) {
                 popNotification('deleted')
-                // Refresh data after deletion
-                const path = location.pathname.substring(
-                    location.pathname.lastIndexOf('/') + 1
-                )
-                dispatch(getTermins({ id: path }))
-                dispatch(getFakturPajakByProyekId({ id: path }))
+                fetchData({ id: getProjectId() })
             }
         } catch (error) {
             console.error('Error deleting faktur:', error)
@@ -289,25 +324,197 @@ export default function Termin() {
             setSelectedFakturId(null)
         }
     }
-    console.log('terminsData', terminsData)
+
+    /* ========================= TERMIN HANDLING ========================= */
+
+    // Open termin dialog
+    const openTerminDialog = (termin: any = null, isEdit = false) => {
+        setIsEditTerminMode(isEdit)
+        setSelectedTerminToEdit(termin)
+
+        if (isEdit && termin) {
+            setTerminFormInitialValues({
+                persen: termin.persen || 0,
+                keterangan: termin.keterangan || '',
+            })
+        } else {
+            // For new termin
+            setTerminFormInitialValues({
+                persen: 0,
+                keterangan: '',
+            })
+        }
+
+        setTerminDialogIsOpen(true)
+    }
+
+    // Close termin dialog
+    const onTerminDialogClose = () => {
+        setTerminDialogIsOpen(false)
+        setIsEditTerminMode(false)
+        setSelectedTerminToEdit(null)
+    }
+
+    // Handle termin form submission
+    const handleTerminSubmit = async (
+        values: TerminFormValues,
+        { setSubmitting }: { setSubmitting: SetSubmitting }
+    ) => {
+        setSubmitting(true)
+        console.log('processedData before', { ...values })
+        const projectId = getProjectId()
+
+        const processedData = {
+            ...values,
+            persen: extractNumberFromString(values.persen),
+            idProject: projectId,
+        }
+        console.log('processedData after', processedData)
+
+        try {
+            let success = false
+            if (isEditTerminMode && selectedTerminToEdit) {
+                // Update existing termin
+                const updateData = {
+                    ...processedData,
+                    id: selectedTerminToEdit.id,
+                }
+
+                success = await apiEditTermin(updateData)
+                if (success) {
+                    popNotification('updated', 'Termin')
+                }
+            } else {
+                // Create new termin
+                success = await apiCreateTermin(processedData)
+                if (success) {
+                    popNotification('added', 'Termin')
+                }
+            }
+
+            if (success) {
+                // Refresh termins data
+                fetchData({ id: projectId })
+            }
+        } catch (error) {
+            console.error(
+                `Error ${isEditTerminMode ? 'updating' : 'creating'} termin:`,
+                error
+            )
+            toast.push(
+                <Notification
+                    title={`${isEditTerminMode ? 'Update' : 'Create'} Failed`}
+                    type="danger"
+                    duration={2500}
+                >
+                    Failed to {isEditTerminMode ? 'update' : 'create'} termin
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
+        } finally {
+            setSubmitting(false)
+            setTerminDialogIsOpen(false)
+        }
+    }
+
+    // Handle termin edit
+    const handleEditTermin = (termin: any) => {
+        openTerminDialog(termin, true)
+    }
+
+    // Handle confirm delete termin
+    const handleConfirmDeleteTermin = (termin: any) => {
+        setSelectedTerminToEdit(termin)
+        setTerminDeleteConfirmOpen(true)
+    }
+
+    // Cancel delete termin
+    const handleCancelDeleteTermin = () => {
+        setTerminDeleteConfirmOpen(false)
+        setSelectedTerminToEdit(null)
+    }
+
+    // Delete termin
+    const handleDeleteTermin = async () => {
+        if (!selectedTerminToEdit?.id) return
+
+        try {
+            const success = await apiDeleteTermin(selectedTerminToEdit)
+
+            if (success) {
+                popNotification('deleted', 'Termin')
+                fetchData({ id: getProjectId() })
+            }
+        } catch (error) {
+            console.error('Error deleting termin:', error)
+            toast.push(
+                <Notification
+                    title={`Delete Failed`}
+                    type="danger"
+                    duration={2500}
+                >
+                    Failed to delete termin
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
+        } finally {
+            setTerminDeleteConfirmOpen(false)
+            setSelectedTerminToEdit(null)
+        }
+    }
+
+    /* ========================= COMMON FUNCTIONS ========================= */
+
+    const fetchData = (data: { id: string }) => {
+        dispatch(getTermins(data)) // by id
+        dispatch(getFakturPajakByProyekId(data))
+    }
+
+    useEffect(() => {
+        const projectId = getProjectId()
+        const requestParam = { id: projectId }
+        fetchData(requestParam)
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.pathname])
+
     return (
         <>
             <Loading loading={loadingTermins || loadingFakturPajakByProyekData}>
                 <div className="flex flex-col py-6 space-y-2">
-                    <div className="flex flex-row justify-between">
-                        <DescriptionSection
-                            title="Termin"
-                            desc="Tambahkan data termin dan faktur"
-                        />
+                    <div className="flex flex-row justify-between items-center">
+                        <div>
+                            <DescriptionSection
+                                title="Termin"
+                                desc="Tambahkan data termin dan faktur"
+                            />
+                            <div className="mt-2 text-sm">
+                                Total:{' '}
+                                <span className="font-bold">
+                                    {totalPercentageUsed}%
+                                </span>{' '}
+                                ({remainingPercentage}% remaining)
+                            </div>
+                        </div>
                         <Button
                             size="sm"
                             variant="twoTone"
-                            // onClick={}
+                            onClick={() => openTerminDialog()}
                             className="w-fit text-xs"
+                            disabled={remainingPercentage <= 0}
                         >
                             Tambah Termin
                         </Button>
                     </div>
+                    {terminsData?.length === 0 && (
+                        <div className="text-center py-8 bg-slate-50 rounded-md">
+                            Belum ada termin yang ditambahkan
+                        </div>
+                    )}
                     {terminsData?.map((termin, index) => {
                         // map semua termin yang ada pada proyek ini
                         // find data faktur pajak by project dengan termin.idFakturPajak
@@ -321,117 +528,150 @@ export default function Termin() {
                                 className="bg-slate-50 rounded-md flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-between gap-3 p-6 sm:p-10 w-full"
                             >
                                 <div className="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full">
-                                    <div className=" flex flex-col text-slate-600 flex-auto sm:items-start items-center gap-1">
-                                        <span>{termin.keterangan}</span>
-                                        <span className="font-bold text-2xl">
-                                            {termin.persen}%
-                                        </span>
-                                        <div>
-                                            Rp.{' '}
-                                            {termin.nilai_termin?.toLocaleString(
-                                                'id-ID'
-                                            )}
+                                    <div className="flex flex-col sm:flex-row justify-between text-slate-600 flex-auto items-center sm:items-start  gap-4 relative">
+                                        <div className="flex flex-col w-full items-center sm:items-start">
+                                            <span>{termin.keterangan}</span>
+                                            <span className="font-bold text-2xl">
+                                                {termin.persen}%
+                                            </span>
+                                            <div>
+                                                Rp.{' '}
+                                                {termin.nilai_termin?.toLocaleString(
+                                                    'id-ID'
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Jika faktur ada tampilkan button edit dan delete faktur */}
+                                        {termin.FakturPajak?.id ? (
+                                            <>
+                                                {fakturByTermin && (
+                                                    <div className="bg-white p-4 w-full flex flex-col sm:flex-row gap-4 rounded-lg justify-between">
+                                                        <div className="flex flex-col items-center sm:items-start ">
+                                                            <span className="font-semibold text-base">
+                                                                Informasi Faktur
+                                                            </span>
+                                                            <div>
+                                                                <span>
+                                                                    Nomor :{' '}
+                                                                </span>
+                                                                {fakturByTermin.nomor ||
+                                                                    '-'}
+                                                            </div>
+                                                            <div>
+                                                                <span>
+                                                                    Nominal :{' '}
+                                                                </span>
+                                                                {fakturByTermin.nominal?.toLocaleString(
+                                                                    'id-ID'
+                                                                ) || '-'}
+                                                            </div>
+                                                            <div>
+                                                                <span>
+                                                                    Tanggal :{' '}
+                                                                </span>
+                                                                {formatDate(
+                                                                    fakturByTermin.tanggal ||
+                                                                        ''
+                                                                ) || '-'}
+                                                            </div>
+                                                            {fakturByTermin.keterangan && (
+                                                                <div>
+                                                                    <span>
+                                                                        Keterangan
+                                                                        :{' '}
+                                                                    </span>
+                                                                    {
+                                                                        fakturByTermin.keterangan
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex space-x-6 sm:space-x-2 justify-center sm:justify-start">
+                                                            <Button
+                                                                type="button"
+                                                                shape="circle"
+                                                                variant="plain"
+                                                                size="sm"
+                                                                icon={
+                                                                    <HiOutlinePencil />
+                                                                }
+                                                                className="text-indigo-500"
+                                                                onClick={() =>
+                                                                    handleEditFaktur(
+                                                                        termin
+                                                                    )
+                                                                }
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                shape="circle"
+                                                                variant="plain"
+                                                                size="sm"
+                                                                className="text-red-500"
+                                                                icon={
+                                                                    <HiOutlineTrash />
+                                                                }
+                                                                onClick={() =>
+                                                                    handleConfirmDeleteFaktur(
+                                                                        termin
+                                                                    )
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <Button
+                                                size="sm"
+                                                variant="solid"
+                                                onClick={() =>
+                                                    openDialog(termin)
+                                                }
+                                            >
+                                                Tambah Faktur
+                                            </Button>
+                                        )}
+                                        <div className=" w-full flex space-x-2 justify-center sm:justify-end">
+                                            <Button
+                                                type="button"
+                                                shape="circle"
+                                                variant="plain"
+                                                size="sm"
+                                                icon={<HiOutlinePencil />}
+                                                className="text-indigo-500"
+                                                onClick={() =>
+                                                    handleEditTermin(termin)
+                                                }
+                                            />
+                                            <Button
+                                                type="button"
+                                                shape="circle"
+                                                variant="plain"
+                                                size="sm"
+                                                className="text-red-500"
+                                                icon={<HiOutlineTrash />}
+                                                onClick={() =>
+                                                    handleConfirmDeleteTermin(
+                                                        termin
+                                                    )
+                                                }
+                                            />
                                         </div>
                                     </div>
-                                    {/* Jika faktur ada tampilkan button edit dan delete faktur */}
-                                    {termin.FakturPajak?.id ? (
-                                        <>
-                                            {fakturByTermin && (
-                                                <>
-                                                    <div className="flex flex-col items-center sm:items-start flex-1">
-                                                        <span className="font-semibold text-base">
-                                                            INFORMASI FAKTUR
-                                                        </span>
-                                                        <div>
-                                                            <span className="font-semibold">
-                                                                Nomor :{' '}
-                                                            </span>
-                                                            {fakturByTermin.nomor ||
-                                                                '-'}
-                                                        </div>
-                                                        <div>
-                                                            <span className="font-semibold">
-                                                                Nominal :{' '}
-                                                            </span>
-                                                            {fakturByTermin.nominal?.toLocaleString(
-                                                                'id-ID'
-                                                            ) || '-'}
-                                                        </div>
-                                                        <div>
-                                                            <span className="font-semibold">
-                                                                Tanggal :{' '}
-                                                            </span>
-                                                            {formatDate(
-                                                                fakturByTermin.tanggal ||
-                                                                    ''
-                                                            ) || '-'}
-                                                        </div>
-                                                        {fakturByTermin.keterangan && (
-                                                            <div>
-                                                                <span className="font-semibold">
-                                                                    Keterangan :{' '}
-                                                                </span>
-                                                                {
-                                                                    fakturByTermin.keterangan
-                                                                }
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex space-x-6 sm:space-x-2 justify-center sm:justify-start">
-                                                        <Button
-                                                            type="button"
-                                                            shape="circle"
-                                                            variant="plain"
-                                                            size="sm"
-                                                            icon={
-                                                                <HiOutlinePencil />
-                                                            }
-                                                            className="text-indigo-500"
-                                                            onClick={() =>
-                                                                handleEdit(
-                                                                    termin
-                                                                )
-                                                            }
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            shape="circle"
-                                                            variant="plain"
-                                                            size="sm"
-                                                            className="text-red-500"
-                                                            icon={
-                                                                <HiOutlineTrash />
-                                                            }
-                                                            onClick={() =>
-                                                                handleConfirmDelete(
-                                                                    termin
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-                                                </>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <Button
-                                            size="sm"
-                                            variant="solid"
-                                            onClick={() => openDialog(termin)}
-                                        >
-                                            Tambah Faktur
-                                        </Button>
-                                    )}
                                 </div>
                             </div>
                         )
                     })}
                 </div>
 
+                {/* Form for Faktur */}
                 <Formik
                     initialValues={formInitialValues}
                     validationSchema={FakturSchema}
                     onSubmit={handleSubmit}
-                    enableReinitialize={true} // Important for updating form with new values when editing
+                    enableReinitialize={true}
                 >
                     {({ errors, touched, isSubmitting }) => (
                         <>
@@ -584,14 +824,166 @@ export default function Termin() {
                                 type="danger"
                                 title="Hapus Faktur"
                                 confirmButtonColor="red-600"
-                                onClose={handleCancelDelete}
-                                onRequestClose={handleCancelDelete}
-                                onCancel={handleCancelDelete}
-                                onConfirm={handleDelete}
+                                onClose={handleCancelDeleteFaktur}
+                                onRequestClose={handleCancelDeleteFaktur}
+                                onCancel={handleCancelDeleteFaktur}
+                                onConfirm={handleDeleteFaktur}
                             >
                                 <p>
                                     Apakah kamu yakin ingin menghapus faktur
                                     pada termin ini?
+                                </p>
+                            </ConfirmDialog>
+                        </>
+                    )}
+                </Formik>
+
+                {/* Form for Termin */}
+                <Formik
+                    initialValues={terminFormInitialValues}
+                    validationSchema={TerminSchema}
+                    onSubmit={handleTerminSubmit}
+                    enableReinitialize={true}
+                >
+                    {({
+                        errors,
+                        touched,
+                        isSubmitting,
+                        values,
+                        setFieldValue,
+                    }) => (
+                        <>
+                            <Dialog
+                                isOpen={terminDialogIsOpen}
+                                onClose={onTerminDialogClose}
+                                onRequestClose={onTerminDialogClose}
+                            >
+                                <Form>
+                                    <h5 className="mb-4">
+                                        {isEditTerminMode
+                                            ? 'Edit Termin'
+                                            : 'Tambah Termin'}
+                                    </h5>
+                                    {!isEditTerminMode && (
+                                        <div className="mb-4 p-2 bg-blue-50 text-blue-600 rounded-md">
+                                            Tersisa {remainingPercentage}% dari
+                                            total
+                                        </div>
+                                    )}
+
+                                    {/* Form Termin */}
+                                    <div className="flex flex-col max-h-[60vh] overflow-y-auto border-b-[1px] pb-4">
+                                        {/* Persentase */}
+                                        <FormItem
+                                            label="Persentase (%)"
+                                            invalid={
+                                                (errors.persen &&
+                                                    touched.persen) as boolean
+                                            }
+                                            errorMessage={errors.persen}
+                                        >
+                                            <Field name="persen">
+                                                {({
+                                                    field,
+                                                    form,
+                                                }: FieldProps) => (
+                                                    <NumericFormat
+                                                        {...field}
+                                                        customInput={Input}
+                                                        placeholder="0"
+                                                        suffix="%"
+                                                        allowNegative={false}
+                                                        decimalScale={2}
+                                                        isAllowed={(values) => {
+                                                            const {
+                                                                floatValue,
+                                                            } = values
+                                                            // For edit mode, allow existing value or for new values, ensure not exceeding 100
+                                                            return isEditTerminMode
+                                                                ? floatValue !==
+                                                                      undefined &&
+                                                                      floatValue >=
+                                                                          0 &&
+                                                                      floatValue <=
+                                                                          100
+                                                                : floatValue !==
+                                                                      undefined &&
+                                                                      floatValue >=
+                                                                          0 &&
+                                                                      floatValue <=
+                                                                          remainingPercentage
+                                                        }}
+                                                        onValueChange={(
+                                                            values
+                                                        ) => {
+                                                            form.setFieldValue(
+                                                                field.name,
+                                                                values.value
+                                                            )
+                                                        }}
+                                                    />
+                                                )}
+                                            </Field>
+                                        </FormItem>
+
+                                        {/* Keterangan */}
+                                        <FormItem
+                                            label="Keterangan"
+                                            invalid={
+                                                (errors.keterangan &&
+                                                    touched.keterangan) as boolean
+                                            }
+                                            errorMessage={errors.keterangan}
+                                        >
+                                            <Field
+                                                name="keterangan"
+                                                placeholder="Masukkan keterangan termin"
+                                                component={Input}
+                                            />
+                                        </FormItem>
+                                    </div>
+                                    {/* Button Dialog Option */}
+                                    <div className="text-right mt-6">
+                                        <Button
+                                            className="ltr:mr-2 rtl:ml-2"
+                                            variant="plain"
+                                            onClick={onTerminDialogClose}
+                                            type="button"
+                                            disabled={isSubmitting}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant="solid"
+                                            type="submit"
+                                            loading={isSubmitting}
+                                        >
+                                            {isEditTerminMode
+                                                ? 'Update'
+                                                : 'Simpan'}
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </Dialog>
+                            <ConfirmDialog
+                                isOpen={terminDeleteConfirmOpen}
+                                type="danger"
+                                title="Hapus Termin"
+                                confirmButtonColor="red-600"
+                                onClose={handleCancelDeleteTermin}
+                                onRequestClose={handleCancelDeleteTermin}
+                                onCancel={handleCancelDeleteTermin}
+                                onConfirm={handleDeleteTermin}
+                            >
+                                <p>
+                                    Apakah kamu yakin ingin menghapus termin
+                                    ini?
+                                    {selectedTerminToEdit?.FakturPajak?.id && (
+                                        <span className="block mt-2 text-red-500">
+                                            Faktur yang terkait dengan termin
+                                            ini juga akan dihapus!
+                                        </span>
+                                    )}
                                 </p>
                             </ConfirmDialog>
                         </>

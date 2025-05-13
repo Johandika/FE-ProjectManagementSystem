@@ -120,7 +120,12 @@ const ProyekTable = () => {
 
     // Process the data to include client names
     const data = useMemo(() => {
-        return proyekData.map((proyek) => {
+        // Periksa apakah proyekData.data adalah array
+        if (!proyekData.data || !Array.isArray(proyekData.data)) {
+            return []
+        }
+
+        return proyekData.data?.map((proyek) => {
             // Find the matching client
             const client = kliensList.find(
                 (client) => client.id === proyek.idKlien
@@ -152,7 +157,15 @@ const ProyekTable = () => {
     )
 
     const fetchData = () => {
-        dispatch(getProyeks({ pageIndex, pageSize, sort, query, filterData }))
+        dispatch(
+            getProyeks({
+                page: pageIndex,
+                limit: pageSize,
+                sort,
+                query,
+                filterData,
+            })
+        )
     }
 
     const columns: ColumnDef<Proyek>[] = useMemo(
@@ -187,12 +200,22 @@ const ProyekTable = () => {
                     const row = props.row.original
                     return (
                         <div>
-                            <div className="capitalize mb-1">
-                                {row.nomor_kontrak}
-                            </div>
-                            <div className="bg-blue-600 text-xs rounded-md px-3 py-[3px] text-center text-white w-fit">
-                                {formatDate(row.tanggal_kontrak)}
-                            </div>
+                            {row.nomor_kontrak || row.tanggal_kontrak ? (
+                                <>
+                                    {row.nomor_kontrak && (
+                                        <div className="capitalize mb-1">
+                                            {row.nomor_kontrak}
+                                        </div>
+                                    )}
+                                    {row.tanggal_kontrak && (
+                                        <div className="bg-blue-600 text-xs rounded-md px-3 py-[3px] text-center text-white w-fit">
+                                            {formatDate(row.tanggal_kontrak)}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div>-</div>
+                            )}
                         </div>
                     )
                 },
@@ -228,9 +251,7 @@ const ProyekTable = () => {
                                     )
                                 })
                             ) : (
-                                <span className="text-gray-400">
-                                    Tidak ada lokasi
-                                </span>
+                                <span>-</span>
                             )}
                         </div>
                     )
@@ -358,6 +379,18 @@ const ProyekTable = () => {
         newTableData.sort = sort
         dispatch(setTableData(newTableData))
     }
+
+    // console.log('tableData', tableData)
+    // console.log('proyekData', proyekData)
+
+    console.log(
+        'tableData State:',
+        useAppSelector((state) => state.proyekList.data.tableData)
+    )
+    console.log(
+        'proyekList:',
+        useAppSelector((state) => state.proyekList.data.proyekList)
+    )
 
     return (
         <>
