@@ -153,3 +153,15 @@ export async function apiCreateProyek<T, U extends Record<string, unknown>>(
         data,
     })
 }
+
+// update status retensi
+export async function apiUpdateStatusRetensi<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/project/status-retensi/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}

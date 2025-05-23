@@ -61,8 +61,9 @@ interface ProyekData {
     realisasi?: number
     progress?: number
     sisa_waktu?: number
-    uang_muka?: number
     keterangan?: string
+    timeline_awal?: string
+    timeline_akhir?: string
     timeline?: number
     status?: string
     idUser?: string
@@ -328,7 +329,6 @@ export const updateProyek = async <T, U extends Record<string, unknown>>(
         nilai_kontrak: extractNumberFromString(
             data.nilai_kontrak as string | number
         ),
-        uang_muka: extractNumberFromString(data.uang_muka as string | number),
         timeline: extractNumberFromString(data.timeline as string | number),
         progress: extractNumberFromString(data.progress as string | number),
         realisasi: extractNumberFromString(data.realisasi as string | number),

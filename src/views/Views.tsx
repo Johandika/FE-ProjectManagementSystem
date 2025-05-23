@@ -128,8 +128,6 @@ const AllRoutes = (props: AllRoutesProps) => {
                           }
                         : routeMeta
 
-                    // console.log('proyekData dalammmm', proyekData)
-                    // console.log(custRouteMeta)
                     return (
                         <Route
                             key={route.key + index}

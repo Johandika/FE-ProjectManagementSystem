@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import DataTable from '@/components/shared/DataTable'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-import { TbReportSearch } from 'react-icons/tb'
 import {
     getProyeks,
     setTableData,
@@ -35,6 +34,7 @@ type Proyek = {
     tanggal_kontrak: string
     nilai_kontrak: number
     uang_muka: number
+    realisasi: number
     progress: number
     status: string
     idKlien: string
@@ -68,12 +68,6 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
 
     return (
         <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={(e) => onDetail(e)}
-            >
-                <TbReportSearch />
-            </span>
             <span
                 className={`cursor-pointer p-2 hover:${textTheme}`}
                 onClick={(e) => onEdit(e)}
@@ -267,9 +261,9 @@ const ProyekTable = () => {
                     // Determine the color based on conditions
                     let textColorClass = 'text-yellow-600' // Default color
 
-                    if (row.uang_muka === 0) {
+                    if (row.realisasi === 0) {
                         textColorClass = 'text-red-500' // Red when realization is 0
-                    } else if (row.uang_muka === row.nilai_kontrak) {
+                    } else if (row.realisasi === row.nilai_kontrak) {
                         textColorClass = 'text-green-500' // Green when realization equals contract value
                     }
 
@@ -286,7 +280,6 @@ const ProyekTable = () => {
                                 </div>
                                 <span>
                                     Rp {row.realisasi.toLocaleString('id-ID')}
-                                    {/* Rp {row.uang_muka} */}
                                 </span>
                             </div>
                         </div>
@@ -379,18 +372,6 @@ const ProyekTable = () => {
         newTableData.sort = sort
         dispatch(setTableData(newTableData))
     }
-
-    // console.log('tableData', tableData)
-    // console.log('proyekData', proyekData)
-
-    console.log(
-        'tableData State:',
-        useAppSelector((state) => state.proyekList.data.tableData)
-    )
-    console.log(
-        'proyekList:',
-        useAppSelector((state) => state.proyekList.data.proyekList)
-    )
 
     return (
         <>

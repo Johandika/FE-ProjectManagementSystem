@@ -25,8 +25,11 @@ import {
     apiCreateAdendum,
     apiDeleteAdendum,
     apiEditAdendum,
+    apiGetAdendum,
     apiUpdateStatusAdendum,
 } from '@/services/AdendumService'
+import { formatDate } from '@/utils/formatDate'
+import { apiGetProyek } from '@/services/ProyekService'
 
 type Adendum = {
     id: string
@@ -36,46 +39,54 @@ type Adendum = {
     tanggal: string
     idProject: string
     status: string
-}
-
-// Form values type
-type FormValues = {
-    tempDasarAdendum: string
-    tempNilaiSebelumAdendum: number | string
-    tempNilaiAdendum: number | string
-    tempTanggal: Date | null
-    tempIdProject: string
+    timeline_akhir_sebelum?: string
+    timeline_akhir_sesudah?: string
 }
 
 // Validation schema for the form fields
 const validationSchema = Yup.object().shape({
     tempDasarAdendum: Yup.string().required('Dasar adendum harus diisi'),
-    tempNilaiSebelumAdendum: Yup.string().required(
-        'Nilai sebelum adendum harus diisi'
-    ),
-    tempNilaiAdendum: Yup.string().required('Nilai adendum harus diisi'),
-    tempTanggal: Yup.date()
-        .required('Tanggal harus diisi')
-        .typeError('Format tanggal tidak valid'),
+    // tempNilaiSebelumAdendum: Yup.string().required(
+    //     'Nilai sebelum adendum harus diisi'
+    // ),
+    // tempNilaiAdendum: Yup.string().required('Nilai adendum harus diisi'),
+    // tempTanggal: Yup.date()
+    //     .required('Tanggal harus diisi')
+    //     .typeError('Format tanggal tidak valid'),
+    // tempTimelineAkhirSesudah: Yup.string().required(
+    //     'Timeline akhir sesudah harus diisi'
+    // ),
 })
 
 injectReducer('proyekDetail', reducer)
 
 export default function Adendum() {
+    const projectId = location.pathname.substring(
+        location.pathname.lastIndexOf('/') + 1
+    )
+
     const [showForm, setShowForm] = useState(false)
     const [editIndex, setEditIndex] = useState<number | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [proyekData, setProyekData] = useState({})
     const [dialogOpen, setDialogOpen] = useState(false)
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
     // New state for status confirmation dialog
     const [statusDialogOpen, setStatusDialogOpen] = useState(false)
+    const [lastAdendum, setLastAdendum] = useState({})
+    const [formInitialValues, setFormInitialValues] = useState({
+        tempDasarAdendum: '',
+        tempNilaiAdendum: 0,
+        tempTanggal: new Date(),
+        tempIdProject: '',
+        tempNilaiSebelumAdendum: 0,
+        tempTimelineAkhirSebelum: '',
+        tempTimelineAkhirSesudah: '',
+    })
     const [adendumToUpdateStatus, setAdendumToUpdateStatus] =
         useState<Adendum | null>(null)
 
     const dispatch = useAppDispatch()
-    const projectId = location.pathname.substring(
-        location.pathname.lastIndexOf('/') + 1
-    )
 
     const adendumByProyekData = useAppSelector(
         (state) => state.proyekDetail.data.adendumsByProyekData
@@ -88,19 +99,37 @@ export default function Adendum() {
     // Fetch adendums when component mounts
     useEffect(() => {
         const requestParam = { id: projectId }
+
         dispatch(getAdendumsByProyek(requestParam))
+
+        // Create an async function inside useEffect
+        const fetchProyek = async () => {
+            try {
+                setProyekData(await apiGetProyek(requestParam))
+                setFormInitialValues({
+                    tempDasarAdendum: '',
+                    tempNilaiAdendum: proyekData.data?.nilai_kontrak,
+                    tempTanggal: new Date(),
+                    tempIdProject: projectId || '',
+                    tempNilaiSebelumAdendum: proyekData.data?.nilai_kontrak,
+                    tempTimelineAkhirSebelum: '',
+                    tempTimelineAkhirSesudah: '',
+                })
+            } catch (error) {
+                // Show error notification
+                toast.push(
+                    <Notification title="Error" type="danger" duration={2500}>
+                        {'Gagal mendapatkan data proyekId'}
+                    </Notification>,
+                    { placement: 'top-center' }
+                )
+            }
+        }
+
+        fetchProyek()
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, projectId])
-
-    // Format date for display
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        })
-    }
 
     // Format currency for display
     const formatCurrency = (amount: number) => {
@@ -109,15 +138,6 @@ export default function Adendum() {
             currency: 'IDR',
             minimumFractionDigits: 0,
         }).format(amount)
-    }
-
-    // Initialize form values
-    const initialValues: FormValues = {
-        tempDasarAdendum: '',
-        tempNilaiSebelumAdendum: '',
-        tempNilaiAdendum: '',
-        tempTanggal: null,
-        tempIdProject: projectId || '',
     }
 
     // Success notification helper
@@ -140,7 +160,7 @@ export default function Adendum() {
         <Loading loading={loading || isSubmitting}>
             <Formik
                 enableReinitialize
-                initialValues={initialValues}
+                initialValues={formInitialValues}
                 validationSchema={validationSchema}
                 onSubmit={() => {
                     // Form submission is handled by save button
@@ -150,15 +170,46 @@ export default function Adendum() {
                     const { values, errors, touched, setFieldValue } =
                         formikProps
 
+                    // Modifikasi handleAddAdendum
                     const handleAddAdendum = () => {
                         setShowForm(true)
                         setEditIndex(null)
 
-                        // Reset temp values
-                        setFieldValue('tempDasarAdendum', '')
-                        setFieldValue('tempNilaiSebelumAdendum', '')
-                        setFieldValue('tempNilaiAdendum', '')
-                        setFieldValue('tempTanggal', null)
+                        // Update nilai form berdasarkan adendum terakhir
+                        if (
+                            adendumByProyekData &&
+                            adendumByProyekData.length > 0
+                        ) {
+                            const lastAdendum =
+                                adendumByProyekData[
+                                    adendumByProyekData.length - 1
+                                ]
+                            setLastAdendum(lastAdendum)
+
+                            setFormInitialValues({
+                                tempDasarAdendum: '',
+                                tempNilaiSebelumAdendum:
+                                    lastAdendum.nilai_adendum,
+                                tempNilaiAdendum: lastAdendum.nilai_adendum,
+                                tempTanggal: new Date(),
+                                tempIdProject: projectId || '',
+                                tempTimelineAkhirSebelum:
+                                    lastAdendum.timeline_akhir_sesudah,
+                                tempTimelineAkhirSesudah: '',
+                            })
+                        } else {
+                            setFormInitialValues({
+                                tempDasarAdendum: '',
+                                tempNilaiSebelumAdendum:
+                                    proyekData.data?.nilai_kontrak,
+                                tempNilaiAdendum: 0,
+                                tempTanggal: new Date(),
+                                tempIdProject: projectId || '',
+                                tempTimelineAkhirSebelum:
+                                    proyekData.data?.timeline_akhir,
+                                tempTimelineAkhirSesudah: '',
+                            })
+                        }
                     }
 
                     const handleSave = async () => {
@@ -167,20 +218,24 @@ export default function Adendum() {
                             !errors.tempDasarAdendum &&
                             !errors.tempNilaiSebelumAdendum &&
                             !errors.tempNilaiAdendum &&
-                            !errors.tempTanggal
+                            !errors.tempTanggal &&
+                            !errors.tempTimelineAkhirSesudah
                         ) {
                             setIsSubmitting(true)
 
                             const requestData = {
                                 dasar_adendum: values.tempDasarAdendum,
-                                nilai_sebelum_adendum: extractNumberFromString(
-                                    values.tempNilaiSebelumAdendum
-                                ),
+                                nilai_sebelum_adendum:
+                                    values.tempNilaiSebelumAdendum,
                                 nilai_adendum: extractNumberFromString(
                                     values.tempNilaiAdendum
                                 ),
                                 tanggal: values.tempTanggal?.toISOString(),
                                 idProject: values.tempIdProject,
+                                timeline_akhir_sebelum:
+                                    values.tempTimelineAkhirSebelum,
+                                timeline_akhir_sesudah:
+                                    values.tempTimelineAkhirSesudah,
                             }
 
                             try {
@@ -261,9 +316,17 @@ export default function Adendum() {
                     // Helper function to reset form fields
                     const resetFormFields = () => {
                         setFieldValue('tempDasarAdendum', '')
-                        setFieldValue('tempNilaiSebelumAdendum', '')
+                        setFieldValue(
+                            'tempNilaiSebelumAdendum',
+                            proyekData.data?.nilai_kontrak
+                        )
                         setFieldValue('tempNilaiAdendum', '')
-                        setFieldValue('tempTanggal', null)
+                        setFieldValue('tempTanggal', new Date())
+                        setFieldValue(
+                            'tempTimelineAkhirSebelum',
+                            proyekData.data?.timeline_akhir
+                        )
+                        setFieldValue('tempTimelineAkhirSesudah', '')
                     }
 
                     const handleCancel = () => {
@@ -276,24 +339,78 @@ export default function Adendum() {
                         if (adendumByProyekData) {
                             const adendum = adendumByProyekData[index]
 
-                            // Set temporary values for editing
-                            setFieldValue(
-                                'tempDasarAdendum',
-                                adendum.dasar_adendum
-                            )
-                            setFieldValue(
-                                'tempNilaiSebelumAdendum',
-                                adendum.nilai_sebelum_adendum
-                            )
-                            setFieldValue(
-                                'tempNilaiAdendum',
-                                adendum.nilai_adendum
-                            )
-                            setFieldValue(
-                                'tempTanggal',
-                                new Date(adendum.tanggal)
-                            )
-                            setFieldValue('tempIdProject', adendum.idProject)
+                            // Coba fetch data adendum detail jika tersedia
+                            const fetchDetailAdendum = async () => {
+                                try {
+                                    // Gunakan API get one adendum jika tersedia
+                                    const detailAdendum = await apiGetAdendum(
+                                        adendum
+                                    )
+
+                                    if (detailAdendum && detailAdendum.data) {
+                                        const data = detailAdendum.data
+
+                                        // Set temporary values dari detail API
+                                        setFieldValue(
+                                            'tempDasarAdendum',
+                                            data.dasar_adendum
+                                        )
+                                        setFieldValue(
+                                            'tempNilaiSebelumAdendum',
+                                            data.nilai_sebelum_adendum
+                                        )
+                                        setFieldValue(
+                                            'tempNilaiAdendum',
+                                            data.nilai_adendum
+                                        )
+                                        setFieldValue(
+                                            'tempTanggal',
+                                            new Date(data.tanggal)
+                                        )
+                                        setFieldValue(
+                                            'tempIdProject',
+                                            data.idProject
+                                        )
+
+                                        // Handle timeline_akhir_sebelum
+                                        if (data.timeline_akhir_sebelum) {
+                                            setFieldValue(
+                                                'tempTimelineAkhirSebelum',
+                                                data.timeline_akhir_sebelum
+                                            )
+                                        } else {
+                                            setFieldValue(
+                                                'tempTimelineAkhirSebelum',
+                                                proyekData.data
+                                                    ?.timeline_akhir || ''
+                                            )
+                                        }
+
+                                        // Handle timeline_akhir_sesudah
+                                        if (data.timeline_akhir_sesudah) {
+                                            setFieldValue(
+                                                'tempTimelineAkhirSesudah',
+                                                new Date(
+                                                    data.timeline_akhir_sesudah
+                                                )
+                                            )
+                                        } else {
+                                            setFieldValue(
+                                                'tempTimelineAkhirSesudah',
+                                                ''
+                                            )
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.error(
+                                        'Error fetching detail adendum:',
+                                        error
+                                    )
+                                }
+                            }
+
+                            // Panggil fungsi untuk fetch detail
+                            fetchDetailAdendum()
 
                             setEditIndex(index)
                             setShowForm(true)
@@ -526,7 +643,7 @@ export default function Adendum() {
                                                     />
                                                 </FormItem>
 
-                                                {/* Nilai Sebelum Adendum */}
+                                                {/* Nilai Sebelum Adendum (Disabled) */}
                                                 <FormItem
                                                     label="Nilai Sebelum Adendum"
                                                     className="mb-3"
@@ -564,6 +681,7 @@ export default function Adendum() {
                                                                         val.value
                                                                     )
                                                                 }
+                                                                disabled={true} // Make this field disabled
                                                             />
                                                         )}
                                                     </Field>
@@ -610,6 +728,64 @@ export default function Adendum() {
                                                             />
                                                         )}
                                                     </Field>
+                                                </FormItem>
+
+                                                {/* Timeline Akhir Sebelum (Disabled) */}
+                                                <FormItem
+                                                    label="Timeline Akhir Sebelum"
+                                                    className="mb-3"
+                                                >
+                                                    <DatePicker
+                                                        disabled
+                                                        placeholder="Pilih Tanggal"
+                                                        value={
+                                                            lastAdendum.timeline_akhir_sesudah
+                                                                ? new Date(
+                                                                      lastAdendum.timeline_akhir_sesudah
+                                                                  )
+                                                                : new Date(
+                                                                      proyekData.data.timeline_akhir
+                                                                  )
+                                                        }
+                                                        inputFormat="DD-MM-YYYY"
+                                                        onChange={(date) => {
+                                                            setFieldValue(
+                                                                'tempTimelineAkhirSebelum',
+                                                                date
+                                                            )
+                                                        }}
+                                                    />
+                                                </FormItem>
+
+                                                {/* Timeline Akhir Sesudah */}
+                                                <FormItem
+                                                    label="Timeline Akhir Sesudah"
+                                                    errorMessage={
+                                                        errors.tempTimelineAkhirSesudah &&
+                                                        touched.tempTimelineAkhirSesudah
+                                                            ? errors.tempTimelineAkhirSesudah
+                                                            : ''
+                                                    }
+                                                    invalid={
+                                                        !!(
+                                                            errors.tempTimelineAkhirSesudah &&
+                                                            touched.tempTimelineAkhirSesudah
+                                                        )
+                                                    }
+                                                >
+                                                    <DatePicker
+                                                        placeholder="Pilih tanggal"
+                                                        value={
+                                                            values.tempTimelineAkhirSesudah
+                                                        }
+                                                        inputFormat="DD-MM-YYYY"
+                                                        onChange={(date) => {
+                                                            setFieldValue(
+                                                                'tempTimelineAkhirSesudah',
+                                                                date
+                                                            )
+                                                        }}
+                                                    />
                                                 </FormItem>
                                             </div>
 
@@ -699,6 +875,26 @@ export default function Adendum() {
                                                                                 data.nilai_sebelum_adendum
                                                                         )}
                                                                     </div>
+                                                                    {data.timeline_akhir_sebelum && (
+                                                                        <div>
+                                                                            Timeline
+                                                                            Akhir
+                                                                            Sebelum:{' '}
+                                                                            {formatDate(
+                                                                                data.timeline_akhir_sebelum
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                    {data.timeline_akhir_sesudah && (
+                                                                        <div>
+                                                                            Timeline
+                                                                            Akhir
+                                                                            Sesudah:{' '}
+                                                                            {formatDate(
+                                                                                data.timeline_akhir_sesudah
+                                                                            )}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -765,63 +961,86 @@ export default function Adendum() {
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8 text-gray-500">
-                                        Belum ada data adendum. Klik 'Tambah
-                                        Adendum' untuk menambahkan.
-                                    </div>
+                                    !loading && (
+                                        <div className="text-center py-5">
+                                            <p className="text-gray-500 dark:text-gray-400">
+                                                Belum ada adendum untuk proyek
+                                                ini
+                                            </p>
+                                        </div>
+                                    )
                                 )}
-                            </AdaptableCard>
 
-                            {/* Dialog Konfirmasi Hapus */}
-                            <ConfirmDialog
-                                isOpen={dialogOpen}
-                                type="danger"
-                                title="Hapus Adendum"
-                                confirmButtonColor="red-600"
-                                onClose={handleCancelDelete}
-                                onRequestClose={handleCancelDelete}
-                                onCancel={handleCancelDelete}
-                                onConfirm={handleDelete}
-                            >
-                                <p>
-                                    Apakah kamu yakin ingin menghapus adendum
-                                    ini?
-                                </p>
-                            </ConfirmDialog>
+                                {/* Confirmation dialog for deletion */}
+                                <ConfirmDialog
+                                    isOpen={dialogOpen}
+                                    type="danger"
+                                    title="Konfirmasi Hapus"
+                                    confirmButtonColor="red-600"
+                                    confirmText="Hapus"
+                                    cancelText="Batal"
+                                    onClose={handleCancelDelete}
+                                    onRequestClose={handleCancelDelete}
+                                    onCancel={handleCancelDelete}
+                                    onConfirm={handleDelete}
+                                >
+                                    <p>
+                                        Apakah Anda yakin ingin menghapus
+                                        adendum ini? Tindakan ini tidak dapat
+                                        dibatalkan.
+                                    </p>
+                                </ConfirmDialog>
 
-                            {/* Dialog Konfirmasi Perubahan Status */}
-                            <ConfirmDialog
-                                isOpen={statusDialogOpen}
-                                type={
-                                    adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'danger'
-                                        : 'success'
-                                }
-                                title={
-                                    adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'Batalkan Persetujuan Adendum'
-                                        : 'Setujui Adendum'
-                                }
-                                confirmButtonColor={
-                                    adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'red-600'
-                                        : 'emerald-600'
-                                }
-                                onClose={handleCancelStatusUpdate}
-                                onRequestClose={handleCancelStatusUpdate}
-                                onCancel={handleCancelStatusUpdate}
-                                onConfirm={handleUpdateStatusAdendum}
-                            >
-                                <p>
+                                {/* Confirmation dialog for status update */}
+                                <ConfirmDialog
+                                    isOpen={statusDialogOpen}
+                                    type={
+                                        adendumToUpdateStatus?.status ===
+                                        'BELUM_DISETUJUI'
+                                            ? 'info'
+                                            : 'danger'
+                                    }
+                                    title={
+                                        adendumToUpdateStatus?.status ===
+                                        'BELUM_DISETUJUI'
+                                            ? 'Konfirmasi Persetujuan'
+                                            : 'Konfirmasi Pembatalan'
+                                    }
+                                    confirmButtonColor={
+                                        adendumToUpdateStatus?.status ===
+                                        'BELUM_DISETUJUI'
+                                            ? 'blue-600'
+                                            : 'red-600'
+                                    }
+                                    confirmText={
+                                        adendumToUpdateStatus?.status ===
+                                        'BELUM_DISETUJUI'
+                                            ? 'Setujui'
+                                            : 'Batalkan'
+                                    }
+                                    cancelText="Batal"
+                                    onClose={handleCancelStatusUpdate}
+                                    onRequestClose={handleCancelStatusUpdate}
+                                    onCancel={handleCancelStatusUpdate}
+                                    onConfirm={handleUpdateStatusAdendum}
+                                >
                                     {adendumToUpdateStatus?.status ===
-                                    'SUDAH_DISETUJUI'
-                                        ? 'Apakah kamu yakin ingin membatalkan persetujuan adendum ini?'
-                                        : 'Apakah kamu yakin ingin menyetujui adendum ini?'}
-                                </p>
-                            </ConfirmDialog>
+                                    'BELUM_DISETUJUI' ? (
+                                        <p>
+                                            Apakah Anda yakin ingin menyetujui
+                                            adendum ini? Nilai proyek akan
+                                            diperbarui sesuai dengan adendum.
+                                        </p>
+                                    ) : (
+                                        <p>
+                                            Apakah Anda yakin ingin membatalkan
+                                            persetujuan adendum ini? Nilai
+                                            proyek akan dikembalikan ke nilai
+                                            sebelumnya.
+                                        </p>
+                                    )}
+                                </ConfirmDialog>
+                            </AdaptableCard>
                         </Form>
                     )
                 }}

@@ -37,8 +37,6 @@ type ItemFieldsProps = {
 const ItemFields = (props: ItemFieldsProps) => {
     const { touched, errors, satuansList = [] } = props
 
-    console.log('satuansList', satuansList)
-
     const calculateJumlahHargaMaterial = (
         volume: number,
         hargaSatuan: number

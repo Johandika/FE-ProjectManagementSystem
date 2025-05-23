@@ -46,29 +46,10 @@ const ProyekEdit = () => {
         (state) => state.proyekEdit.data.berkasesData?.data || []
     )
 
-    // subkontraktors data
-    const subkontraktorsData = useAppSelector(
-        (state) => state.proyekEdit.data.subkontraktorsData?.data || []
-    )
-
-    // termins data by id
-    const terminsData = useAppSelector(
-        (state) => state.proyekEdit.data.terminsData || []
-    )
-
     const loading = useAppSelector((state) => state.proyekEdit.data.loading)
 
     const loadingKliens = useAppSelector(
         (state) => state.proyekEdit.data.loadingKliens
-    )
-    const loadingBerkases = useAppSelector(
-        (state) => state.proyekEdit.data.loadingBerkases
-    )
-    const loadingSubkontraktors = useAppSelector(
-        (state) => state.proyekEdit.data.loadingSubkontraktors
-    )
-    const loadingTermins = useAppSelector(
-        (state) => state.proyekEdit.data.loadingTermins
     )
 
     const fetchData = (data: { id: string }) => {
@@ -137,44 +118,24 @@ const ProyekEdit = () => {
               pekerjaan: proyekData.pekerjaan,
               pic: proyekData.pic,
               nomor_kontrak: proyekData.nomor_kontrak,
-              uang_muka: proyekData.uang_muka,
               tanggal_kontrak: proyekData.tanggal_kontrak,
               nilai_kontrak: proyekData.nilai_kontrak,
               timeline: proyekData.timeline,
               keterangan: proyekData.keterangan,
               idClient: proyekData.Client.id,
-              //   Pakai untuk nanti
-              //       lokasi: proyekData.Lokasis,
-              //       subkontraktor: proyekData.SubkonProjects,
-              //       berkas: proyekData.BerkasProjects,
-              //   }
           }
         : {}
 
-    console.log('proyekDataEdit', proyekDataEdit)
-    console.log('proyekData', proyekData)
-
     return (
         <>
-            <Loading
-                loading={
-                    loading ||
-                    loadingKliens ||
-                    loadingBerkases ||
-                    loadingSubkontraktors ||
-                    loadingTermins
-                }
-            >
+            <Loading loading={loading || loadingKliens}>
                 {!isEmpty(proyekData) && (
                     <>
                         <ProyekForm
                             type="edit"
-                            initialData={proyekData}
                             initialDataEdit={proyekDataEdit}
                             kliensList={kliensData}
                             berkasesList={berkasesData}
-                            subkontraktorsList={subkontraktorsData}
-                            terminsList={terminsData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}

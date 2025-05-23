@@ -5,21 +5,25 @@ import reducer, {
     getTermins,
     setPekerjaanActive,
 } from '../../ProyekEdit/store'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import DescriptionSection from './DesriptionSection'
 import { injectReducer } from '@/store'
 import { formatDate } from '@/utils/formatDate'
+import { Button, Notification, toast } from '@/components/ui'
+import { apiUpdateStatusRetensi } from '@/services/ProyekService'
+import { ConfirmDialog } from '@/components/shared'
 
 injectReducer('proyekEdit', reducer)
 
 export default function Detail() {
     const dispatch = useAppDispatch()
     const location = useLocation()
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false)
+    const [statusChangeItem, setStatusChangeItem] = useState(null)
 
-    const { proyekData, pekerjaanActive } = useAppSelector(
-        (state) => state.proyekEdit.data
-    )
+    const { proyekData } = useAppSelector((state) => state.proyekEdit.data)
 
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
@@ -31,6 +35,65 @@ export default function Detail() {
                 }
             })
         dispatch(getTermins(data))
+    }
+
+    const handleOpenStatusChangeDialog = () => {
+        setStatusChangeItem({
+            id: proyekData.id,
+            newStatus: !proyekData.status_retensi,
+            nama: proyekData.pekerjaan,
+        })
+        setStatusChangeDialogOpen(true)
+    }
+
+    const confirmStatusChange = async () => {
+        setStatusChangeDialogOpen(false)
+        setIsSubmitting(true)
+
+        try {
+            const result = await apiUpdateStatusRetensi({
+                id: statusChangeItem.id,
+                status_retensi: statusChangeItem.newStatus,
+            })
+            if (
+                result &&
+                result.data?.statusCode >= 200 &&
+                result.data?.statusCode < 300
+            ) {
+                await dispatch(getProyek({ id: statusChangeItem.id })).unwrap()
+                toast.push(
+                    <Notification
+                        title="Status berhasil diperbarui"
+                        type="success"
+                        duration={2500}
+                    >
+                        Status Retensi berhasil di update
+                    </Notification>,
+                    { placement: 'top-center' }
+                )
+            } else {
+                toast.push(
+                    <Notification title="Error" type="danger" duration={2500}>
+                        {result ? result?.message : 'Gagal memperbarui status'}
+                    </Notification>,
+                    { placement: 'top-center' }
+                )
+            }
+        } catch (error) {
+            toast.push(
+                <Notification title="Error" type="danger" duration={2500}>
+                    {error?.response?.data?.message ||
+                        'Gagal memperbarui status'}
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    const cancelStatusChange = () => {
+        setStatusChangeDialogOpen(false)
     }
 
     useEffect(() => {
@@ -54,83 +117,153 @@ export default function Detail() {
                         title="Informasi Dasar"
                         desc="Informasi dasar proyek"
                     />
-                    <div className="space-y-0">
-                        <div className="flex flex-col sm:flex-row gap-0 sm:gap-2">
-                            <div className="font-semibold flex-0">
-                                Nama Pekerjaan :
-                            </div>
-                            <div className="flex-1">{proyekData.pekerjaan}</div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Klien :</div>
-                            <div>{proyekData.Client?.nama}</div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">PIC :</div>
-                            <div>{proyekData.pic}</div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Nomor Kontrak :</div>
-                            <div>{proyekData.nomor_kontrak}</div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Tgl. Kontrak :</div>
-                            <div>
-                                {formatDate(proyekData.tanggal_kontrak || '')}
+                    <div>
+                        <div className="flex flex-col gap-0 border-b py-4 ">
+                            <div className="text-sm">Nama Pekerjaan :</div>
+                            <div className="text-base font-semibold text-neutral-500">
+                                {proyekData.pekerjaan}
                             </div>
                         </div>
-
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Status :</div>
-                            <div>{proyekData.status}</div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Nilai Kontrak :</div>
-                            <div>
-                                {proyekData.nilai_kontrak?.toLocaleString(
-                                    'id-ID'
-                                )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2">
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Klien :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.Client?.nama}
+                                </div>
                             </div>
-                        </div>
-
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">Progress (%) :</div>
-                            <div>{proyekData.progress}</div>
-                        </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="font-semibold">
-                                Waktu Pengerjaan (hari) :
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">PIC :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.pic}
+                                </div>
                             </div>
-                            <div>{proyekData.timeline}</div>
-                        </div>
-                        {/* <div className="flex flex-row gap-2">
-                            <div className="font-semibold">
-                                Berkas Tagihan :
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Nomor Kontrak :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.nomor_kontrak || '-'}
+                                </div>
                             </div>
-                            <div>
-                                {proyekData.BerkasProjects &&
-                                    proyekData.BerkasProjects.map(
-                                        (berkas, index) => (
-                                            <span key={berkas.id}>
-                                                {berkas.nama}
-                                                {index <
-                                                proyekData?.BerkasProjects
-                                                    .length -
-                                                    1
-                                                    ? ', '
-                                                    : ''}
-                                            </span>
-                                        )
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Tgl. Kontrak :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {formatDate(
+                                        proyekData.tanggal_kontrak || '-'
                                     )}
+                                </div>
                             </div>
-                        </div> */}
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Status :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.status || '-'}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Nilai Kontrak :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.nilai_kontrak?.toLocaleString(
+                                        'id-ID'
+                                    ) || '-'}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Uang Muka :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.uang_muka?.toLocaleString(
+                                        'id-ID'
+                                    ) || '-'}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Progress (%) :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.progress}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">
+                                    Waktu Pengerjaan (hari) :
+                                </div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.timeline}
+                                </div>
+                            </div>
+                            {/* Retensi */}
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Retensi :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.is_retensi ? 'Ya' : 'Tidak'}
+                                </div>
+                            </div>
+                            {proyekData.is_retensi === true && (
+                                <>
+                                    <div className="flex flex-col gap-0 border-b py-4">
+                                        <div className="text-sm">
+                                            Persen Retensi :
+                                        </div>
+                                        <div className="text-base font-semibold text-neutral-500">
+                                            {`${proyekData.persen_retensi}%` ||
+                                                '-'}
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-0 border-b py-4">
+                                        <div className="text-sm">
+                                            Tgl. Jatuh Tempo Retensi :
+                                        </div>
+                                        <div className="text-base font-semibold text-neutral-500">
+                                            {formatDate(
+                                                proyekData.jatuh_tempo_retensi
+                                            ) || '-'}
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-0  border-b md:border-0  py-4">
+                                        <div className="text-sm">
+                                            Status Retensi :
+                                        </div>
+                                        <div className="text-base font-semibold text-neutral-500">
+                                            {!isSubmitting &&
+                                                (proyekData.status_retensi ===
+                                                true ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="text-green-500">
+                                                            Sudah Dibayar
+                                                        </div>
+                                                        <Button
+                                                            size="xs"
+                                                            variant="solid"
+                                                            onClick={
+                                                                handleOpenStatusChangeDialog
+                                                            }
+                                                        >
+                                                            Ubah Status
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="text-rose-500">
+                                                            Belum Bayar
+                                                        </div>
+                                                        <Button
+                                                            size="xs"
+                                                            variant="solid"
+                                                            onClick={
+                                                                handleOpenStatusChangeDialog
+                                                            }
+                                                        >
+                                                            Ubah Status
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
 
-                        <div className="flex flex-col sm:flex-row gap-0 sm:gap-2">
-                            <div className="font-semibold flex-0">
-                                Keterangan :
-                            </div>
-                            <div className="flex-1">
-                                {proyekData.keterangan}
+                            {/* batas */}
+                            <div className="flex flex-col gap-0  py-4">
+                                <div className="text-sm">Keterangan :</div>
+                                <div className="text-base font-semibold text-neutral-500">
+                                    {proyekData.keterangan || '-'}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -197,6 +330,26 @@ export default function Detail() {
                     )}
                 </div> */}
             </div>
+            <ConfirmDialog
+                isOpen={statusChangeDialogOpen}
+                onClose={cancelStatusChange}
+                onRequestClose={cancelStatusChange}
+                onCancel={cancelStatusChange}
+                type="warning"
+                title="Ubah Status"
+                onConfirm={confirmStatusChange}
+            >
+                <p>
+                    Apakah kamu yakin ingin mengubah status retensi berkas
+                    menjadi{' '}
+                    <strong>
+                        {statusChangeItem?.newStatus
+                            ? 'sudah dibayar'
+                            : 'belum dibayar'}
+                    </strong>
+                    ?
+                </p>
+            </ConfirmDialog>
         </section>
     )
 }

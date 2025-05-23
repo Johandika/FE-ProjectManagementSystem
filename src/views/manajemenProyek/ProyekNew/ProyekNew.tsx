@@ -60,6 +60,10 @@ const ProyekNew = () => {
             uang_muka: extractNumberFromString(
                 data.uang_muka as string | number
             ),
+            persen_retensi: extractNumberFromString(
+                data.persen_retensi as string | number
+            ),
+
             item: data.item?.map((itemData) => ({
                 ...itemData,
                 detail: itemData.detail.map((detailItem) => ({

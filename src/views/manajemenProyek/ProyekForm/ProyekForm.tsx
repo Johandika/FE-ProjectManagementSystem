@@ -27,8 +27,10 @@ type InitialData = {
     tanggal_kontrak?: string
     tanggal_delivery?: string
     nilai_kontrak?: number
-    timeline?: number
     uang_muka?: number
+    persen_retensi?: number
+    timeline_awal?: string
+    timeline_akhir?: string
     keterangan?: string
     idUser?: string
     berkas?: string[]
@@ -65,7 +67,6 @@ type InitialDataEdit = {
     tanggal_service_po?: string
     tanggal_kontrak?: string
     tanggal_delivery?: string
-    uang_muka?: number
     nilai_kontrak?: number
     idClient?: string
     timeline?: number
@@ -113,7 +114,15 @@ type ProyekForm = {
     }[]
 }
 
-const validationSchema = Yup.object().shape({
+const validationSchemaNew = Yup.object().shape({
+    pekerjaan: Yup.string().required('Pekerjaan wajib diisi'),
+    timeline_awal: Yup.string().required('Timeline awal wajib diisi'),
+    timeline_akhir: Yup.string().required('Timeline akhir wajib diisi'),
+    idClient: Yup.string().required('Klien wajib diisi'),
+    pic: Yup.string().required('PIC wajib diisi'),
+})
+
+const validationSchemaEdit = Yup.object().shape({
     pekerjaan: Yup.string().required('Pekerjaan wajib diisi'),
     idClient: Yup.string().required('Klien wajib diisi'),
     pic: Yup.string().required('PIC wajib diisi'),
@@ -169,11 +178,16 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             pekerjaan: '',
             pic: '',
             nomor_kontrak: '',
+            timeline_awal: '',
+            timeline_akhir: '',
             tanggal_service_po: '',
-            uang_muka: 0,
             tanggal_kontrak: '',
+            is_retensi: false,
+            persen_retensi: 0,
+            jatuh_tempo_retensi: null,
             tanggal_delivery: '',
             nilai_kontrak: 0,
+            uang_muka: 0,
             timeline: 0,
             keterangan: '',
             idClient: '',
@@ -188,7 +202,6 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             pic: '',
             nomor_kontrak: '',
             tanggal_service_po: '',
-            uang_muka: 0,
             tanggal_kontrak: '',
             tanggal_delivery: '',
             nilai_kontrak: 0,
@@ -217,7 +230,9 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                           }
                         : { ...initialDataEdit }
                 }
-                validationSchema={validationSchema}
+                validationSchema={
+                    type === 'new' ? validationSchemaNew : validationSchemaEdit
+                }
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
 
