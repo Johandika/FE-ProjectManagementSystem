@@ -8,7 +8,7 @@ export type AppConfig = {
 }
 
 const appConfig: AppConfig = {
-    apiPrefix: 'http://localhost:3000',
+    apiPrefix: 'http://localhost:3005',
     // apiPrefix: 'https://hitapi.cerdasvision.com',
     authenticatedEntryPath: '/dashboard',
     unAuthenticatedEntryPath: '/sign-in',

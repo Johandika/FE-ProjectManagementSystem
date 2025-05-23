@@ -50,17 +50,17 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
 
-    const onDetail = (e) => {
+    const onDetail = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
         e.stopPropagation()
         navigate(`/manajemen-proyek-detail/${row.id}`)
     }
 
-    const onEdit = (e) => {
+    const onEdit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
         e.stopPropagation()
         navigate(`/manajemen-proyek-edit/${row.id}`)
     }
 
-    const onDelete = (e) => {
+    const onDelete = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
         e.stopPropagation()
         dispatch(toggleDeleteConfirmation(true))
         dispatch(setSelectedProyek(row.id))
@@ -108,7 +108,11 @@ const ProyekTable = () => {
     )
 
     // Handler for row click to navigate to detail page
-    const handleRowClick = (row: Proyek) => {
+    const handleRowClick = (
+        e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+        row: Proyek
+    ) => {
+        e.stopPropagation()
         navigate(`/manajemen-proyek-detail/${row.id}`)
     }
 
