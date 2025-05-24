@@ -38,8 +38,6 @@ export async function apiGetTermin<T, U extends Record<string, unknown>>(
 export async function apiEditTermin<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('dataapi', data)
-
     return ApiService.fetchData<T>({
         url: `/terminProject/${data.id}`,
         method: 'patch',

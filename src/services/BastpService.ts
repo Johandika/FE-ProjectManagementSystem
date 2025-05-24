@@ -39,8 +39,6 @@ export async function apiGetBastp<T, U extends Record<string, unknown>>(
 export async function apiEditBastp<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('data api', data)
-
     return ApiService.fetchData<T>({
         url: `/bastp/${data.id}`,
         method: 'patch',

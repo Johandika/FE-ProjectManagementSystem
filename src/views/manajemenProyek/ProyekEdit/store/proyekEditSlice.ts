@@ -244,7 +244,6 @@ export const getTermins = createAsyncThunk(
 export const getPurchaseByProyek = createAsyncThunk(
     SLICE_NAME + '/getPurchaseByProyek',
     async (data: { id: string }) => {
-        console.log('data', data.id)
         const response = await apiGetPurchaseByProyek<
             GetPurchaseByProyekResponse,
             { id: string }
@@ -295,7 +294,6 @@ export const updateFakturPajak = async <T, U extends Record<string, unknown>>(
     data: U
 ) => {
     try {
-        console.log('data slice', data)
         const response = await apiPutFakturPajak<T, U>(data)
         return response.data
     } catch (error: any) {
@@ -360,7 +358,6 @@ export const deleteProyek = async <T, U extends Record<string, unknown>>(
 export const deletePurchase = async <T, U extends Record<string, unknown>>(
     data: U
 ) => {
-    console.log('data', data)
     const response = await apiDeletePurchaseOrders<T, U>(data)
     console.log('response deletePurchase', response)
     return response.data

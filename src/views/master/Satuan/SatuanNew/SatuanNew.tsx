@@ -12,7 +12,6 @@ const SatuanNew = () => {
 
     const addSatuan = async (data: FormModel) => {
         try {
-            console.log('dataa', data)
             const response = await apiCreateSatuan<boolean, FormModel>(data)
             return { success: true, data: response.data }
         } catch (error: any) {

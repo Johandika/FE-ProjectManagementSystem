@@ -80,7 +80,6 @@ export const getProyeks = createAsyncThunk(
             GetMasterProyekResponse,
             GetMasterProyekData
         >(data)
-        console.log('data', data)
 
         return {
             data: response.data,

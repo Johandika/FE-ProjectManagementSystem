@@ -153,7 +153,7 @@ export const protectedRoutes = [
             header: 'Tambah Subkontraktor',
         },
     },
-    // Pengatuiran
+    // Pengaturan
     {
         key: 'settings.pengaturanPengguna',
         path: '/pengaturan/pengguna',
@@ -164,6 +164,12 @@ export const protectedRoutes = [
         key: 'settings.pengaturanPeran',
         path: '/pengaturan/peran',
         component: lazy(() => import('@/views/pengaturan/Peran')),
+        authority: [],
+    },
+    // Notifikasi
+    {
+        path: '/semua-notifikasi',
+        component: lazy(() => import('@/views/notifikasi/Notifikasi')),
         authority: [],
     },
 ]

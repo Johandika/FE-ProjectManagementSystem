@@ -50,11 +50,6 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
 
-    const onDetail = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-        e.stopPropagation()
-        navigate(`/manajemen-proyek-detail/${row.id}`)
-    }
-
     const onEdit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
         e.stopPropagation()
         navigate(`/manajemen-proyek-edit/${row.id}`)
@@ -108,11 +103,8 @@ const ProyekTable = () => {
     )
 
     // Handler for row click to navigate to detail page
-    const handleRowClick = (
-        e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-        row: Proyek
-    ) => {
-        e.stopPropagation()
+    const handleRowClick = (row: Proyek) => {
+        // e.stopPropagation()
         navigate(`/manajemen-proyek-detail/${row.id}`)
     }
 
@@ -236,6 +228,7 @@ const ProyekTable = () => {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="group"
+                                            onClick={(e) => e.stopPropagation()}
                                         >
                                             <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
                                                 <div className="text-lg group-hover:scale-110 transition">

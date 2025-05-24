@@ -13,7 +13,7 @@ import {
     HiOutlineCalendar,
     HiOutlineClipboardCheck,
     HiOutlineBan,
-    HiOutlineMailOpen,
+    HiOutlineTrash,
 } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
 import isLastChild from '@/utils/isLastChild'
@@ -22,18 +22,19 @@ import useThemeClass from '@/utils/hooks/useThemeClass'
 import { useAppSelector } from '@/store'
 import useResponsive from '@/utils/hooks/useResponsive'
 import acronym from '@/utils/acronym'
+import {
+    apiGetAllNotification,
+    apiDeleteAllReadNotification,
+} from '@/services/NotificationService'
+import { formatWaktuNotifikasi } from '@/utils/formatDate'
+import { toast, Notification as NotificationuUi } from '../ui'
 
 type NotificationList = {
     id: string
-    target: string
-    description: string
-    date: string
-    image: string
-    type: number
-    location: string
-    locationLabel: string
-    status: string
-    readed: boolean
+    type: string
+    pesan: string
+    status_baca: boolean
+    waktu_baca: string
 }
 
 const notificationHeight = 'h-72'
@@ -119,7 +120,7 @@ const _Notification = ({ className }: { className?: string }) => {
     >([])
     const [unreadNotification, setUnreadNotification] = useState(false)
     const [noResult] = useState(false)
-    const [loading] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const { bgTheme } = useThemeClass()
 
@@ -127,27 +128,61 @@ const _Notification = ({ className }: { className?: string }) => {
 
     const direction = useAppSelector((state) => state.theme.direction)
 
-    const getNotificationCount = async () => {
-        // Fetch Notification count
-    }
-
-    useEffect(() => {
-        getNotificationCount()
-    }, [])
-
     const onNotificationOpen = async () => {
-        // Fetch NotificationList
+        if (notificationList.length === 0) {
+            setLoading(true)
+
+            try {
+                const result = await apiGetAllNotification()
+                setLoading(false)
+                setNotificationList(result.data.data)
+            } catch (error) {
+                console.log('error', error)
+                setLoading(false)
+            }
+        }
+        ;[notificationList, setLoading]
     }
 
-    const onMarkAllAsRead = useCallback(() => {
-        const list = notificationList.map((item: NotificationList) => {
-            if (!item.readed) {
-                item.readed = true
+    const deleteAllReadNotification = useCallback(async () => {
+        setLoading(true)
+        try {
+            const result = await apiDeleteAllReadNotification()
+
+            if (!result) {
+                toast.push(
+                    <NotificationuUi
+                        title="Error"
+                        type="danger"
+                        duration={2500}
+                    >
+                        Gagal menghapus notifikasi
+                    </NotificationuUi>,
+                    { placement: 'top-center' }
+                )
+            } else {
+                toast.push(
+                    <NotificationuUi
+                        title="Berhasil"
+                        type="success"
+                        duration={2500}
+                    >
+                        Berhasil menghapus notifikasi yang sudah dibaca
+                    </NotificationuUi>,
+                    { placement: 'top-center' }
+                )
             }
-            return item
-        })
-        setNotificationList(list)
-        setUnreadNotification(false)
+        } catch (error) {
+            toast.push(
+                <NotificationuUi title="Error" type="danger" duration={2500}>
+                    {error.response?.data?.message ||
+                        'Gagal menghapus notifikasi'}
+                </NotificationuUi>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setLoading(false)
+        }
     }, [notificationList])
 
     const onMarkAsRead = useCallback(
@@ -182,21 +217,21 @@ const _Notification = ({ className }: { className?: string }) => {
         >
             <Dropdown.Item variant="header">
                 <div className="border-b border-gray-200 dark:border-gray-600 px-4 py-2 flex items-center justify-between">
-                    <h6>Notifications</h6>
-                    <Tooltip title="Mark all as read">
+                    <h6>Notifikasi</h6>
+                    <Tooltip title="Hapus pesan yg sudah dibaca">
                         <Button
                             variant="plain"
                             shape="circle"
                             size="sm"
-                            icon={<HiOutlineMailOpen className="text-xl" />}
-                            onClick={onMarkAllAsRead}
+                            icon={<HiOutlineTrash className="text-xl" />}
+                            onClick={deleteAllReadNotification}
                         />
                     </Tooltip>
                 </div>
             </Dropdown.Item>
             <div className={classNames('overflow-y-auto', notificationHeight)}>
                 <ScrollBar direction={direction}>
-                    {notificationList.length > 0 &&
+                    {notificationList.length > 0 ? (
                         notificationList.map((item, index) => (
                             <div
                                 key={item.id}
@@ -207,26 +242,71 @@ const _Notification = ({ className }: { className?: string }) => {
                                 }`}
                                 onClick={() => onMarkAsRead(item.id)}
                             >
-                                <div>{notificationTypeAvatar(item)}</div>
+                                <div>
+                                    {}
+                                    <Avatar
+                                        shape="circle"
+                                        className={`
+                                             ${
+                                                 item.type === 'timeline'
+                                                     ? 'bg-amber-100 text-amber-600'
+                                                     : item.type === 'adendum'
+                                                     ? 'bg-blue-100 text-blue-600'
+                                                     : item.type ===
+                                                       'faktur_pajak'
+                                                     ? 'bg-green-100 text-green-600'
+                                                     : ''
+                                             }
+                                             dark:bg-blue-500/20 dark:text-blue-100`}
+                                        icon={
+                                            item.type === 'adendum' ? (
+                                                <HiOutlineBell />
+                                            ) : item.type === 'faktur_pajak' ? (
+                                                <HiOutlineBell />
+                                            ) : item.type === 'timeline' ? (
+                                                <HiOutlineBell />
+                                            ) : (
+                                                ''
+                                            )
+                                        }
+                                    />
+                                </div>
+                                {/* text and descirpiton */}
                                 <div className="ltr:ml-3 rtl:mr-3">
-                                    <div>
-                                        {item.target && (
+                                    <div className="flex flex-col">
+                                        {item.type && (
                                             <span className="font-semibold heading-text">
-                                                {item.target}{' '}
+                                                {item.type
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    item.type
+                                                        .slice(1)
+                                                        .toLowerCase()}
                                             </span>
                                         )}
-                                        <span>{item.description}</span>
+                                        <span>{item.pesan}</span>
                                     </div>
-                                    <span className="text-xs">{item.date}</span>
+                                    <span className="text-xs">
+                                        {formatWaktuNotifikasi(item.createdAt)}
+                                    </span>
                                 </div>
+                                {/* badge status baca */}
                                 <Badge
                                     className="absolute top-4 ltr:right-4 rtl:left-4 mt-1.5"
                                     innerClass={`${
-                                        item.readed ? 'bg-gray-300' : bgTheme
+                                        item.status_baca
+                                            ? 'bg-gray-300'
+                                            : bgTheme
                                     } `}
                                 />
                             </div>
-                        ))}
+                        ))
+                    ) : (
+                        <div className="flex justify-center items-center h-full text-gray-400">
+                            Tidak ada data
+                        </div>
+                    )}
+
                     {loading && (
                         <div
                             className={classNames(
@@ -251,9 +331,9 @@ const _Notification = ({ className }: { className?: string }) => {
                                     alt="no-notification"
                                 />
                                 <h6 className="font-semibold">
-                                    No notifications!
+                                    Tidak Ada Notifikasi
                                 </h6>
-                                <p className="mt-1">Please Try again later</p>
+                                <p className="mt-1">Coba lagi!</p>
                             </div>
                         </div>
                     )}
@@ -262,10 +342,10 @@ const _Notification = ({ className }: { className?: string }) => {
             <Dropdown.Item variant="header">
                 <div className="flex justify-center border-t border-gray-200 dark:border-gray-600 px-4 py-2">
                     <Link
-                        to="/app/account/activity-log"
+                        to="/semua-notifikasi"
                         className="font-semibold cursor-pointer p-2 px-3 text-gray-600 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white"
                     >
-                        View All Activity
+                        Lihat Semua
                     </Link>
                 </div>
             </Dropdown.Item>

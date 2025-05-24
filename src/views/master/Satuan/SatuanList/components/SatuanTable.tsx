@@ -132,8 +132,6 @@ const SatuanTable = () => {
         dispatch(setTableData(newTableData))
     }
 
-    console.log('data satuan', data)
-
     return (
         <>
             <DataTable
