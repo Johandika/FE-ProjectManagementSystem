@@ -22,6 +22,7 @@ function useAuth() {
     const query = useQuery()
 
     const { token, signedIn } = useAppSelector((state) => state.auth.session)
+    const user = useAppSelector((state) => state.auth.user)
 
     const signIn = async (
         values: SignInCredential
@@ -41,12 +42,11 @@ function useAuth() {
 
                 // Menyiapkan data user dari respons
                 const userData = {
-                    avatar: '',
-                    userName: resp.data.email || 'Anonymous',
-                    authority: ['USER'],
+                    username: resp.data.username || '',
+                    role: resp.data.role || '',
                     email: resp.data.email || '',
+                    authorization: resp.data.authorization || '',
                 }
-
                 dispatch(setUser(userData))
 
                 const redirectUrl = query.get(REDIRECT_URL_KEY)
@@ -125,6 +125,7 @@ function useAuth() {
         signIn,
         signUp,
         signOut,
+        user, //tambahan untuk simpan user login di local storage
     }
 }
 

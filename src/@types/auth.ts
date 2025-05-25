@@ -6,6 +6,8 @@ export type SignInCredential = {
 export type SignInResponse = {
     statusCode: number
     message: string
+    role: string
+    username: string
     email: string
     authorization: string
 }

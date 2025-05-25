@@ -478,7 +478,10 @@ export default function Termin() {
 
     const handleUpdateStatusFaktur = async (fakturData: any) => {
         try {
-            const fakturDataUpdated = { ...fakturData, status: 'Sudah Bayar' }
+            const fakturDataUpdated = {
+                id: fakturData.id,
+                status: 'Sudah Bayar',
+            }
             const result = await apiUpdateStatusFaktur(fakturDataUpdated)
 
             if (result.data.statusCode === 200) {
