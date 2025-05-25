@@ -88,7 +88,7 @@ const initialState: MasterKlienListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
+        category: ['bags', 'cloths', 'devices', 'shoes', 'd'],
         status: [0, 1, 2],
         productStatus: 0,
     },

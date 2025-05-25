@@ -11,8 +11,14 @@ export type TableQueries = {
     pageIndex?: number
     pageSize?: number
     query?: string
-    sort?: {
-        order: 'asc' | 'desc' | ''
-        key: string | number
+}
+export type TableProyekQueries = {
+    total?: number
+    pageIndex?: number
+    pageSize?: number
+    query?: string
+    filterData?: {
+        order?: string
+        progress?: number
     }
 }

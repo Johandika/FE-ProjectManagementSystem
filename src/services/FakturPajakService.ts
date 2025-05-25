@@ -70,6 +70,18 @@ export async function apiPutFakturPajak<T, U extends Record<string, unknown>>(
     })
 }
 
+// update status faktur pajak
+export async function apiUpdateStatusFaktur<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/fakturPajak/status/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
 // create
 export async function apiCreateFakturPajak<
     T,

@@ -82,7 +82,7 @@ const initialState: FakturPajakListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
+        category: ['bags', 'cloths', 'devices', 'shoes', 'a'],
         status: [0, 1, 2],
         fakturPajakStatus: 0,
     },

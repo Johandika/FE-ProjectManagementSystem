@@ -1,7 +1,7 @@
 // File ini menangani operasi terkait daftar produk dalam aplikasi, termasuk memuat data produk, menghapus produk, dan mengelola status loading dan filter.
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import type { TableQueries } from '@/@types/common'
+import type { TableProyekQueries } from '@/@types/common'
 import {
     apiDeleteProyeks,
     apiGetKliens,
@@ -53,10 +53,8 @@ type GetMasterKlienResponse = {
 }
 
 type FilterQueries = {
-    name: string
-    category: string[]
-    status: number[]
-    proyekStatus: number
+    order: string | null
+    progress: number | null
 }
 
 export type ProyekListSlice = {
@@ -64,14 +62,14 @@ export type ProyekListSlice = {
     kliensLoading: boolean
     deleteConfirmation: boolean
     selectedProyek: string
-    tableData: TableQueries
+    tableData: TableProyekQueries
     filterData: FilterQueries
     proyekList: Proyek[]
     kliensList: Klien[]
 }
 
-type GetMasterKlienData = TableQueries & { filterData?: FilterQueries }
-type GetMasterProyekData = TableQueries & { filterData?: FilterQueries }
+// type GetMasterKlienData = TableProyekQueries & { filterData?: FilterQueries }
+type GetMasterProyekData = TableProyekQueries & { filterData?: FilterQueries }
 
 export const getProyeks = createAsyncThunk(
     SLICE_NAME + '/getProyeks',
@@ -112,14 +110,14 @@ export const deleteProyek = async (data: { id: string | string[] }) => {
     return response.data
 }
 
-export const initialTableData: TableQueries = {
+export const initialTableData: TableProyekQueries = {
     total: 0,
-    pageIndex: 1,
-    pageSize: 10,
-    query: '',
-    sort: {
+    pageIndex: 1, // page aktif
+    pageSize: 10, // total ata per page
+    query: '', // search query
+    filterData: {
         order: '',
-        key: '',
+        progress: 0,
     },
 }
 
@@ -132,10 +130,8 @@ const initialState: ProyekListSlice = {
     kliensList: [],
     tableData: initialTableData,
     filterData: {
-        name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
-        status: [0, 1, 2],
-        proyekStatus: 0,
+        order: null,
+        progress: null,
     },
 }
 

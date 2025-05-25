@@ -77,7 +77,7 @@ const initialState: MasterSubkontraktorListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
+        category: ['bags', 'cloths', 'devices', 'shoes', 'e'],
         status: [0, 1, 2],
         subkontraktorStatus: 0,
     },

@@ -74,7 +74,7 @@ const initialState: MasterSatuanListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
+        category: ['bags', 'cloths', 'devices', 'shoes', 'c'],
         status: [0, 1, 2],
         satuanStatus: 0,
     },

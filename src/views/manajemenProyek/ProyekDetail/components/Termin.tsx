@@ -23,6 +23,7 @@ import { NumericFormat } from 'react-number-format'
 import {
     apiCreateFakturPajak,
     apiDeleteFakturPajaks,
+    apiUpdateStatusFaktur,
 } from '@/services/FakturPajakService'
 import {
     apiCreateTermin,
@@ -38,6 +39,7 @@ import {
 import DescriptionSection from './DesriptionSection'
 import { formatDate } from '@/utils/formatDate'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
+import { IoIosAdd, IoIosCheckmark } from 'react-icons/io'
 
 // Define missing interfaces
 export interface SetSubmitting {
@@ -62,7 +64,7 @@ const FakturSchema = Yup.object().shape({
 // Interface untuk nilai awal form faktur
 interface FakturFormValues {
     nomor: string
-    nominal: number | string
+    nominal: number
     tanggal: string
     keterangan?: string
 }
@@ -474,6 +476,45 @@ export default function Termin() {
         dispatch(getFakturPajakByProyekId(data))
     }
 
+    const handleUpdateStatusFaktur = async (fakturData: any) => {
+        try {
+            const fakturDataUpdated = { ...fakturData, status: 'Sudah Bayar' }
+            const result = await apiUpdateStatusFaktur(fakturDataUpdated)
+
+            if (result.data.statusCode === 200) {
+                popNotification('updated', 'Status Faktur')
+                fetchData({ id: getProjectId() })
+            } else {
+                toast.push(
+                    <Notification
+                        title="Update Status Failed"
+                        type="danger"
+                        duration={2500}
+                    >
+                        Gagal memperbarui status faktur
+                    </Notification>,
+                    {
+                        placement: 'top-center',
+                    }
+                )
+            }
+        } catch (error) {
+            console.error('Error updating status faktur:', error)
+            toast.push(
+                <Notification
+                    title="Update Status Failed"
+                    type="danger"
+                    duration={2500}
+                >
+                    Gagal memperbarui status faktur
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
+        }
+    }
+
     useEffect(() => {
         const projectId = getProjectId()
         const requestParam = { id: projectId }
@@ -515,45 +556,109 @@ export default function Termin() {
                             Belum ada termin yang ditambahkan
                         </div>
                     )}
-                    {terminsData?.map((termin, index) => {
-                        // map semua termin yang ada pada proyek ini
-                        // find data faktur pajak by project dengan termin.idFakturPajak
-                        const fakturByTermin = FakturPajakByProyekData?.find(
-                            (faktur) => faktur.id === termin.FakturPajak?.id
-                        )
+                    <div className="overflow-x-auto">
+                        <div className="min-w-[400px]">
+                            {terminsData?.map((termin, index) => {
+                                // map semua termin yang ada pada proyek ini
+                                // find data faktur pajak by project dengan termin.idFakturPajak
+                                const fakturByTermin =
+                                    FakturPajakByProyekData?.find(
+                                        (faktur) =>
+                                            faktur.id === termin.FakturPajak?.id
+                                    )
 
-                        return (
-                            <div
-                                key={index}
-                                className="bg-slate-50 rounded-md flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-between gap-3 p-6 sm:p-10 w-full"
-                            >
-                                <div className="flex flex-col gap-4 sm:gap-0 sm:flex-row w-full">
-                                    <div className="flex flex-col sm:flex-row justify-between text-slate-600 flex-auto items-center sm:items-start  gap-4 relative">
-                                        <div className="flex flex-col w-full items-center sm:items-start">
-                                            <span>{termin.keterangan}</span>
-                                            <span className="font-bold text-2xl">
-                                                {termin.persen}%
-                                            </span>
-                                            <div>
-                                                Rp.{' '}
-                                                {termin.nilai_termin?.toLocaleString(
-                                                    'id-ID'
-                                                )}
+                                return (
+                                    <div
+                                        key={index}
+                                        className={` flex flex-row 
+                                    ${
+                                        index === 0
+                                            ? 'rounded-t-md border'
+                                            : index === terminsData.length - 1
+                                            ? 'rounded-b-md border-b border-x'
+                                            : 'border-b border-x'
+                                    }
+                                         sm:flex-row justify-center sm:justify-between`}
+                                    >
+                                        <div className="border-r p-6 flex flex-1 flex-row ">
+                                            <div className="flex flex-col w-full items-center sm:items-start ">
+                                                <span>{termin.keterangan}</span>
+                                                <span className="font-bold text-2xl">
+                                                    {termin.persen}%
+                                                </span>
+                                                <div>
+                                                    Rp.{' '}
+                                                    {termin.nilai_termin?.toLocaleString(
+                                                        'id-ID'
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className=" w-full flex space-x-2 justify-center sm:justify-end ">
+                                                <div>
+                                                    {!termin.FakturPajak
+                                                        ?.id && (
+                                                        <Button
+                                                            type="button"
+                                                            shape="circle"
+                                                            variant="twoTone"
+                                                            size="sm"
+                                                            icon={<IoIosAdd />}
+                                                            className="text-indigo-500"
+                                                            onClick={() =>
+                                                                openDialog(
+                                                                    termin
+                                                                )
+                                                            }
+                                                        >
+                                                            Faktur
+                                                        </Button>
+                                                    )}
+
+                                                    <Button
+                                                        type="button"
+                                                        shape="circle"
+                                                        variant="plain"
+                                                        size="sm"
+                                                        icon={
+                                                            <HiOutlinePencil />
+                                                        }
+                                                        className="text-indigo-500"
+                                                        onClick={() =>
+                                                            handleEditTermin(
+                                                                termin
+                                                            )
+                                                        }
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        shape="circle"
+                                                        variant="plain"
+                                                        size="sm"
+                                                        className="text-red-500"
+                                                        icon={
+                                                            <HiOutlineTrash />
+                                                        }
+                                                        onClick={() =>
+                                                            handleConfirmDeleteTermin(
+                                                                termin
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Jika faktur ada tampilkan button edit dan delete faktur */}
-                                        {termin.FakturPajak?.id ? (
+                                        {termin.FakturPajak?.id && (
                                             <>
                                                 {fakturByTermin && (
-                                                    <div className="bg-white p-4 w-full flex flex-col sm:flex-row gap-4 rounded-lg justify-between">
+                                                    <div className="bg-white flex-1 p-6 w-full flex flex-col sm:flex-row gap-4 rounded-lg justify-between">
                                                         <div className="flex flex-col items-center sm:items-start ">
-                                                            <span className="font-semibold text-base">
-                                                                Informasi Faktur
-                                                            </span>
                                                             <div>
                                                                 <span>
-                                                                    Nomor :{' '}
+                                                                    Nomor
+                                                                    Faktur:{' '}
                                                                 </span>
                                                                 {fakturByTermin.nomor ||
                                                                     '-'}
@@ -587,83 +692,78 @@ export default function Termin() {
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div className="flex space-x-6 sm:space-x-2 justify-center sm:justify-start">
+                                                        <div className="flex space-x-6 sm:space-x-0 justify-center sm:justify-start">
                                                             <Button
                                                                 type="button"
                                                                 shape="circle"
-                                                                variant="plain"
+                                                                variant="twoTone"
                                                                 size="sm"
                                                                 icon={
-                                                                    <HiOutlinePencil />
+                                                                    <IoIosCheckmark />
                                                                 }
                                                                 className="text-indigo-500"
                                                                 onClick={() =>
-                                                                    handleEditFaktur(
-                                                                        termin
+                                                                    handleUpdateStatusFaktur(
+                                                                        fakturByTermin
                                                                     )
                                                                 }
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                className="text-red-500"
-                                                                icon={
-                                                                    <HiOutlineTrash />
+                                                                disabled={
+                                                                    fakturByTermin.status ===
+                                                                        'Sudah Bayar' &&
+                                                                    true
                                                                 }
-                                                                onClick={() =>
-                                                                    handleConfirmDeleteFaktur(
-                                                                        termin
-                                                                    )
-                                                                }
-                                                            />
+                                                            >
+                                                                {fakturByTermin.status ===
+                                                                'Sudah Bayar'
+                                                                    ? 'Sudah Bayar'
+                                                                    : 'Update Status'}
+                                                            </Button>
+
+                                                            {fakturByTermin.status !==
+                                                                'Sudah Bayar' && (
+                                                                <>
+                                                                    <Button
+                                                                        type="button"
+                                                                        shape="circle"
+                                                                        variant="plain"
+                                                                        size="sm"
+                                                                        icon={
+                                                                            <HiOutlinePencil />
+                                                                        }
+                                                                        className="text-indigo-500"
+                                                                        onClick={() =>
+                                                                            handleEditFaktur(
+                                                                                termin
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <Button
+                                                                        type="button"
+                                                                        shape="circle"
+                                                                        variant="plain"
+                                                                        size="sm"
+                                                                        className="text-red-500"
+                                                                        icon={
+                                                                            <HiOutlineTrash />
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleConfirmDeleteFaktur(
+                                                                                termin
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )}
                                             </>
-                                        ) : (
-                                            <Button
-                                                size="sm"
-                                                variant="solid"
-                                                onClick={() =>
-                                                    openDialog(termin)
-                                                }
-                                            >
-                                                Tambah Faktur
-                                            </Button>
                                         )}
-                                        <div className=" w-full flex space-x-2 justify-center sm:justify-end">
-                                            <Button
-                                                type="button"
-                                                shape="circle"
-                                                variant="plain"
-                                                size="sm"
-                                                icon={<HiOutlinePencil />}
-                                                className="text-indigo-500"
-                                                onClick={() =>
-                                                    handleEditTermin(termin)
-                                                }
-                                            />
-                                            <Button
-                                                type="button"
-                                                shape="circle"
-                                                variant="plain"
-                                                size="sm"
-                                                className="text-red-500"
-                                                icon={<HiOutlineTrash />}
-                                                onClick={() =>
-                                                    handleConfirmDeleteTermin(
-                                                        termin
-                                                    )
-                                                }
-                                            />
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        )
-                    })}
+                                )
+                            })}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Form for Faktur */}

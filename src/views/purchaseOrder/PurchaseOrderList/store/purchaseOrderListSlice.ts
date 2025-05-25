@@ -81,7 +81,7 @@ const initialState: PurchaseOrderListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
+        category: ['bags', 'cloths', 'devices', 'shoes', 'f'],
         status: [0, 1, 2],
         purchaseOrderStatus: 0,
     },

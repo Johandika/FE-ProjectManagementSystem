@@ -194,9 +194,10 @@ export default function AllNotification() {
                                         <Button
                                             size="xs"
                                             className="flex items-center justify-center ml-auto"
-                                            onClick={() =>
+                                            onClick={(e) => {
+                                                e.stopPropagation()
                                                 handleReadStatus(item)
-                                            }
+                                            }}
                                         >
                                             Tandai Dibaca
                                         </Button>
@@ -204,9 +205,10 @@ export default function AllNotification() {
                                         <Button
                                             size="xs"
                                             className="flex items-center justify-center ml-auto"
-                                            onClick={() =>
+                                            onClick={(e) => {
+                                                e.stopPropagation()
                                                 handleReadStatus(item)
-                                            }
+                                            }}
                                             disabled
                                         >
                                             Sudah Dibaca

@@ -25,6 +25,7 @@ import acronym from '@/utils/acronym'
 import {
     apiGetAllNotification,
     apiDeleteAllReadNotification,
+    apiGetUnreadNotification,
 } from '@/services/NotificationService'
 import { formatWaktuNotifikasi } from '@/utils/formatDate'
 import { toast, Notification as NotificationuUi } from '../ui'
@@ -35,6 +36,7 @@ type NotificationList = {
     pesan: string
     status_baca: boolean
     waktu_baca: string
+    createdAt: string
 }
 
 const notificationHeight = 'h-72'
@@ -119,7 +121,8 @@ const _Notification = ({ className }: { className?: string }) => {
         NotificationList[]
     >([])
     const [unreadNotification, setUnreadNotification] = useState(false)
-    const [noResult] = useState(false)
+
+    const [noResult, setNoResult] = useState(false)
     const [loading, setLoading] = useState(false)
 
     const { bgTheme } = useThemeClass()
@@ -128,7 +131,23 @@ const _Notification = ({ className }: { className?: string }) => {
 
     const direction = useAppSelector((state) => state.theme.direction)
 
-    const onNotificationOpen = async () => {
+    const getNotificationCount = useCallback(async () => {
+        const resp = await apiGetUnreadNotification()
+        const unreadMessageQty = resp.data.data
+
+        if (unreadMessageQty > 0) {
+            setNoResult(false)
+            setUnreadNotification(true)
+        } else {
+            setNoResult(true)
+        }
+    }, [setUnreadNotification])
+
+    useEffect(() => {
+        getNotificationCount()
+    }, [getNotificationCount])
+
+    const onNotificationOpen = useCallback(async () => {
         if (notificationList.length === 0) {
             setLoading(true)
 
@@ -141,8 +160,7 @@ const _Notification = ({ className }: { className?: string }) => {
                 setLoading(false)
             }
         }
-        ;[notificationList, setLoading]
-    }
+    }, [notificationList])
 
     const deleteAllReadNotification = useCallback(async () => {
         setLoading(true)
@@ -189,19 +207,19 @@ const _Notification = ({ className }: { className?: string }) => {
         (id: string) => {
             const list = notificationList.map((item) => {
                 if (item.id === id) {
-                    item.readed = true
+                    return { ...item, status_baca: true }
                 }
                 return item
             })
             setNotificationList(list)
-            const hasUnread = notificationList.some((item) => !item.readed)
-
-            if (!hasUnread) {
-                setUnreadNotification(false)
-            }
+            setUnreadNotification(list.some((item) => !item.status_baca))
         },
         [notificationList]
     )
+
+    useEffect(() => {
+        setUnreadNotification(notificationList.some((n) => !n.status_baca))
+    }, [notificationList])
 
     return (
         <Dropdown
@@ -231,7 +249,7 @@ const _Notification = ({ className }: { className?: string }) => {
             </Dropdown.Item>
             <div className={classNames('overflow-y-auto', notificationHeight)}>
                 <ScrollBar direction={direction}>
-                    {notificationList.length > 0 ? (
+                    {notificationList.length > 0 &&
                         notificationList.map((item, index) => (
                             <div
                                 key={item.id}
@@ -300,12 +318,7 @@ const _Notification = ({ className }: { className?: string }) => {
                                     } `}
                                 />
                             </div>
-                        ))
-                    ) : (
-                        <div className="flex justify-center items-center h-full text-gray-400">
-                            Tidak ada data
-                        </div>
-                    )}
+                        ))}
 
                     {loading && (
                         <div
@@ -317,7 +330,7 @@ const _Notification = ({ className }: { className?: string }) => {
                             <Spinner size={40} />
                         </div>
                     )}
-                    {noResult && (
+                    {noResult && notificationList.length === 0 && (
                         <div
                             className={classNames(
                                 'flex items-center justify-center',

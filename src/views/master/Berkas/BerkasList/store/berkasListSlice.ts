@@ -75,7 +75,7 @@ const initialState: MasterBerkasListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'watches'],
+        category: ['bags', 'cloths', 'devices', 'shoes', 'b'],
         status: [0, 1, 2],
         berkasStatus: 0,
     },

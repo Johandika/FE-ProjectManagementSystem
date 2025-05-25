@@ -133,7 +133,7 @@ const ProyekTable = () => {
         fetchData()
         dispatch(getKliens()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
+    }, [pageIndex, pageSize, sort, filterData])
 
     useEffect(() => {
         if (tableRef) {
@@ -151,9 +151,8 @@ const ProyekTable = () => {
             getProyeks({
                 page: pageIndex,
                 limit: pageSize,
-                sort,
                 query,
-                filterData,
+                filterData: filterData,
             })
         )
     }

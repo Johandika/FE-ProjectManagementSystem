@@ -1,35 +1,20 @@
 import ApiService from './ApiService'
 
-// get all proyeks
-// export async function apiGetProyeks<T, U extends Record<string, unknown>>(
-//     data: U
-// ) {
-//     return ApiService.fetchData<T>({
-//         url: `/project`,
-//         method: 'get',
-//         data,
-//     })
-// }
 export interface GetProyeksRequest {
     page?: number
     limit?: number
     query?: string
-    sort?: {
-        key?: string
-        order?: string
-    }
     filterData?: {
-        name?: string
-        category?: string[]
-        status?: number[]
-        proyekStatus?: number
+        order: string
+        progress: number
+        idClient: string
     }
 }
 
 export async function apiGetProyeks<T, U extends GetProyeksRequest>(data: U) {
     // Membangun query string parameters
     const params = new URLSearchParams()
-
+    console.log('data', data)
     // Menangani pagination
     if (data.page) params.append('page', data.page.toString())
     if (data.limit) params.append('limit', data.limit.toString())
@@ -39,17 +24,16 @@ export async function apiGetProyeks<T, U extends GetProyeksRequest>(data: U) {
         params.append('search', data.query)
 
     // Menangani pengurutan
-    if (data.sort?.key && data.sort.order) {
-        params.append('sortBy', data.sort.key)
-        params.append('sortOrder', data.sort.order)
-    }
+    if (data.filterData?.order)
+        params.append('order', data.filterData.order.toString())
 
-    // // Menangani filter jika diperlukan
-    // if (data.filterData?.proyekStatus)
-    //     params.append('status', data.filterData.proyekStatus.toString())
+    // Menangani progress
+    if (data.filterData?.progress)
+        params.append('progress', data.filterData.progress.toString())
 
-    // // Jika ada filter tambahan yang perlu diterapkan
-    // if (data.filterData?.name) params.append('name', data.filterData.name)
+    // Menangani idClient
+    if (data.filterData?.idClient)
+        params.append('idClient', data.filterData.idClient.toString())
 
     // URL dengan query parameters
     const url = `/project${params.toString() ? `?${params.toString()}` : ''}`

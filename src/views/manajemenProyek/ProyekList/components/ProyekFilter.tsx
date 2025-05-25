@@ -1,4 +1,4 @@
-import { useState, useRef, forwardRef } from 'react'
+import { useState, useRef, forwardRef, useEffect } from 'react'
 import { HiOutlineFilter, HiOutlineSearch } from 'react-icons/hi'
 import {
     getProyeks,
@@ -6,6 +6,7 @@ import {
     initialTableData,
     useAppDispatch,
     useAppSelector,
+    getKliens,
 } from '../store'
 import { FormItem, FormContainer } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
@@ -15,12 +16,11 @@ import Radio from '@/components/ui/Radio'
 import Drawer from '@/components/ui/Drawer'
 import { Field, Form, Formik, FormikProps, FieldProps } from 'formik'
 import type { MouseEvent } from 'react'
+import { Select } from '@/components/ui'
 
 type FormModel = {
-    name: string
-    category: string[]
-    status: number[]
-    proyekStatus: number
+    order: string
+    progress: number
 }
 
 type FilterFormProps = {
@@ -36,6 +36,10 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
     ({ onSubmitComplete }, ref) => {
         const dispatch = useAppDispatch()
 
+        const kliensList = useAppSelector(
+            (state) => state.proyekList.data.kliensList
+        )
+
         const filterData = useAppSelector(
             (state) => state.proyekList.data.filterData
         )
@@ -43,8 +47,13 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
         const handleSubmit = (values: FormModel) => {
             onSubmitComplete?.()
             dispatch(setFilterData(values))
-            dispatch(getProyeks(initialTableData))
+            // dispatch(getProyeks(initialTableData))
         }
+
+        useEffect(() => {
+            dispatch(getKliens()) // kliens
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [])
 
         return (
             <Formik
@@ -58,145 +67,107 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                 {({ values, touched, errors }) => (
                     <Form>
                         <FormContainer>
+                            {/* Select client */}
                             <FormItem
-                                invalid={errors.name && touched.name}
-                                errorMessage={errors.name}
+                                label="Klien"
+                                invalid={errors.idClient && touched.idClient}
+                                errorMessage={errors.idClient}
                             >
-                                <h6 className="mb-4">Included text</h6>
-                                <Field
-                                    type="text"
-                                    autoComplete="off"
-                                    name="name"
-                                    placeholder="Keyword"
-                                    component={Input}
-                                    prefix={
-                                        <HiOutlineSearch className="text-lg" />
-                                    }
-                                />
-                            </FormItem>
-                            <FormItem
-                                invalid={errors.category && touched.category}
-                                errorMessage={errors.category as string}
-                            >
-                                <h6 className="mb-4">Berkas Pajak Category</h6>
-                                <Field name="category">
-                                    {({ field, form }: FieldProps) => (
-                                        <>
-                                            <Checkbox.Group
-                                                vertical
-                                                value={values.category}
-                                                onChange={(options) =>
+                                <Field name="idClient">
+                                    {({ field, form }: FieldProps) => {
+                                        // Find the selected client based on current idClient value
+                                        const selectedClient = field.value
+                                            ? kliensList.find(
+                                                  (client) =>
+                                                      client.id === field.value
+                                              )
+                                            : null
+
+                                        // Map clients to options format required by Select component
+                                        const clientOptions = kliensList.map(
+                                            (client) => ({
+                                                value: client.id,
+                                                label: `${client.nama}`,
+                                            })
+                                        )
+
+                                        return (
+                                            <Select
+                                                field={field}
+                                                form={form}
+                                                options={clientOptions}
+                                                value={
+                                                    selectedClient
+                                                        ? {
+                                                              value: selectedClient.nama,
+                                                              label: `${selectedClient.nama}`,
+                                                          }
+                                                        : null
+                                                }
+                                                placeholder="Pilih klien"
+                                                onChange={(option) => {
                                                     form.setFieldValue(
                                                         field.name,
-                                                        options
+                                                        option?.value
                                                     )
-                                                }
-                                            >
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="bags"
-                                                >
-                                                    Bags{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="cloths"
-                                                >
-                                                    Cloths{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="devices"
-                                                >
-                                                    Devices{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="shoes"
-                                                >
-                                                    Shoes{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    name={field.name}
-                                                    value="watches"
-                                                >
-                                                    Watches{' '}
-                                                </Checkbox>
-                                            </Checkbox.Group>
-                                        </>
-                                    )}
+                                                }}
+                                            />
+                                        )
+                                    }}
                                 </Field>
                             </FormItem>
+
+                            {/* Progress */}
                             <FormItem
-                                invalid={errors.status && touched.status}
-                                errorMessage={errors.status as string}
+                                invalid={errors.progress && touched.progress}
+                                errorMessage={errors.progress}
                             >
-                                <h6 className="mb-4">Berkas Pajak Category</h6>
-                                <Field name="status">
-                                    {({ field, form }: FieldProps) => (
-                                        <>
-                                            <Checkbox.Group
-                                                vertical
-                                                value={values.status}
-                                                onChange={(options) =>
-                                                    form.setFieldValue(
-                                                        field.name,
-                                                        options
-                                                    )
-                                                }
-                                            >
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value={0}
-                                                >
-                                                    In Stock{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value={1}
-                                                >
-                                                    Limited{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value={2}
-                                                >
-                                                    Out Of Stock{' '}
-                                                </Checkbox>
-                                            </Checkbox.Group>
-                                        </>
-                                    )}
-                                </Field>
-                            </FormItem>
-                            <FormItem
-                                invalid={
-                                    errors.proyekStatus && touched.proyekStatus
-                                }
-                                errorMessage={errors.proyekStatus}
-                            >
-                                <h6 className="mb-4">Berkas Pajak Status</h6>
-                                <Field name="proyekStatus">
+                                <h6 className="mb-4">Progress</h6>
+                                <Field name="progress">
                                     {({ field, form }: FieldProps) => (
                                         <Radio.Group
                                             vertical
-                                            value={values.proyekStatus}
-                                            onChange={(val) =>
+                                            value={values.progress}
+                                            onChange={(val) => {
                                                 form.setFieldValue(
                                                     field.name,
                                                     val
                                                 )
-                                            }
+                                            }}
                                         >
-                                            <Radio value={0}>Published</Radio>
-                                            <Radio value={1}>Disabled</Radio>
-                                            <Radio value={2}>Archive</Radio>
+                                            <Radio value={30}>30</Radio>
+                                            <Radio value={50}>50</Radio>
+                                            <Radio value={95}>95</Radio>
+                                            <Radio value={100}>100</Radio>
+                                        </Radio.Group>
+                                    )}
+                                </Field>
+                            </FormItem>
+
+                            {/* Urutan asc desc */}
+                            <FormItem
+                                invalid={errors.order && touched.order}
+                                errorMessage={errors.order}
+                            >
+                                <h6 className="mb-4">Urutkan</h6>
+                                <Field name="order">
+                                    {({ field, form }: FieldProps) => (
+                                        <Radio.Group
+                                            vertical
+                                            value={values.order}
+                                            onChange={(val) => {
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    val
+                                                )
+                                            }}
+                                        >
+                                            <Radio value={'asc'}>
+                                                Ascending
+                                            </Radio>
+                                            <Radio value={'desc'}>
+                                                Descending
+                                            </Radio>
                                         </Radio.Group>
                                     )}
                                 </Field>
