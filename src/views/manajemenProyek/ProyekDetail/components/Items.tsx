@@ -1118,54 +1118,6 @@ export default function Items() {
                                                                     </Field>
                                                                 </FormItem>
 
-                                                                {/* Volume */}
-                                                                <FormItem
-                                                                    label="Volume"
-                                                                    errorMessage={
-                                                                        detailErrors.tempVolume &&
-                                                                        detailTouched.tempVolume
-                                                                            ? detailErrors.tempVolume
-                                                                            : ''
-                                                                    }
-                                                                    invalid={
-                                                                        !!(
-                                                                            detailErrors.tempVolume &&
-                                                                            detailTouched.tempVolume
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Field name="tempVolume">
-                                                                        {({
-                                                                            field,
-                                                                            form,
-                                                                        }: FieldProps) => (
-                                                                            <NumericFormat
-                                                                                thousandSeparator="."
-                                                                                decimalSeparator=","
-                                                                                placeholder="Masukkan volume"
-                                                                                customInput={
-                                                                                    Input
-                                                                                }
-                                                                                {...field}
-                                                                                onValueChange={(
-                                                                                    values
-                                                                                ) => {
-                                                                                    const {
-                                                                                        value,
-                                                                                    } =
-                                                                                        values
-                                                                                    form.setFieldValue(
-                                                                                        field.name,
-                                                                                        value
-                                                                                    )
-                                                                                    calculateJumlahHargaMaterial()
-                                                                                    calculateJumlahHargaJasa()
-                                                                                }}
-                                                                            />
-                                                                        )}
-                                                                    </Field>
-                                                                </FormItem>
-
                                                                 {/* Harga Satuan Material */}
                                                                 <FormItem
                                                                     label="Harga Satuan Material"
@@ -1209,6 +1161,32 @@ export default function Items() {
                                                                                     )
                                                                                     calculateJumlahHargaMaterial()
                                                                                 }}
+                                                                            />
+                                                                        )}
+                                                                    </Field>
+                                                                </FormItem>
+
+                                                                {/* Jumlah Harga Material */}
+                                                                <FormItem label="Jumlah Harga Material">
+                                                                    <Field name="tempJumlahHargaMaterial">
+                                                                        {({
+                                                                            field,
+                                                                        }: FieldProps) => (
+                                                                            <NumericFormat
+                                                                                disabled
+                                                                                thousandSeparator="."
+                                                                                decimalSeparator=","
+                                                                                prefix="Rp "
+                                                                                placeholder="Jumlah harga material"
+                                                                                customInput={
+                                                                                    Input
+                                                                                }
+                                                                                {...field}
+                                                                                readOnly
+                                                                                value={
+                                                                                    field.value ||
+                                                                                    '0'
+                                                                                }
                                                                             />
                                                                         )}
                                                                     </Field>
@@ -1262,32 +1240,6 @@ export default function Items() {
                                                                     </Field>
                                                                 </FormItem>
 
-                                                                {/* Jumlah Harga Material */}
-                                                                <FormItem label="Jumlah Harga Material">
-                                                                    <Field name="tempJumlahHargaMaterial">
-                                                                        {({
-                                                                            field,
-                                                                        }: FieldProps) => (
-                                                                            <NumericFormat
-                                                                                disabled
-                                                                                thousandSeparator="."
-                                                                                decimalSeparator=","
-                                                                                prefix="Rp "
-                                                                                placeholder="Jumlah harga material"
-                                                                                customInput={
-                                                                                    Input
-                                                                                }
-                                                                                {...field}
-                                                                                readOnly
-                                                                                value={
-                                                                                    field.value ||
-                                                                                    '0'
-                                                                                }
-                                                                            />
-                                                                        )}
-                                                                    </Field>
-                                                                </FormItem>
-
                                                                 {/* Jumlah Harga Jasa */}
                                                                 <FormItem label="Jumlah Harga Jasa">
                                                                     <Field name="tempJumlahHargaJasa">
@@ -1309,6 +1261,54 @@ export default function Items() {
                                                                                     field.value ||
                                                                                     '0'
                                                                                 }
+                                                                            />
+                                                                        )}
+                                                                    </Field>
+                                                                </FormItem>
+
+                                                                {/* Volume */}
+                                                                <FormItem
+                                                                    label="Volume"
+                                                                    errorMessage={
+                                                                        detailErrors.tempVolume &&
+                                                                        detailTouched.tempVolume
+                                                                            ? detailErrors.tempVolume
+                                                                            : ''
+                                                                    }
+                                                                    invalid={
+                                                                        !!(
+                                                                            detailErrors.tempVolume &&
+                                                                            detailTouched.tempVolume
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Field name="tempVolume">
+                                                                        {({
+                                                                            field,
+                                                                            form,
+                                                                        }: FieldProps) => (
+                                                                            <NumericFormat
+                                                                                thousandSeparator="."
+                                                                                decimalSeparator=","
+                                                                                placeholder="Masukkan volume"
+                                                                                customInput={
+                                                                                    Input
+                                                                                }
+                                                                                {...field}
+                                                                                onValueChange={(
+                                                                                    values
+                                                                                ) => {
+                                                                                    const {
+                                                                                        value,
+                                                                                    } =
+                                                                                        values
+                                                                                    form.setFieldValue(
+                                                                                        field.name,
+                                                                                        value
+                                                                                    )
+                                                                                    calculateJumlahHargaMaterial()
+                                                                                    calculateJumlahHargaJasa()
+                                                                                }}
                                                                             />
                                                                         )}
                                                                     </Field>
