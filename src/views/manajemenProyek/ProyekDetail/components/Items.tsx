@@ -476,7 +476,6 @@ export default function Items() {
                                         </Button>
                                     )}
                                 </div>
-
                                 {/* Form untuk input item */}
                                 {showItemForm && (
                                     <div className="mb-4 border bg-slate-50 rounded-md p-4">
@@ -536,8 +535,7 @@ export default function Items() {
                                         </FormContainer>
                                     </div>
                                 )}
-
-                                {/* Nested Formik for Detail Items */}
+                                {/* Nested Formik for Detail Items */};
                                 <Formik
                                     enableReinitialize
                                     initialValues={initialDetailValues}
@@ -556,56 +554,54 @@ export default function Items() {
                                             setFieldValue: setDetailField,
                                         } = detailFormikProps
 
-                                        const calculateJumlahHargaMaterial =
-                                            () => {
-                                                const volume =
-                                                    extractNumberFromString(
-                                                        detailValues.tempVolume
-                                                    )
-                                                const hargaSatuanMaterial =
-                                                    extractNumberFromString(
-                                                        detailValues.tempHargaSatuanMaterial
-                                                    )
-                                                const jumlah =
-                                                    volume * hargaSatuanMaterial
-                                                setDetailField(
-                                                    'tempJumlahHargaMaterial',
-                                                    jumlah
-                                                )
-                                                calculateTotal()
-                                            }
-
-                                        const calculateJumlahHargaJasa = () => {
+                                        // Function to calculate values in real-time
+                                        const calculateValues = () => {
+                                            // Extract numeric values from formatted strings
                                             const volume =
                                                 extractNumberFromString(
                                                     detailValues.tempVolume
-                                                )
+                                                ) || 0
+                                            const hargaSatuanMaterial =
+                                                extractNumberFromString(
+                                                    detailValues.tempHargaSatuanMaterial
+                                                ) || 0
                                             const hargaSatuanJasa =
                                                 extractNumberFromString(
                                                     detailValues.tempHargaSatuanJasa
-                                                )
-                                            const jumlah =
-                                                volume * hargaSatuanJasa
+                                                ) || 0
+
+                                            // Calculate values
+                                            const jumlahHargaMaterial =
+                                                hargaSatuanMaterial * volume
+                                            const jumlahHargaJasa =
+                                                hargaSatuanJasa * volume
+                                            const total =
+                                                jumlahHargaMaterial +
+                                                jumlahHargaJasa
+
+                                            // Update form fields
+                                            setDetailField(
+                                                'tempJumlahHargaMaterial',
+                                                jumlahHargaMaterial.toString()
+                                            )
                                             setDetailField(
                                                 'tempJumlahHargaJasa',
-                                                jumlah
+                                                jumlahHargaJasa.toString()
                                             )
-                                            calculateTotal()
+                                            setDetailField(
+                                                'tempJumlah',
+                                                total.toString()
+                                            )
                                         }
 
-                                        const calculateTotal = () => {
-                                            const jumlahMaterial =
-                                                extractNumberFromString(
-                                                    detailValues.tempJumlahHargaMaterial
-                                                )
-                                            const jumlahJasa =
-                                                extractNumberFromString(
-                                                    detailValues.tempJumlahHargaJasa
-                                                )
-                                            const total =
-                                                jumlahMaterial + jumlahJasa
-                                            setDetailField('tempJumlah', total)
-                                        }
+                                        // Call calculateValues whenever relevant fields change
+                                        useEffect(() => {
+                                            calculateValues()
+                                        }, [
+                                            detailValues.tempVolume,
+                                            detailValues.tempHargaSatuanMaterial,
+                                            detailValues.tempHargaSatuanJasa,
+                                        ])
 
                                         const handleAddDetail = (
                                             itemIndex: number
@@ -637,13 +633,16 @@ export default function Items() {
                                                 )
                                                 setDetailField(
                                                     'tempJumlahHargaMaterial',
-                                                    ''
+                                                    '0'
                                                 )
                                                 setDetailField(
                                                     'tempJumlahHargaJasa',
-                                                    ''
+                                                    '0'
                                                 )
-                                                setDetailField('tempJumlah', '')
+                                                setDetailField(
+                                                    'tempJumlah',
+                                                    '0'
+                                                )
                                             }
                                         }
 
@@ -769,15 +768,15 @@ export default function Items() {
                                                         )
                                                         setDetailField(
                                                             'tempJumlahHargaMaterial',
-                                                            ''
+                                                            '0'
                                                         )
                                                         setDetailField(
                                                             'tempJumlahHargaJasa',
-                                                            ''
+                                                            '0'
                                                         )
                                                         setDetailField(
                                                             'tempJumlah',
-                                                            ''
+                                                            '0'
                                                         )
                                                         setShowDetailForm(false)
                                                         setEditDetailIndex(null)
@@ -827,6 +826,8 @@ export default function Items() {
                                                 }
                                             }
                                         }
+
+                                       
 
                                         const handleCancelDetail = () => {
                                             setShowDetailForm(false)
@@ -1054,14 +1055,12 @@ export default function Items() {
                                                                             field,
                                                                             form,
                                                                         }: FieldProps) => {
-                                                                            // Find the selected client based on current idClient value
                                                                             const selectedSatuan =
                                                                                 field.value
                                                                                     ? satuansData.data?.find(
                                                                                           (
                                                                                               satuan
                                                                                           ) =>
-                                                                                              // field.value = kg
                                                                                               satuan.id ===
                                                                                               field.value
                                                                                       )
@@ -1076,14 +1075,7 @@ export default function Items() {
                                                                                         label: `${satuan.satuan}`,
                                                                                     })
                                                                                 )
-                                                                            console.log(
-                                                                                'field',
-                                                                                field
-                                                                            )
-                                                                            console.log(
-                                                                                'satuansData.data?',
-                                                                                satuansData.data
-                                                                            )
+
                                                                             return (
                                                                                 <Select
                                                                                     field={
@@ -1159,7 +1151,7 @@ export default function Items() {
                                                                                         field.name,
                                                                                         value
                                                                                     )
-                                                                                    calculateJumlahHargaMaterial()
+                                                                                    calculateValues()
                                                                                 }}
                                                                             />
                                                                         )}
@@ -1233,7 +1225,7 @@ export default function Items() {
                                                                                         field.name,
                                                                                         value
                                                                                     )
-                                                                                    calculateJumlahHargaJasa()
+                                                                                    calculateValues()
                                                                                 }}
                                                                             />
                                                                         )}
@@ -1306,8 +1298,7 @@ export default function Items() {
                                                                                         field.name,
                                                                                         value
                                                                                     )
-                                                                                    calculateJumlahHargaMaterial()
-                                                                                    calculateJumlahHargaJasa()
+                                                                                    calculateValues()
                                                                                 }}
                                                                             />
                                                                         )}
@@ -1787,6 +1778,7 @@ export default function Items() {
                                                 </ConfirmDialog>
                                             </>
                                         )
+                                        
                                     }}
                                 </Formik>
                             </AdaptableCard>

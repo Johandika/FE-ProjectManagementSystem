@@ -10,7 +10,7 @@ const Dashboard = () => {
         <>
             <div className="mb-4 lg:mb-0">
                 <h3>Dashboard</h3>
-                <p>Masih dummy, tergantung kebutuhan</p>
+                <p>Ringkasan data proyek</p>
             </div>
             <div className="grid grid-cols-1 ">
                 {/* <SplineArea /> */}

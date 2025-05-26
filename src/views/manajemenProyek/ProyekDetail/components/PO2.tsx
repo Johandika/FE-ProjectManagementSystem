@@ -1,248 +1,492 @@
-import { Field, FieldArray, useFormikContext } from 'formik'
-import { FormItem } from '@/components/ui/Form'
-import Input from '@/components/ui/Input'
-import Button from '@/components/ui/Button'
-import { HiMinus, HiPlus } from 'react-icons/hi'
-import AdaptableCard from '@/components/shared/AdaptableCard'
-import { NumericFormat } from 'react-number-format'
-import type { FormikErrors, FormikTouched, FieldProps } from 'formik'
-import { useMemo, useEffect } from 'react'
+;<Formik
+    enableReinitialize
+    initialValues={initialDetailValues}
+    validationSchema={detailItemValidationSchema}
+    onSubmit={() => {
+        // Form submission is handled by save button
+    }}
+>
+    {(detailFormikProps) => {
+        const {
+            values: detailValues,
+            errors: detailErrors,
+            touched: detailTouched,
+            setFieldValue: setDetailField,
+        } = detailFormikProps
 
-interface Termin {
-    keterangan: string
-    persen: number
-}
+        // Function to calculate values in real-time
+        const calculateValues = () => {
+            // Extract numeric values from formatted strings
+            const volume = extractNumberFromString(detailValues.tempVolume) || 0
+            const hargaSatuanMaterial =
+                extractNumberFromString(detailValues.tempHargaSatuanMaterial) ||
+                0
+            const hargaSatuanJasa =
+                extractNumberFromString(detailValues.tempHargaSatuanJasa) || 0
 
-type TerminFieldsProps = {
-    touched: FormikTouched<{
-        termin: Termin[]
-    }>
-    errors: FormikErrors<{
-        termin: Termin[]
-    }>
-    terminsList?: {
-        id: string
-        persen: number
-        tanggal: string
-        status: string
-        idProject: string
-        idFakturPajak: string
-        keterangan: string
-    }[]
-}
+            // Calculate values
+            const jumlahHargaMaterial = hargaSatuanMaterial * volume
+            const jumlahHargaJasa = hargaSatuanJasa * volume
+            const total = jumlahHargaMaterial + jumlahHargaJasa
 
-const TerminFields = (props: TerminFieldsProps) => {
-    const { touched, errors, terminsList = [] } = props
-    const { values, setFieldValue } = useFormikContext<{ termin: Termin[] }>()
-
-    // Mengisi formik values dengan data dari terminsList saat komponen dimount
-    useEffect(() => {
-        if (terminsList && terminsList.length > 0) {
-            const formattedTermin = terminsList.map((item, index) => ({
-                // Gunakan keterangan dari data jika tersedia, atau generate otomatis jika tidak
-                keterangan: item.keterangan || `Termin ${index + 1}`,
-                persen: item.persen,
-            }))
-            setFieldValue('termin', formattedTermin)
-        }
-    }, [terminsList, setFieldValue])
-
-    // Menghitung total persentase secara langsung saat render menggunakan useMemo
-    const totalPersen = useMemo(() => {
-        if (!values.termin || !Array.isArray(values.termin)) {
-            return 0
+            // Update form fields
+            setDetailField(
+                'tempJumlahHargaMaterial',
+                jumlahHargaMaterial.toString()
+            )
+            setDetailField('tempJumlahHargaJasa', jumlahHargaJasa.toString())
+            setDetailField('tempJumlah', total.toString())
         }
 
-        return values.termin.reduce((sum, item) => {
-            const value = parseFloat(String(item.persen)) || 0
-            return sum + value
-        }, 0)
-    }, [values.termin])
+        // Call calculateValues whenever relevant fields change
+        useEffect(() => {
+            calculateValues()
+        }, [
+            detailValues.tempVolume,
+            detailValues.tempHargaSatuanMaterial,
+            detailValues.tempHargaSatuanJasa,
+        ])
 
-    return (
-        <AdaptableCard divider className="mb-4">
-            <h5>Termin Pembayaran</h5>
-            <p className="mb-6">
-                Tambahkan data termin pembayaran beserta persentasenya
-            </p>
+        const handleAddDetail = (itemIndex: number) => {
+            if (itemsByProyekData) {
+                setCurrentItemIndex(itemIndex)
+                setShowDetailForm(true)
+                setEditDetailIndex(null)
+                setShowItemForm(false)
 
-            <FieldArray name="termin">
-                {({ push, remove }) => {
-                    return (
-                        <div>
-                            {values.termin && values.termin.length > 0 && (
-                                <div className="flex mb-2">
-                                    <div className="flex-grow mr-4">
-                                        <p className="font-medium">
-                                            Keterangan
-                                        </p>
-                                    </div>
-                                    <div className="w-32">
-                                        <p className="font-medium">
-                                            Persentase (%)
-                                        </p>
-                                    </div>
-                                    <div className="w-10"></div>
-                                </div>
-                            )}
+                // Set the item ID for the detail
+                setDetailField('tempIdItem', itemsByProyekData[itemIndex].id)
 
-                            {values.termin &&
-                                values.termin.map((_, index) => {
-                                    // Otomatis set keterangan sebagai "Termin {index+1}"
-                                    const terminName = `Termin ${index + 1}`
+                // Reset other temp values
+                setDetailField('tempUraian', '')
+                setDetailField('tempSatuan', '')
+                setDetailField('tempVolume', '')
+                setDetailField('tempHargaSatuanMaterial', '')
+                setDetailField('tempHargaSatuanJasa', '')
+                setDetailField('tempJumlahHargaMaterial', '0')
+                setDetailField('tempJumlahHargaJasa', '0')
+                setDetailField('tempJumlah', '0')
+            }
+        }
 
-                                    // Jika keterangan kosong atau berbeda dengan format yang diharapkan, update
-                                    if (
-                                        values.termin[index].keterangan !==
-                                        terminName
-                                    ) {
-                                        setFieldValue(
-                                            `termin[${index}].keterangan`,
-                                            terminName
+        const handleSaveDetail = async () => {
+            // Validate fields
+            if (
+                !detailErrors.tempUraian &&
+                !detailErrors.tempSatuan &&
+                !detailErrors.tempVolume &&
+                !detailErrors.tempHargaSatuanMaterial &&
+                !detailErrors.tempHargaSatuanJasa
+            ) {
+                setIsSubmitting(true)
+
+                const requestData = {
+                    uraian: detailValues.tempUraian,
+                    idSatuan: detailValues.tempSatuan,
+                    volume: extractNumberFromString(detailValues.tempVolume),
+                    harga_satuan_material: extractNumberFromString(
+                        detailValues.tempHargaSatuanMaterial
+                    ),
+                    harga_satuan_jasa: extractNumberFromString(
+                        detailValues.tempHargaSatuanJasa
+                    ),
+                    jumlah_harga_material: extractNumberFromString(
+                        detailValues.tempJumlahHargaMaterial
+                    ),
+                    jumlah_harga_jasa: extractNumberFromString(
+                        detailValues.tempJumlahHargaJasa
+                    ),
+                    jumlah: extractNumberFromString(detailValues.tempJumlah),
+                    idItemProject: detailValues.tempIdItem,
+                }
+
+                try {
+                    let result
+
+                    if (
+                        editDetailIndex !== null &&
+                        currentItemIndex !== null &&
+                        itemsByProyekData
+                    ) {
+                        // Handle edit with API call
+                        const detailId =
+                            itemsByProyekData[currentItemIndex]
+                                .DetailItemProjects[editDetailIndex].id
+
+                        result = await apiUpdateDetailItem({
+                            id: detailId,
+                            ...requestData,
+                        })
+                    } else {
+                        result = await apiCreateDetailItem(requestData)
+                    }
+
+                    setIsSubmitting(false)
+
+                    if (
+                        result &&
+                        result.data?.statusCode >= 200 &&
+                        result.data?.statusCode < 300
+                    ) {
+                        // Refresh data
+                        dispatch(
+                            getItemsByProyek({
+                                id: projectId,
+                            })
+                        )
+
+                        // Show success notification
+                        popNotification(
+                            editDetailIndex !== null
+                                ? 'diperbarui'
+                                : 'ditambahkan'
+                        )
+
+                        // Reset form and close
+                        setDetailField('tempUraian', '')
+                        setDetailField('tempSatuan', '')
+                        setDetailField('tempVolume', '')
+                        setDetailField('tempHargaSatuanMaterial', '')
+                        setDetailField('tempHargaSatuanJasa', '')
+                        setDetailField('tempJumlahHargaMaterial', '0')
+                        setDetailField('tempJumlahHargaJasa', '0')
+                        setDetailField('tempJumlah', '0')
+                        setShowDetailForm(false)
+                        setEditDetailIndex(null)
+                    } else {
+                        // Show error notification
+                        toast.push(
+                            <Notification
+                                title="Error"
+                                type="danger"
+                                duration={2500}
+                            >
+                                {result
+                                    ? result.data?.message
+                                    : 'Gagal menambahkan detail item'}
+                            </Notification>,
+                            {
+                                placement: 'top-center',
+                            }
+                        )
+                    }
+                } catch (error) {
+                    setIsSubmitting(false)
+                    console.error('Error:', error)
+
+                    // Show generic error notification
+                    toast.push(
+                        <Notification
+                            title="Error"
+                            type="danger"
+                            duration={2500}
+                        >
+                            Terjadi kesalahan saat memproses permintaan
+                        </Notification>,
+                        {
+                            placement: 'top-center',
+                        }
+                    )
+                }
+            }
+        }
+
+        // ... (keep all other existing functions unchanged)
+
+        return (
+            <>
+                {/* Form untuk input detail item */}
+                {showDetailForm && (
+                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
+                        <h6 className="mb-3">
+                            {editDetailIndex !== null
+                                ? 'Edit Detail Item'
+                                : 'Tambah Detail Item Baru'}
+                        </h6>
+
+                        <FormContainer>
+                            <div className="grid grid-cols-2 gap-4">
+                                {/* Uraian */}
+                                <FormItem
+                                    label="Uraian"
+                                    errorMessage={
+                                        detailErrors.tempUraian &&
+                                        detailTouched.tempUraian
+                                            ? detailErrors.tempUraian
+                                            : ''
+                                    }
+                                    invalid={
+                                        !!(
+                                            detailErrors.tempUraian &&
+                                            detailTouched.tempUraian
                                         )
                                     }
+                                >
+                                    <Field
+                                        type="text"
+                                        autoComplete="off"
+                                        name="tempUraian"
+                                        placeholder="Masukkan uraian"
+                                        component={Input}
+                                    />
+                                </FormItem>
 
-                                    const keteranganError =
-                                        errors.termin?.[index]?.keterangan &&
-                                        touched.termin?.[index]?.keterangan
+                                {/* Satuan */}
+                                <FormItem
+                                    label="Satuan"
+                                    errorMessage={
+                                        detailErrors.tempSatuan &&
+                                        detailTouched.tempSatuan
+                                            ? detailErrors.tempSatuan
+                                            : ''
+                                    }
+                                    invalid={
+                                        !!(
+                                            detailErrors.tempSatuan &&
+                                            detailTouched.tempSatuan
+                                        )
+                                    }
+                                >
+                                    <Field name="tempSatuan">
+                                        {({ field, form }: FieldProps) => {
+                                            const selectedSatuan = field.value
+                                                ? satuansData.data?.find(
+                                                      (satuan) =>
+                                                          satuan.id ===
+                                                          field.value
+                                                  )
+                                                : null
 
-                                    const persenError =
-                                        errors.termin?.[index]?.persen &&
-                                        touched.termin?.[index]?.persen
+                                            const satuanOptions =
+                                                satuansData.data?.map(
+                                                    (satuan) => ({
+                                                        value: satuan.id,
+                                                        label: `${satuan.satuan}`,
+                                                    })
+                                                )
 
-                                    return (
-                                        <div
-                                            className="flex items-start mb-4"
-                                            key={index}
-                                        >
-                                            <FormItem
-                                                className="flex-grow mb-0 mr-4"
-                                                invalid={Boolean(
-                                                    keteranganError
-                                                )}
-                                                errorMessage={
-                                                    typeof errors.termin?.[
-                                                        index
-                                                    ]?.keterangan === 'string'
-                                                        ? errors.termin?.[index]
-                                                              ?.keterangan
-                                                        : ''
-                                                }
-                                            >
-                                                <Input
-                                                    type="text"
-                                                    value={terminName}
-                                                    disabled
-                                                    readOnly
-                                                    className="bg-gray-100"
-                                                />
-                                                <Field
-                                                    type="hidden"
-                                                    name={`termin[${index}].keterangan`}
-                                                    value={terminName}
-                                                />
-                                            </FormItem>
-                                            <FormItem
-                                                className="w-32 mb-0 mr-2"
-                                                invalid={Boolean(persenError)}
-                                                errorMessage={
-                                                    typeof errors.termin?.[
-                                                        index
-                                                    ]?.persen === 'string'
-                                                        ? errors.termin?.[index]
-                                                              ?.persen
-                                                        : ''
-                                                }
-                                            >
-                                                <Field
-                                                    name={`termin[${index}].persen`}
-                                                >
-                                                    {({
-                                                        field,
-                                                        form,
-                                                    }: FieldProps) => (
-                                                        <NumericFormat
-                                                            {...field}
-                                                            customInput={Input}
-                                                            placeholder="%"
-                                                            suffix="%"
-                                                            onValueChange={(
-                                                                values
-                                                            ) => {
-                                                                form.setFieldValue(
-                                                                    field.name,
-                                                                    Number(
-                                                                        values.value
-                                                                    )
-                                                                )
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Field>
-                                            </FormItem>
-
-                                            <div className="flex items-center h-10">
-                                                <Button
-                                                    type="button"
-                                                    shape="circle"
-                                                    variant="plain"
-                                                    size="sm"
-                                                    icon={<HiMinus />}
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        e.stopPropagation()
-                                                        remove(index)
+                                            return (
+                                                <Select
+                                                    field={field}
+                                                    form={form}
+                                                    options={satuanOptions}
+                                                    value={
+                                                        selectedSatuan
+                                                            ? {
+                                                                  value: selectedSatuan.id,
+                                                                  label: `${selectedSatuan.satuan}`,
+                                                              }
+                                                            : null
+                                                    }
+                                                    placeholder="Pilih satuan"
+                                                    onChange={(option) => {
+                                                        form.setFieldValue(
+                                                            field.name,
+                                                            option?.value
+                                                        )
                                                     }}
                                                 />
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                                            )
+                                        }}
+                                    </Field>
+                                </FormItem>
 
-                            {/* Total Percentage Display */}
-                            {values.termin && values.termin.length > 0 && (
-                                <div className="flex justify-end mb-4">
-                                    <div className="w-32 mr-12">
-                                        <div
-                                            className={`font-medium ${
-                                                totalPersen !== 100
-                                                    ? 'text-red-500'
-                                                    : 'text-emerald-500'
-                                            }`}
-                                        >
-                                            Total: {totalPersen}%
-                                        </div>
-                                        {totalPersen !== 100 && (
-                                            <div className="text-xs text-red-500">
-                                                Total harus 100%
-                                            </div>
+                                {/* Harga Satuan Material */}
+                                <FormItem
+                                    label="Harga Satuan Material"
+                                    errorMessage={
+                                        detailErrors.tempHargaSatuanMaterial &&
+                                        detailTouched.tempHargaSatuanMaterial
+                                            ? detailErrors.tempHargaSatuanMaterial
+                                            : ''
+                                    }
+                                    invalid={
+                                        !!(
+                                            detailErrors.tempHargaSatuanMaterial &&
+                                            detailTouched.tempHargaSatuanMaterial
+                                        )
+                                    }
+                                >
+                                    <Field name="tempHargaSatuanMaterial">
+                                        {({ field, form }: FieldProps) => (
+                                            <NumericFormat
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                prefix="Rp "
+                                                placeholder="Masukkan harga satuan material"
+                                                customInput={Input}
+                                                {...field}
+                                                onValueChange={(values) => {
+                                                    const { value } = values
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        value
+                                                    )
+                                                    calculateValues()
+                                                }}
+                                            />
                                         )}
-                                    </div>
-                                </div>
-                            )}
+                                    </Field>
+                                </FormItem>
 
-                            <Button
-                                type="button"
-                                variant="twoTone"
-                                icon={<HiPlus />}
-                                onClick={() => {
-                                    const nextIndex = values.termin
-                                        ? values.termin.length + 1
-                                        : 1
-                                    push({
-                                        keterangan: `Termin ${nextIndex}`,
-                                        persen: 0,
-                                    })
-                                }}
-                            >
-                                Tambah Termin
-                            </Button>
-                        </div>
-                    )
-                }}
-            </FieldArray>
-        </AdaptableCard>
-    )
-}
+                                {/* Jumlah Harga Material */}
+                                <FormItem label="Jumlah Harga Material">
+                                    <Field name="tempJumlahHargaMaterial">
+                                        {({ field }: FieldProps) => (
+                                            <NumericFormat
+                                                disabled
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                prefix="Rp "
+                                                placeholder="Jumlah harga material"
+                                                customInput={Input}
+                                                {...field}
+                                                readOnly
+                                                value={field.value || '0'}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
 
-export default TerminFields
+                                {/* Harga Satuan Jasa */}
+                                <FormItem
+                                    label="Harga Satuan Jasa"
+                                    errorMessage={
+                                        detailErrors.tempHargaSatuanJasa &&
+                                        detailTouched.tempHargaSatuanJasa
+                                            ? detailErrors.tempHargaSatuanJasa
+                                            : ''
+                                    }
+                                    invalid={
+                                        !!(
+                                            detailErrors.tempHargaSatuanJasa &&
+                                            detailTouched.tempHargaSatuanJasa
+                                        )
+                                    }
+                                >
+                                    <Field name="tempHargaSatuanJasa">
+                                        {({ field, form }: FieldProps) => (
+                                            <NumericFormat
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                prefix="Rp "
+                                                placeholder="Masukkan harga satuan jasa"
+                                                customInput={Input}
+                                                {...field}
+                                                onValueChange={(values) => {
+                                                    const { value } = values
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        value
+                                                    )
+                                                    calculateValues()
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                {/* Jumlah Harga Jasa */}
+                                <FormItem label="Jumlah Harga Jasa">
+                                    <Field name="tempJumlahHargaJasa">
+                                        {({ field }: FieldProps) => (
+                                            <NumericFormat
+                                                disabled
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                prefix="Rp "
+                                                placeholder="Jumlah harga jasa"
+                                                customInput={Input}
+                                                {...field}
+                                                readOnly
+                                                value={field.value || '0'}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                {/* Volume */}
+                                <FormItem
+                                    label="Volume"
+                                    errorMessage={
+                                        detailErrors.tempVolume &&
+                                        detailTouched.tempVolume
+                                            ? detailErrors.tempVolume
+                                            : ''
+                                    }
+                                    invalid={
+                                        !!(
+                                            detailErrors.tempVolume &&
+                                            detailTouched.tempVolume
+                                        )
+                                    }
+                                >
+                                    <Field name="tempVolume">
+                                        {({ field, form }: FieldProps) => (
+                                            <NumericFormat
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                placeholder="Masukkan volume"
+                                                customInput={Input}
+                                                {...field}
+                                                onValueChange={(values) => {
+                                                    const { value } = values
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        value
+                                                    )
+                                                    calculateValues()
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                {/* Total */}
+                                <FormItem label="Total">
+                                    <Field name="tempJumlah">
+                                        {({ field }: FieldProps) => (
+                                            <NumericFormat
+                                                disabled
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                prefix="Rp "
+                                                placeholder="Total"
+                                                customInput={Input}
+                                                {...field}
+                                                readOnly
+                                                value={field.value || '0'}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+                            </div>
+
+                            <div className="flex justify-end space-x-2 mt-4">
+                                <Button
+                                    size="sm"
+                                    variant="plain"
+                                    onClick={handleCancelDetail}
+                                    type="button"
+                                >
+                                    Batal
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="solid"
+                                    onClick={handleSaveDetail}
+                                    type="button"
+                                    loading={isSubmitting}
+                                >
+                                    Simpan
+                                </Button>
+                            </div>
+                        </FormContainer>
+                    </div>
+                )}
+
+                {/* ... (keep the rest of the code unchanged) */}
+            </>
+        )
+    }}
+</Formik>
