@@ -70,7 +70,7 @@ const FakturPajakEdit = () => {
                 type="success"
                 duration={2500}
             >
-                Product successfuly {keyword}
+                Faktur Pajak successfuly {keyword}
             </Notification>,
             {
                 placement: 'top-center',

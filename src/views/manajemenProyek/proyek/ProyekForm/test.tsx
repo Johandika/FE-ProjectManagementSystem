@@ -535,7 +535,7 @@ export default function Items() {
                                         </FormContainer>
                                     </div>
                                 )}
-                                {/* Nested Formik for Detail Items */};
+                                {/* Nested Formik for Detail Items */}
                                 <Formik
                                     enableReinitialize
                                     initialValues={initialDetailValues}
@@ -826,8 +826,6 @@ export default function Items() {
                                                 }
                                             }
                                         }
-
-                                       
 
                                         const handleCancelDetail = () => {
                                             setShowDetailForm(false)
@@ -1575,7 +1573,6 @@ export default function Items() {
                                                                                                 detail,
                                                                                                 detailIndex
                                                                                             ) => {
-                                                                                                
                                                                                                 return (
                                                                                                     <div
                                                                                                         key={
@@ -1775,7 +1772,6 @@ export default function Items() {
                                                 </ConfirmDialog>
                                             </>
                                         )
-                                        
                                     }}
                                 </Formik>
                             </AdaptableCard>

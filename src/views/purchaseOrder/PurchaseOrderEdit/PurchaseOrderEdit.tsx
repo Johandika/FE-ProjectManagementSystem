@@ -46,7 +46,7 @@ const PurchaseOrderEdit = () => {
                 type="success"
                 duration={2500}
             >
-                Product successfuly {keyword}
+                Purchase successfuly {keyword}
             </Notification>,
             {
                 placement: 'top-center',

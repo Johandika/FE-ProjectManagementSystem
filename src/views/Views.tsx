@@ -10,7 +10,7 @@ import PublicRoute from '@/components/route/PublicRoute'
 import AuthorityGuard from '@/components/route/AuthorityGuard'
 import AppRoute from '@/components/route/AppRoute'
 import type { LayoutType } from '@/@types/theme'
-import reducer from './manajemenProyek/ProyekEdit/store'
+import reducer from './manajemenProyek/proyek/ProyekEdit/store'
 
 interface ViewsProps {
     pageContainerType?: 'default' | 'gutterless' | 'contained'

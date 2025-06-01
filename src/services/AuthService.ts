@@ -25,12 +25,14 @@ export async function apiSignUp(data: SignUpCredential) {
     })
 }
 
-export async function apiSignOut(data: { id: string }) {
-    return ApiService.fetchData({
+export async function apiSignOut(data: { authorization: string }) {
+    const res = ApiService.fetchData({
         url: '/user/logout',
         method: 'post',
         data,
     })
+
+    return res
 }
 
 export async function apiForgotPassword(data: ForgotPassword) {

@@ -73,7 +73,7 @@ export default function DialogUpdatePassword() {
                 type="success"
                 duration={2500}
             >
-                Product successfuly {keyword}
+                Password successfuly {keyword}
             </Notification>,
             {
                 placement: 'top-center',

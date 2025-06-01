@@ -13,6 +13,7 @@ import LocationFields from './LocationFields'
 import TerminFields from './TerminFields'
 import SubkontraktorFields from './SubkontraktorFields'
 import ItemFields from './ItemFields'
+import { useLocation } from 'react-router-dom'
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type FormikRef = FormikProps<any>
@@ -172,10 +173,15 @@ const DeleteProyekButton = ({ onDelete }: { onDelete: OnDelete }) => {
 }
 
 const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
+    const location = useLocation()
+    const stateFromTender = location.state
+
     const {
         type,
         initialData = {
-            pekerjaan: '',
+            pekerjaan: stateFromTender?.pekerjaan || '',
+            nilai_kontrak: stateFromTender?.nilai_kontrak || 0,
+            idClient: stateFromTender?.idClient || '',
             pic: '',
             nomor_kontrak: '',
             timeline_awal: '',
@@ -186,11 +192,9 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             persen_retensi: 0,
             jatuh_tempo_retensi: null,
             tanggal_delivery: '',
-            nilai_kontrak: 0,
             uang_muka: 0,
             timeline: 0,
             keterangan: '',
-            idClient: '',
             berkas: [],
             item: [],
             lokasi: [],
@@ -253,6 +257,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                             errors={errors}
                                             kliensList={kliensList}
                                             berkasesList={berkasesList}
+                                            initialData={initialData}
                                         />
 
                                         {type === 'new' && (

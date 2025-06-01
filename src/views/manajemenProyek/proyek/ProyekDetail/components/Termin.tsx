@@ -57,8 +57,8 @@ export interface FormModel {
 // Schema validasi untuk form faktur
 const FakturSchema = Yup.object().shape({
     nomor: Yup.string().required('Nomor wajib diisi'),
-    nominal: Yup.number()
-        .min(1, 'Nominal harus lebih besar dari 0')
+    nominal: Yup.string()
+        .min(2, 'Nominal harus lebih besar dari 0')
         .typeError('Nominal harus berupa angka'),
     tanggal: Yup.string().required('Tanggal wajib diisi'),
 })

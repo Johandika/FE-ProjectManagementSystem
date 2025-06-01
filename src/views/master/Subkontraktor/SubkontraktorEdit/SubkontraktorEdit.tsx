@@ -70,7 +70,7 @@ const SubkontraktorEdit = () => {
                 type="success"
                 duration={2500}
             >
-                Product successfuly {keyword}
+                Subkontraktor successfuly {keyword}
             </Notification>,
             {
                 placement: 'top-center',

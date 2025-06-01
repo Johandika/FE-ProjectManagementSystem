@@ -103,7 +103,9 @@ function useAuth() {
     }
 
     const signOut = async () => {
-        // await apiSignOut()
+        const authObject = { authorization: user.authorization }
+
+        await apiSignOut(authObject)
         // Hapus token dari Redux store
         dispatch(signOutSuccess())
 

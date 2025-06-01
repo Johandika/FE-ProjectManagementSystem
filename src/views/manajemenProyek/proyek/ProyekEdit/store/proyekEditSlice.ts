@@ -312,7 +312,6 @@ export const getAllBerkasesByTermin = createAsyncThunk(
             FakturPajak,
             { id: string }
         >(data)
-        console.log('response.data getAllBerkasesByTermin', response.data)
         return response.data
     }
 )
@@ -325,7 +324,6 @@ export const getAllBerkasByProyek = createAsyncThunk(
             FakturPajak,
             { id: string }
         >(data)
-        console.log('response.data getAllBerkasesByTermin', response.data)
         return response.data
     }
 )

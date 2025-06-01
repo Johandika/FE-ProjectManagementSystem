@@ -6,7 +6,7 @@ import { NumericFormat } from 'react-number-format'
 import { Checkbox, DatePicker, Select } from '@/components/ui'
 import dayjs from 'dayjs'
 import reducer from '@/views/master/Satuan/SatuanList/store'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface Termin {
     keterangan: string
@@ -66,11 +66,13 @@ type BasicInformationFields = {
     values?: FormFieldsName
     kliensList?: { id: string; nama: string; keterangan: string }[]
     berkasesList?: { id: string; nama: string }[]
+    initialData?: any[]
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const { touched, errors, type, kliensList = [] } = props
+    const { touched, errors, type, kliensList = [], initialData = {} } = props
     const [checkRetensi, setCheckRetensi] = useState(false)
+    const [disabledState, setDisabledState] = useState(false)
 
     const onCheck = (value: boolean, form: any) => {
         console.log(setCheckRetensi(value))
@@ -83,6 +85,12 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             form.setFieldValue('jatuh_tempo_retensi', null)
         }
     }
+
+    useEffect(() => {
+        if (initialData?.idClient?.length > 5) {
+            setDisabledState(true)
+        }
+    }, [initialData])
 
     return (
         <AdaptableCard divider className="mb-4">
@@ -101,6 +109,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     name="pekerjaan"
                     placeholder="Nama pekerjaan"
                     component={Input}
+                    disabled={disabledState}
                 />
             </FormItem>
 
@@ -135,6 +144,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                     <Select
                                         field={field}
                                         form={form}
+                                        isDisabled={disabledState}
                                         options={clientOptions}
                                         value={
                                             selectedClient
@@ -227,6 +237,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                 <NumericFormat
                                     {...field}
                                     customInput={Input}
+                                    disabled={disabledState}
                                     placeholder="Nilai Kontrak"
                                     thousandSeparator="."
                                     decimalSeparator=","

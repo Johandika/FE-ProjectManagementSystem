@@ -1,7 +1,7 @@
 import ProyekForm, {
     FormModel,
     SetSubmitting,
-} from '@/views/manajemenProyek/ProyekForm'
+} from '@/views/manajemenProyek/proyek/ProyekForm'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import { useNavigate } from 'react-router-dom'
@@ -139,12 +139,12 @@ const ProyekNew = () => {
                     placement: 'top-center',
                 }
             )
-            navigate('/manajemen-proyek')
+            navigate('/manajemen-proyek/proyek')
         }
     }
 
     const handleDiscard = () => {
-        navigate('/manajemen-proyek')
+        navigate('/manajemen-proyek/proyek')
     }
 
     useEffect(() => {

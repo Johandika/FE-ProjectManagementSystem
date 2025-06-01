@@ -21,7 +21,7 @@ import ProyekForm, {
     FormModel,
     SetSubmitting,
     OnDeleteCallback,
-} from '@/views/manajemenProyek/ProyekForm'
+} from '@/views/manajemenProyek/proyek/ProyekForm'
 import isEmpty from 'lodash/isEmpty'
 
 injectReducer('proyekEdit', reducer)
@@ -71,7 +71,7 @@ const ProyekEdit = () => {
     }
 
     const handleDiscard = () => {
-        navigate('/manajemen-proyek')
+        navigate('/manajemen-proyek/proyek')
     }
 
     const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
@@ -95,7 +95,7 @@ const ProyekEdit = () => {
                 placement: 'top-center',
             }
         )
-        navigate('/manajemen-proyek')
+        navigate('/manajemen-proyek/proyek')
     }
 
     useEffect(() => {

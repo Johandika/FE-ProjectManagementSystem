@@ -4,35 +4,43 @@ import DoubleSidedImage from '@/components/shared/DoubleSidedImage'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import reducer, {
-    getKlien,
-    updateKlien,
-    deleteKlien,
+    getTender,
     useAppSelector,
     useAppDispatch,
+    getKliens,
 } from './store'
 import { injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import KlienForm, {
+import TenderForm, {
     FormModel,
     SetSubmitting,
     OnDeleteCallback,
-} from '@/views/master/Klien/KlienForm'
+} from '@/views/manajemenProyek/tender/TenderForm'
 import isEmpty from 'lodash/isEmpty'
+import { apiDeleteTender, apiPutTender } from '@/services/TenderService'
 
-injectReducer('klienEdit', reducer)
+injectReducer('tenderEdit', reducer)
 
-const KlienEdit = () => {
+const TenderEdit = () => {
     const dispatch = useAppDispatch()
 
     const location = useLocation()
     const navigate = useNavigate()
 
-    const klienData = useAppSelector((state) => state.klienEdit.data.klienData)
-    const loading = useAppSelector((state) => state.klienEdit.data.loading)
+    const tenderData = useAppSelector(
+        (state) => state.tenderEdit.data.tenderData
+    )
+
+    const kliensData = useAppSelector(
+        (state) => state.tenderEdit.data.kliensData?.data || []
+    )
+
+    const loading = useAppSelector((state) => state.tenderEdit.data.loading)
 
     const fetchData = (data: { id: string }) => {
-        dispatch(getKlien(data))
+        dispatch(getTender(data))
+        dispatch(getKliens())
     }
 
     const popNotification = (keyword: string) => {
@@ -42,13 +50,13 @@ const KlienEdit = () => {
                 type="success"
                 duration={2500}
             >
-                Klien successfuly {keyword}
+                Tender successfuly {keyword}
             </Notification>,
             {
                 placement: 'top-center',
             }
         )
-        navigate('/master/klien')
+        navigate('/manajemen-proyek/tender')
     }
 
     const handleFormSubmit = async (
@@ -57,9 +65,10 @@ const KlienEdit = () => {
     ) => {
         try {
             setSubmitting(true)
-            const result = await updateKlien(values)
 
-            if (result.statusCode === 200) {
+            const result = await apiPutTender(values)
+
+            if (result.data.statusCode === 200) {
                 popNotification('updated')
             } else {
                 // Menampilkan notifikasi error
@@ -69,7 +78,7 @@ const KlienEdit = () => {
                         type="danger"
                         duration={3500}
                     >
-                        {result.message}
+                        {result.data.message}
                     </Notification>,
                     {
                         placement: 'top-center',
@@ -83,12 +92,13 @@ const KlienEdit = () => {
     }
 
     const handleDiscard = () => {
-        navigate('/master/klien')
+        navigate('/manajemen-proyek/tender')
     }
 
     const handleDelete = async (setDialogOpen: OnDeleteCallback) => {
         setDialogOpen(false)
-        const result = await deleteKlien({ id: klienData.id })
+
+        const result = await apiDeleteTender({ id: tenderData.id })
         if (result.statusCode === 200) {
             popNotification('deleted')
         } else {
@@ -120,30 +130,31 @@ const KlienEdit = () => {
     return (
         <>
             <Loading loading={loading}>
-                {!isEmpty(klienData) && (
+                {!isEmpty(tenderData) && (
                     <>
-                        <KlienForm
+                        <TenderForm
                             type="edit"
-                            initialData={klienData}
+                            initialData={tenderData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}
+                            kliensData={kliensData}
                         />
                     </>
                 )}
             </Loading>
-            {!loading && isEmpty(klienData) && (
+            {!loading && isEmpty(tenderData) && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <DoubleSidedImage
                         src="/img/others/img-2.png"
                         darkModeSrc="/img/others/img-2-dark.png"
-                        alt="No product found!"
+                        alt="No tender found!"
                     />
-                    <h3 className="mt-8">No product found!</h3>
+                    <h3 className="mt-8">No tender found!</h3>
                 </div>
             )}
         </>
     )
 }
 
-export default KlienEdit
+export default TenderEdit

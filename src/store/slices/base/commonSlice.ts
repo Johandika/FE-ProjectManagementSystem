@@ -22,6 +22,7 @@ export const getDashboard = createAsyncThunk(
     async (data: any) => {
         try {
             const response = await apiGetDashboard<any, any>(data)
+            console.log('response.data', response.data)
 
             return response.data
         } catch (error: any) {

@@ -12,39 +12,78 @@ export const protectedRoutes = [
         component: lazy(() => import('@/views/Dashboard')),
         authority: [],
     },
-    // Manajemen Proyek
+    // Proyek
     {
-        key: 'apps.manajemenProyek',
-        path: '/manajemen-proyek',
-        component: lazy(() => import('@/views/manajemenProyek/ProyekList')),
+        key: 'apps.proyek',
+        path: '/manajemen-proyek/proyek',
+        component: lazy(
+            () => import('@/views/manajemenProyek/proyek/ProyekList')
+        ),
         authority: [],
     },
     {
         added: 'detailProyek',
-        key: 'apps.manajemenProyek',
+        key: 'apps.proyek',
         path: '/manajemen-proyek-detail/:proyekId',
-        component: lazy(() => import('@/views/manajemenProyek/ProyekDetail')),
+        component: lazy(
+            () => import('@/views/manajemenProyek/proyek/ProyekDetail')
+        ),
         authority: [],
         meta: {
             header: 'Detail Proyek',
         },
     },
     {
-        key: 'apps.manajemenProyek',
+        key: 'apps.proyek',
         path: '/manajemen-proyek-edit/:proyekId',
-        component: lazy(() => import('@/views/manajemenProyek/ProyekEdit')),
+        component: lazy(
+            () => import('@/views/manajemenProyek/proyek/ProyekEdit')
+        ),
         authority: [],
         meta: {
             header: 'Ubah Proyek',
         },
     },
     {
-        key: 'apps.manajemenProyek',
+        key: 'apps.proyek',
         path: '/manajemen-proyek-new',
-        component: lazy(() => import('@/views/manajemenProyek/ProyekNew')),
+        component: lazy(
+            () => import('@/views/manajemenProyek/proyek/ProyekNew')
+        ),
         authority: [],
         meta: {
             header: 'Tambah Proyek',
+        },
+    },
+    // Tender
+    {
+        key: 'apps.tender',
+        path: '/manajemen-proyek/tender',
+        component: lazy(
+            () => import('@/views/manajemenProyek/tender/TenderList')
+        ),
+        authority: [],
+    },
+    {
+        key: 'apps.tender',
+        path: '/manajemen-proyek/tender-edit/:proyekId',
+        component: lazy(
+            () => import('@/views/manajemenProyek/tender/TenderEdit')
+        ),
+        authority: [],
+        meta: {
+            header: 'Ubah Tender',
+        },
+    },
+    {
+        key: 'apps.tender',
+        path: '/manajemen-proyek/tender-new',
+        component: lazy(
+            () => import('@/views/manajemenProyek/tender/TenderNew')
+        ),
+        authority: [],
+        meta: {
+            header: 'Tambah Tender',
         },
     },
     // Klien
