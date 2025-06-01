@@ -1035,10 +1035,7 @@ const PurchaseOrder = () => {
                                                                                                     <HiOutlineTrash />
                                                                                                 }
                                                                                                 onClick={() => {
-                                                                                                    console.log(
-                                                                                                        'detail22',
-                                                                                                        detail
-                                                                                                    )
+                                                                                                   
                                                                                                     handleRemoveDetail(
                                                                                                         detail?.id
                                                                                                     )

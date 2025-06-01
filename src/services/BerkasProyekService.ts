@@ -58,3 +58,39 @@ export async function apiDeleteBerkasProyek<
         data,
     })
 }
+
+// getAllBerkas By TerminId// get by id
+export async function apiGetAllBerkasByTerminId<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/berkasProject/termin-project/${data.id}`,
+        method: 'get',
+        data,
+    })
+}
+
+// getAllBerkas By TerminId// get by id
+export async function apiGetAllBerkasByProyek<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/berkasProject/project/${data.id}`,
+        method: 'get',
+        data,
+    })
+}
+
+// create berkas multiple
+export async function apiCreateBerkasMultiple<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: '/berkasProject/multiple',
+        method: 'post',
+        data,
+    })
+}

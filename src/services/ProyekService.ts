@@ -14,7 +14,6 @@ export interface GetProyeksRequest {
 export async function apiGetProyeks<T, U extends GetProyeksRequest>(data: U) {
     // Membangun query string parameters
     const params = new URLSearchParams()
-    console.log('data', data)
     // Menangani pagination
     if (data.page) params.append('page', data.page.toString())
     if (data.limit) params.append('limit', data.limit.toString())
@@ -37,7 +36,7 @@ export async function apiGetProyeks<T, U extends GetProyeksRequest>(data: U) {
 
     // URL dengan query parameters
     const url = `/project${params.toString() ? `?${params.toString()}` : ''}`
-    console.log('url', url)
+
     return ApiService.fetchData<T>({
         url,
         method: 'get',
@@ -143,6 +142,30 @@ export async function apiUpdateStatusRetensi<
 >(data: U) {
     return ApiService.fetchData<T>({
         url: `/project/status-retensi/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// update status diproses proyek
+export async function apiUpdateStatusDiprosesProyek<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/project/status-diproses/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// update status selesai proyek
+export async function apiUpdateStatusSelesaiProyek<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/project/status-selesai/${data.id}`,
         method: 'patch',
         data,
     })

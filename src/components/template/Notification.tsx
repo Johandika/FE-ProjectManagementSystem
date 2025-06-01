@@ -273,20 +273,12 @@ const _Notification = ({ className }: { className?: string }) => {
                                                      : item.type ===
                                                        'faktur_pajak'
                                                      ? 'bg-green-100 text-green-600'
+                                                     : item.type === 'project'
+                                                     ? 'bg-fuchsia-100 text-fuchsia-600'
                                                      : ''
                                              }
                                              dark:bg-blue-500/20 dark:text-blue-100`}
-                                        icon={
-                                            item.type === 'adendum' ? (
-                                                <HiOutlineBell />
-                                            ) : item.type === 'faktur_pajak' ? (
-                                                <HiOutlineBell />
-                                            ) : item.type === 'timeline' ? (
-                                                <HiOutlineBell />
-                                            ) : (
-                                                ''
-                                            )
-                                        }
+                                        icon={<HiOutlineBell />}
                                     />
                                 </div>
                                 {/* text and descirpiton */}

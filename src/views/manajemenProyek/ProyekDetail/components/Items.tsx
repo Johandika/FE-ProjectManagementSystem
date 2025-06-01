@@ -1575,10 +1575,7 @@ export default function Items() {
                                                                                                 detail,
                                                                                                 detailIndex
                                                                                             ) => {
-                                                                                                console.log(
-                                                                                                    'detail',
-                                                                                                    detail
-                                                                                                )
+                                                                                                
                                                                                                 return (
                                                                                                     <div
                                                                                                         key={

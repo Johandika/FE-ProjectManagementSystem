@@ -56,3 +56,15 @@ export async function apiCreateBastp<T, U extends Record<string, unknown>>(
         data,
     })
 }
+
+// update tanggal permbayaran BASTP
+export async function apiUpdateTanggalPembayaranBastp<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/terminProject/tanggal-pembayaran/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}

@@ -6,12 +6,15 @@ import {
     setTableData,
     setSelectedProyek,
     toggleDeleteConfirmation,
+    toggleUpdateConfirmation,
     useAppDispatch,
     useAppSelector,
     getKliens,
+    setProjectStatus,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import ProyekDeleteConfirmation from './ProyekDeleteConfirmation'
+import ProyekUpdateStatusConfirmation from './ProyekUpdateStatusConfirmation'
 import { useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
 import type {
@@ -22,6 +25,7 @@ import type {
 import { IoLocationSharp } from 'react-icons/io5'
 import { AiFillCreditCard } from 'react-icons/ai'
 import { formatDate } from '@/utils/formatDate'
+import { Button } from '@/components/ui'
 
 type Proyek = {
     id: string
@@ -155,6 +159,17 @@ const ProyekTable = () => {
                 filterData: filterData,
             })
         )
+    }
+
+    const onUpdate = (
+        e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+        row: any
+    ) => {
+        e.stopPropagation()
+        console.log('row', row)
+        dispatch(toggleUpdateConfirmation(true))
+        dispatch(setSelectedProyek(row.id))
+        dispatch(setProjectStatus(row.status))
     }
 
     const columns: ColumnDef<Proyek>[] = useMemo(
@@ -336,9 +351,34 @@ const ProyekTable = () => {
             {
                 header: 'Status',
                 accessorKey: 'status',
+                minWidth: 160,
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.status}</span>
+                    return (
+                        <div className="flex flex-col gap-1">
+                            <span className="capitalize" color="green">
+                                {row.status}
+                            </span>
+                            {(row.status === 'Belum Dimulai' ||
+                                row.status ===
+                                    'Selesai Sudah tertagih 100%') && (
+                                <Button
+                                    size="xs"
+                                    variant="solid"
+                                    color={
+                                        row.status === 'Belum Dimulai'
+                                            ? 'indigo-600'
+                                            : 'emerald-500'
+                                    }
+                                    onClick={(e) => onUpdate(e, row)}
+                                >
+                                    {row.status === 'Belum Dimulai'
+                                        ? 'Mulai Proyek'
+                                        : 'Proyek Selesai'}
+                                </Button>
+                            )}
+                        </div>
+                    )
                 },
             },
             {
@@ -389,6 +429,7 @@ const ProyekTable = () => {
                 onRowClick={handleRowClick}
             />
             <ProyekDeleteConfirmation />
+            <ProyekUpdateStatusConfirmation />
         </>
     )
 }

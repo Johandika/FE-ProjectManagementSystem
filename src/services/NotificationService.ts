@@ -35,7 +35,6 @@ export async function apiGetOneAndReadNotification<
     T,
     U extends Record<string, unknown>
 >(data: U) {
-    console.log('data dlm api', data)
     const res = await ApiService.fetchData<T>({
         url: `/notification/${data.id}`,
         method: 'get',

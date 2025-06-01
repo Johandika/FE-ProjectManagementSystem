@@ -18,14 +18,11 @@
                 "collapse": "Master",
                 "item1": "Klien",
                 "item2": "Berkas Tagihan"
-            }
-        },
-        "settings": {
-            "settings": "Settings",
-            "pengaturan": {
-                "collapse": "Pengaturan",
-                "item1": "Pengguna",
-                "item2": "Peran"
+            },
+            "peranDanPengguna": {
+                "collapse": "Peran & Pengguna",
+                "item1": "Peran",
+                "item2": "Pengguna"
             }
         }
     }

@@ -57,8 +57,10 @@ export interface FormModel {
 // Schema validasi untuk form faktur
 const FakturSchema = Yup.object().shape({
     nomor: Yup.string().required('Nomor wajib diisi'),
+    nominal: Yup.number()
+        .min(1, 'Nominal harus lebih besar dari 0')
+        .typeError('Nominal harus berupa angka'),
     tanggal: Yup.string().required('Tanggal wajib diisi'),
-    keterangan: Yup.string(),
 })
 
 // Interface untuk nilai awal form faktur
@@ -109,6 +111,8 @@ export default function Termin() {
     const [selectedTerminToEdit, setSelectedTerminToEdit] = useState<any>(null)
     const [terminDeleteConfirmOpen, setTerminDeleteConfirmOpen] =
         useState(false)
+    const [statusChangeItem, setStatusChangeItem] = useState(null)
+    const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false)
     const [terminFormInitialValues, setTerminFormInitialValues] =
         useState<TerminFormValues>({
             persen: 0,
@@ -131,12 +135,8 @@ export default function Termin() {
         (state) => state.proyekEdit.data.fakturPajakByProyekData
     )
 
-    const loadingTermins = useAppSelector(
-        (state) => state.proyekEdit.data.loadingTermins
-    )
-
-    const loadingFakturPajakByProyekData = useAppSelector(
-        (state) => state.proyekEdit.data.loadingFakturPajakByProyekData
+    const { loadingTermins, loadingFakturPajakByProyekData } = useAppSelector(
+        (state) => state.proyekEdit.data
     )
 
     // Calculate total percentage used
@@ -205,6 +205,17 @@ export default function Termin() {
         )
     }
 
+    const handleOpenStatusChangeDialog = (fakturByTerminProyek: any) => {
+        setStatusChangeItem({
+            id: fakturByTerminProyek.id,
+        })
+        setStatusChangeDialogOpen(true)
+    }
+
+    const cancelStatusChange = () => {
+        setStatusChangeDialogOpen(false)
+    }
+
     const handleSubmit = async (
         values: FakturFormValues,
         { setSubmitting }: { setSubmitting: SetSubmitting }
@@ -256,13 +267,14 @@ export default function Termin() {
                 `Error ${isEditMode ? 'updating' : 'creating'} faktur pajak:`,
                 error
             )
+
             toast.push(
                 <Notification
                     title={`${isEditMode ? 'Update' : 'Create'} Failed`}
                     type="danger"
                     duration={2500}
                 >
-                    Failed to {isEditMode ? 'update' : 'create'} faktur
+                    {error.response.data.message[0]}
                 </Notification>,
                 {
                     placement: 'top-center',
@@ -363,7 +375,6 @@ export default function Termin() {
         { setSubmitting }: { setSubmitting: SetSubmitting }
     ) => {
         setSubmitting(true)
-        console.log('processedData before', { ...values })
         const projectId = getProjectId()
 
         const processedData = {
@@ -371,7 +382,6 @@ export default function Termin() {
             persen: extractNumberFromString(values.persen),
             idProject: projectId,
         }
-        console.log('processedData after', processedData)
 
         try {
             let success = false
@@ -476,16 +486,17 @@ export default function Termin() {
         dispatch(getFakturPajakByProyekId(data))
     }
 
-    const handleUpdateStatusFaktur = async (fakturData: any) => {
+    const confirmStatusChange = async () => {
         try {
             const fakturDataUpdated = {
-                id: fakturData.id,
+                id: statusChangeItem.id,
                 status: 'Sudah Bayar',
             }
             const result = await apiUpdateStatusFaktur(fakturDataUpdated)
 
             if (result.data.statusCode === 200) {
                 popNotification('updated', 'Status Faktur')
+                setStatusChangeDialogOpen(false)
                 fetchData({ id: getProjectId() })
             } else {
                 toast.push(
@@ -618,36 +629,41 @@ export default function Termin() {
                                                         </Button>
                                                     )}
 
-                                                    <Button
-                                                        type="button"
-                                                        shape="circle"
-                                                        variant="plain"
-                                                        size="sm"
-                                                        icon={
-                                                            <HiOutlinePencil />
-                                                        }
-                                                        className="text-indigo-500"
-                                                        onClick={() =>
-                                                            handleEditTermin(
-                                                                termin
-                                                            )
-                                                        }
-                                                    />
-                                                    <Button
-                                                        type="button"
-                                                        shape="circle"
-                                                        variant="plain"
-                                                        size="sm"
-                                                        className="text-red-500"
-                                                        icon={
-                                                            <HiOutlineTrash />
-                                                        }
-                                                        onClick={() =>
-                                                            handleConfirmDeleteTermin(
-                                                                termin
-                                                            )
-                                                        }
-                                                    />
+                                                    {/* anchor */}
+                                                    {!fakturByTermin && (
+                                                        <>
+                                                            <Button
+                                                                type="button"
+                                                                shape="circle"
+                                                                variant="plain"
+                                                                size="sm"
+                                                                icon={
+                                                                    <HiOutlinePencil />
+                                                                }
+                                                                className="text-indigo-500"
+                                                                onClick={() =>
+                                                                    handleEditTermin(
+                                                                        termin
+                                                                    )
+                                                                }
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                shape="circle"
+                                                                variant="plain"
+                                                                size="sm"
+                                                                className="text-red-500"
+                                                                icon={
+                                                                    <HiOutlineTrash />
+                                                                }
+                                                                onClick={() =>
+                                                                    handleConfirmDeleteTermin(
+                                                                        termin
+                                                                    )
+                                                                }
+                                                            />
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -695,7 +711,7 @@ export default function Termin() {
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div className="flex space-x-6 sm:space-x-0 justify-center sm:justify-start">
+                                                        <div className="flex flex-col md:flex-row space-x-4 sm:space-x-0 justify-center sm:justify-start items-center gap-2 md:gap-0">
                                                             <Button
                                                                 type="button"
                                                                 shape="circle"
@@ -705,10 +721,14 @@ export default function Termin() {
                                                                     <IoIosCheckmark />
                                                                 }
                                                                 className="text-indigo-500"
-                                                                onClick={() =>
-                                                                    handleUpdateStatusFaktur(
-                                                                        fakturByTermin
-                                                                    )
+                                                                onClick={
+                                                                    () =>
+                                                                        handleOpenStatusChangeDialog(
+                                                                            fakturByTermin
+                                                                        )
+                                                                    // handleUpdateStatusFaktur(
+                                                                    //     fakturByTermin
+                                                                    // )
                                                                 }
                                                                 disabled={
                                                                     fakturByTermin.status ===
@@ -722,41 +742,43 @@ export default function Termin() {
                                                                     : 'Update Status'}
                                                             </Button>
 
-                                                            {fakturByTermin.status !==
-                                                                'Sudah Bayar' && (
-                                                                <>
-                                                                    <Button
-                                                                        type="button"
-                                                                        shape="circle"
-                                                                        variant="plain"
-                                                                        size="sm"
-                                                                        icon={
-                                                                            <HiOutlinePencil />
-                                                                        }
-                                                                        className="text-indigo-500"
-                                                                        onClick={() =>
-                                                                            handleEditFaktur(
-                                                                                termin
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                    <Button
-                                                                        type="button"
-                                                                        shape="circle"
-                                                                        variant="plain"
-                                                                        size="sm"
-                                                                        className="text-red-500"
-                                                                        icon={
-                                                                            <HiOutlineTrash />
-                                                                        }
-                                                                        onClick={() =>
-                                                                            handleConfirmDeleteFaktur(
-                                                                                termin
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </>
-                                                            )}
+                                                            <div className="flex flex-row">
+                                                                {fakturByTermin.status !==
+                                                                    'Sudah Bayar' && (
+                                                                    <>
+                                                                        <Button
+                                                                            type="button"
+                                                                            shape="circle"
+                                                                            variant="plain"
+                                                                            size="sm"
+                                                                            icon={
+                                                                                <HiOutlinePencil />
+                                                                            }
+                                                                            className="text-indigo-500"
+                                                                            onClick={() =>
+                                                                                handleEditFaktur(
+                                                                                    termin
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                        <Button
+                                                                            type="button"
+                                                                            shape="circle"
+                                                                            variant="plain"
+                                                                            size="sm"
+                                                                            className="text-red-500"
+                                                                            icon={
+                                                                                <HiOutlineTrash />
+                                                                            }
+                                                                            onClick={() =>
+                                                                                handleConfirmDeleteFaktur(
+                                                                                    termin
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 )}
@@ -1087,6 +1109,26 @@ export default function Termin() {
                                             ini juga akan dihapus!
                                         </span>
                                     )}
+                                </p>
+                            </ConfirmDialog>
+                            <ConfirmDialog
+                                isOpen={statusChangeDialogOpen}
+                                onClose={cancelStatusChange}
+                                onRequestClose={cancelStatusChange}
+                                onCancel={cancelStatusChange}
+                                type="warning"
+                                title="Ubah Status"
+                                onConfirm={confirmStatusChange}
+                            >
+                                <p>
+                                    Apakah kamu yakin ingin mengubah status
+                                    faktur menjadi{' '}
+                                    <strong>
+                                        {!statusChangeItem?.newStatus
+                                            ? 'sudah dibayar'
+                                            : 'belum dibayar'}
+                                    </strong>
+                                    ?
                                 </p>
                             </ConfirmDialog>
                         </>

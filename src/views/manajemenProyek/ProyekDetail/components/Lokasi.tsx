@@ -252,7 +252,6 @@ export default function Lokasi() {
                                 }
 
                                 setIsSubmitting(false)
-                                console.log('result', result)
 
                                 if (
                                     result &&
@@ -357,8 +356,6 @@ export default function Lokasi() {
                             setIsSubmitting(true)
                             try {
                                 // Call delete API with location ID
-                                console.log('lokasidata', lokasiData)
-                                console.log('id,lok', lokasiId)
                                 const success = await apiDeleteLokasi(lokasiId)
 
                                 if (success) {

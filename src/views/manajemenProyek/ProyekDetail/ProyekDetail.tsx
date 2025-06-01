@@ -8,7 +8,6 @@ import Lokasi from './components/Lokasi'
 import Subkontraktor from './components/Subkontraktor'
 import BerkasTagihan from './components/BerkasTagihan'
 import Bastp from './components/Bastp'
-import Timeline from './components/Timeline'
 // import { injectReducer } from '@/store'
 // import reducer from '../ProyekEdit/store'
 
@@ -30,7 +29,6 @@ export default function ProyekDetail() {
                     <TabNav value="tab7">Adendum</TabNav>
                     <TabNav value="tab8">BASTP</TabNav>
                     <TabNav value="tab9">Berkas Tagihan</TabNav>
-                    <TabNav value="tab10">Timeline</TabNav>
                 </TabList>
                 <div className="px-4">
                     <TabContent value="tab1">
@@ -59,9 +57,6 @@ export default function ProyekDetail() {
                     </TabContent>
                     <TabContent value="tab9">
                         <BerkasTagihan />
-                    </TabContent>
-                    <TabContent value="tab10">
-                        <Timeline />
                     </TabContent>
                 </div>
             </Tabs>

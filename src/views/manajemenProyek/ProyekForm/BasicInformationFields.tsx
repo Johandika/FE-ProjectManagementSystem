@@ -334,6 +334,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                             name="pic"
                             placeholder="Person in charge"
                             component={Input}
+                            style={{ textTransform: 'uppercase' }}
                         />
                     </FormItem>
                 </div>

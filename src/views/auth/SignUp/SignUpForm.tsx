@@ -43,7 +43,6 @@ const SignUpForm = (props: SignUpFormProps) => {
         values: SignUpFormSchema,
         setSubmitting: (isSubmitting: boolean) => void
     ) => {
-        console.log('value', values)
 
         const { nama, password, email, nomor_telepon } = values
         setSubmitting(true)

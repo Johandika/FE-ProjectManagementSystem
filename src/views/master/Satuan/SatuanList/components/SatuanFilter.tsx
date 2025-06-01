@@ -216,7 +216,7 @@ const DrawerFooter = ({ onSaveClick, onCancel }: DrawerFooterProps) => {
                 Cancel
             </Button>
             <Button size="sm" variant="solid" onClick={onSaveClick}>
-                Query
+                Terapkan
             </Button>
         </div>
     )

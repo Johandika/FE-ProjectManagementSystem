@@ -24,6 +24,10 @@ export type ForgotPassword = {
     email: string
 }
 
-export type ResetPassword = {
+export type Register = {
+    nama: string
+    email: string
     password: string
+    nomor_telepon: string
+    idRole: string
 }

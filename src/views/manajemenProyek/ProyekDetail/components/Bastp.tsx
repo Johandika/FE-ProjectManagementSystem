@@ -6,6 +6,7 @@ import isLastChild from '@/utils/isLastChild'
 import DescriptionSection from './DesriptionSection'
 import reducer, {
     getBastpsByProyek,
+    getTermins,
     useAppDispatch,
     useAppSelector,
 } from '../store'
@@ -17,36 +18,49 @@ import Button from '@/components/ui/Button'
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import { ConfirmDialog, Loading } from '@/components/shared'
 import * as Yup from 'yup'
-import { Notification, toast } from '@/components/ui'
+import { Dialog, Notification, toast } from '@/components/ui'
 import DatePicker from '@/components/ui/DatePicker'
 import {
     apiCreateBastp,
     apiDeleteBastp,
     apiEditBastp,
+    apiUpdateTanggalPembayaranBastp,
 } from '@/services/BastpService'
+import dayjs from 'dayjs'
+import { IoIosAdd } from 'react-icons/io'
 
 type Bastp = {
     id: string
     tanggal: string
-    keterangan: string
     idProject: string
     createdAt: string
     updatedAt: string
+    tanggal_pembayaran?: string
 }
 
 // Form values type
 type FormValues = {
     tempTanggal: Date | null
-    tempKeterangan: string
     tempIdProject: string
+}
+
+export interface SetSubmitting {
+    (isSubmitting: boolean): void
+}
+interface BastpFormValues {
+    tanggal_pembayaran: string | null
 }
 
 // Validation schema for the form fields
 const validationSchema = Yup.object().shape({
-    tempKeterangan: Yup.string().required('Keterangan harus diisi'),
     tempTanggal: Yup.date()
         .required('Tanggal harus diisi')
         .typeError('Format tanggal tidak valid'),
+})
+
+// Schema validasi untuk form termin
+const BastpSchema = Yup.object().shape({
+    tanggal_pembayaran: Yup.string().required('Tanggal wajib diisi'),
 })
 
 injectReducer('proyekDetail', reducer)
@@ -57,24 +71,105 @@ export default function Bastp() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
+    const [selectedBastpToEdit, setSelectedBastpToEdit] = useState<any>(null)
+    const [bastpDialogIsOpen, setBastpDialogIsOpen] = useState(false)
+    const [idTermin, setIdTermin] = useState('')
+    const [isEditBastpMode, setIsEditBastpMode] = useState(false)
+    const [bastpFormInitialValues, setBastpFormInitialValues] =
+        useState<BastpFormValues>({
+            tanggal_pembayaran: null,
+        })
 
     const dispatch = useAppDispatch()
     const projectId = location.pathname.substring(
         location.pathname.lastIndexOf('/') + 1
     )
 
-    const bastpsByProyekData = useAppSelector(
-        (state) => state.proyekDetail.data.bastpProyekData.data
+    const terminsData = useAppSelector(
+        (state) => state.proyekDetail.data.terminsData
     )
 
-    const loading = useAppSelector(
-        (state) => state.proyekDetail.data.loadingBastpsByProyek
+    const loadingTermins = useAppSelector(
+        (state) => state.proyekDetail.data.loadingTermins
     )
+
+    const getProjectId = () => {
+        return location.pathname.substring(
+            location.pathname.lastIndexOf('/') + 1
+        )
+    }
+
+    const handleBastpSubmit = async (
+        values: BastpFormValues,
+        { setSubmitting }: { setSubmitting: SetSubmitting }
+    ) => {
+        setSubmitting(true)
+        const projectId = getProjectId()
+
+        const processedData = {
+            ...values,
+            id: idTermin || '',
+        }
+
+        let success = false
+
+        try {
+            if (isEditBastpMode && selectedBastpToEdit) {
+                // Update existing termin
+                const updateData = {
+                    ...processedData,
+                    id: selectedBastpToEdit.id,
+                }
+
+                success = await apiUpdateTanggalPembayaranBastp(updateData)
+
+                if (success) {
+                    dispatch(getTermins({ id: projectId }))
+                    popNotification('diperbarui')
+                }
+            } else {
+                // Create new termin
+                console.log('processedData', processedData)
+
+                success = await apiUpdateTanggalPembayaranBastp(processedData)
+                if (success) {
+                    dispatch(getTermins({ id: projectId }))
+                    popNotification('ditambahkan')
+                }
+            }
+        } catch (error) {
+            console.error(
+                `Error ${isEditBastpMode ? 'updating' : 'creating'} termin:`,
+                error
+            )
+            toast.push(
+                <Notification
+                    title={`${isEditBastpMode ? 'Update' : 'Create'} Failed`}
+                    type="danger"
+                    duration={2500}
+                >
+                    {error.response.data.message}
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
+        } finally {
+            setSubmitting(false)
+            setBastpDialogIsOpen(false)
+        }
+    }
+
+    const onBastpDialogClose = () => {
+        setBastpDialogIsOpen(false)
+        setIsEditBastpMode(false)
+        setSelectedBastpToEdit(null)
+    }
 
     // Fetch BASTs when component mounts
     useEffect(() => {
         const requestParam = { id: projectId }
-        dispatch(getBastpsByProyek(requestParam))
+        dispatch(getTermins(requestParam))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, projectId])
 
@@ -91,7 +186,6 @@ export default function Bastp() {
     // Initialize form values
     const initialValues: FormValues = {
         tempTanggal: null,
-        tempKeterangan: '',
         tempIdProject: projectId || '',
     }
 
@@ -111,10 +205,8 @@ export default function Bastp() {
         )
     }
 
-    console.log('bastpsByProyekData', bastpsByProyekData)
-
     return (
-        <Loading loading={loading || isSubmitting}>
+        <Loading loading={loadingTermins || isSubmitting}>
             <Formik
                 enableReinitialize
                 initialValues={initialValues}
@@ -127,33 +219,44 @@ export default function Bastp() {
                     const { values, errors, touched, setFieldValue } =
                         formikProps
 
-                    const handleAddBastp = () => {
-                        setShowForm(true)
-                        setEditIndex(null)
+                    const openBastpDialog = (
+                        data: any = null,
+                        isEdit = false
+                    ) => {
+                        setIsEditBastpMode(isEdit)
+                        setSelectedBastpToEdit(data)
 
-                        // Reset temp values
-                        setFieldValue('tempTanggal', null)
-                        setFieldValue('tempKeterangan', '')
+                        if (isEdit && data) {
+                            setBastpFormInitialValues({
+                                tanggal_pembayaran:
+                                    data.tanggal_pembayaran || null,
+                            })
+                        } else {
+                            // For new termin
+                            setBastpFormInitialValues({
+                                tanggal_pembayaran: null,
+                            })
+                        }
+
+                        setBastpDialogIsOpen(true)
                     }
 
                     const handleSave = async () => {
                         // Validate fields
-                        if (!errors.tempKeterangan && !errors.tempTanggal) {
+                        if (!errors.tempTanggal) {
                             setIsSubmitting(true)
 
                             const requestData = {
                                 tanggal: values.tempTanggal?.toISOString(),
-                                keterangan: values.tempKeterangan,
                                 idProject: values.tempIdProject,
                             }
 
                             try {
                                 let result
 
-                                if (editIndex !== null && bastpsByProyekData) {
+                                if (editIndex !== null && terminsData) {
                                     // Handle edit with API call
-                                    const bastpId =
-                                        bastpsByProyekData[editIndex].id
+                                    const bastpId = terminsData[editIndex].id
                                     result = await apiEditBastp({
                                         id: bastpId,
                                         ...requestData,
@@ -163,20 +266,12 @@ export default function Bastp() {
                                     result = await apiCreateBastp(requestData)
                                 }
 
-                                setIsSubmitting(false)
-
                                 if (
                                     result &&
                                     result.data?.statusCode >= 200 &&
                                     result.data?.statusCode < 300
                                 ) {
-                                    console.log('result', result)
-
-                                    // Refresh data
-                                    dispatch(
-                                        getBastpsByProyek({ id: projectId })
-                                    )
-
+                                    dispatch(getTermins({ id: projectId }))
                                     // Show success notification
                                     popNotification(
                                         editIndex !== null
@@ -204,7 +299,6 @@ export default function Bastp() {
                                     )
                                 }
                             } catch (error) {
-                                setIsSubmitting(false)
                                 console.error('Error:', error)
 
                                 // Show generic error notification
@@ -220,6 +314,8 @@ export default function Bastp() {
                                     </Notification>,
                                     { placement: 'top-center' }
                                 )
+                            } finally {
+                                setIsSubmitting(false)
                             }
                         }
                     }
@@ -227,7 +323,6 @@ export default function Bastp() {
                     // Helper function to reset form fields
                     const resetFormFields = () => {
                         setFieldValue('tempTanggal', null)
-                        setFieldValue('tempKeterangan', '')
                     }
 
                     const handleCancel = () => {
@@ -237,15 +332,14 @@ export default function Bastp() {
                     }
 
                     const handleEdit = (index: number) => {
-                        if (bastpsByProyekData) {
-                            const bastp = bastpsByProyekData[index]
+                        if (terminsData) {
+                            const bastp = terminsData[index]
 
                             // Set temporary values for editing
                             setFieldValue(
                                 'tempTanggal',
                                 new Date(bastp.tanggal)
                             )
-                            setFieldValue('tempKeterangan', bastp.keterangan)
                             setFieldValue('tempIdProject', bastp.idProject)
 
                             setEditIndex(index)
@@ -266,8 +360,8 @@ export default function Bastp() {
                     }
 
                     const handleDelete = async () => {
-                        if (deleteIndex !== null && bastpsByProyekData) {
-                            const bastpId = bastpsByProyekData[deleteIndex].id
+                        if (deleteIndex !== null && terminsData) {
+                            const bastpId = terminsData[deleteIndex].id
 
                             setIsSubmitting(true)
                             try {
@@ -278,18 +372,9 @@ export default function Bastp() {
 
                                 if (success) {
                                     // Refresh data aft'er successful delete
-                                    console.log(
-                                        'projectId sebelum refresh',
-                                        projectId
-                                    )
 
-                                    dispatch(
-                                        getBastpsByProyek({ id: projectId })
-                                    )
-                                    console.log(
-                                        'projectId setelah refresh',
-                                        projectId
-                                    )
+                                    dispatch(getTermins({ id: projectId }))
+
                                     popNotification('dihapus')
                                 }
                             } catch (error) {
@@ -323,17 +408,6 @@ export default function Bastp() {
                                         title="Informasi BASTP"
                                         desc="Informasi Berita Acara Serah Terima Pekerjaan"
                                     />
-                                    {!showForm && (
-                                        <Button
-                                            size="sm"
-                                            variant="twoTone"
-                                            onClick={handleAddBastp}
-                                            className="w-fit text-xs"
-                                            type="button"
-                                        >
-                                            Tambah BASTP
-                                        </Button>
-                                    )}
                                 </div>
 
                                 {/* Form untuk input BASTP */}
@@ -341,7 +415,7 @@ export default function Bastp() {
                                     <div className="mb-4 border bg-slate-50 rounded-md p-4">
                                         <h6 className="mb-3">
                                             {editIndex !== null
-                                                ? 'Edit BASTP'
+                                                ? 'Edit <BASTP></BASTP>'
                                                 : 'Tambah BASTP Baru'}
                                         </h6>
 
@@ -377,31 +451,6 @@ export default function Bastp() {
                                                         }}
                                                     />
                                                 </FormItem>
-
-                                                {/* Keterangan */}
-                                                <FormItem
-                                                    label="Keterangan"
-                                                    errorMessage={
-                                                        errors.tempKeterangan &&
-                                                        touched.tempKeterangan
-                                                            ? errors.tempKeterangan
-                                                            : ''
-                                                    }
-                                                    invalid={
-                                                        !!(
-                                                            errors.tempKeterangan &&
-                                                            touched.tempKeterangan
-                                                        )
-                                                    }
-                                                >
-                                                    <Field
-                                                        type="text"
-                                                        autoComplete="off"
-                                                        name="tempKeterangan"
-                                                        placeholder="Masukkan keterangan BASTP"
-                                                        component={Input}
-                                                    />
-                                                </FormItem>
                                             </div>
 
                                             <div className="flex justify-end space-x-2 mt-4">
@@ -428,11 +477,10 @@ export default function Bastp() {
                                 )}
 
                                 {/* Daftar BASTP */}
-                                {bastpsByProyekData &&
-                                bastpsByProyekData.length > 0 ? (
+                                {terminsData && terminsData.length > 0 ? (
                                     <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-                                        {bastpsByProyekData.map(
-                                            (data: Bastp, index: number) => {
+                                        {terminsData.map(
+                                            (data: any, index: number) => {
                                                 // If currently editing this item, don't show it in the list
                                                 if (editIndex === index) {
                                                     return null
@@ -444,7 +492,7 @@ export default function Bastp() {
                                                         className={classNames(
                                                             'flex items-center justify-between px-4 py-6',
                                                             !isLastChild(
-                                                                bastpsByProyekData,
+                                                                terminsData,
                                                                 index
                                                             ) &&
                                                                 'border-b border-gray-200 dark:border-gray-600'
@@ -454,7 +502,7 @@ export default function Bastp() {
                                                             <div className="text-3xl">
                                                                 <LuFilePlus2 className="text-indigo-500" />
                                                             </div>
-                                                            <div className="ml-3 rtl:mr-3">
+                                                            <div className="ml-3 rtl:mr-3 space-y-1">
                                                                 <div className="flex items-center">
                                                                     <div className="text-gray-900 dark:text-gray-100 font-semibold">
                                                                         BASTP{' '}
@@ -462,20 +510,41 @@ export default function Bastp() {
                                                                             1}
                                                                     </div>
                                                                 </div>
-                                                                <div className="text-gray-500 text-sm mt-1">
-                                                                    <div>
-                                                                        Tanggal:{' '}
-                                                                        {formatDate(
-                                                                            data.tanggal
-                                                                        )}
+                                                                {data.tanggal_pembayaran !==
+                                                                null ? (
+                                                                    <div className="text-gray-500 text-sm mt-1">
+                                                                        <div>
+                                                                            Tanggal:{' '}
+                                                                            {formatDate(
+                                                                                data.tanggal_pembayaran
+                                                                            )}
+                                                                        </div>
                                                                     </div>
-                                                                    <div>
-                                                                        Keterangan:{' '}
-                                                                        {
-                                                                            data.keterangan
-                                                                        }
-                                                                    </div>
-                                                                </div>
+                                                                ) : (
+                                                                    !showForm && (
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="twoTone"
+                                                                            shape="circle"
+                                                                            className="w-fit text-xs"
+                                                                            type="button"
+                                                                            icon={
+                                                                                <IoIosAdd />
+                                                                            }
+                                                                            onClick={() => {
+                                                                                setIdTermin(
+                                                                                    data.id
+                                                                                )
+                                                                                openBastpDialog(
+                                                                                    data
+                                                                                )
+                                                                            }}
+                                                                        >
+                                                                            Tambah
+                                                                            BASTP
+                                                                        </Button>
+                                                                    )
+                                                                )}
                                                             </div>
                                                         </div>
 
@@ -490,8 +559,12 @@ export default function Bastp() {
                                                                 }
                                                                 className="text-indigo-500"
                                                                 onClick={() =>
-                                                                    handleEdit(
-                                                                        index
+                                                                    // handleEdit(
+                                                                    //     index
+                                                                    // )
+                                                                    openBastpDialog(
+                                                                        data,
+                                                                        true
                                                                     )
                                                                 }
                                                             />
@@ -542,6 +615,107 @@ export default function Bastp() {
                         </Form>
                     )
                 }}
+            </Formik>
+
+            {/* Form for update date bastp */}
+            <Formik
+                initialValues={bastpFormInitialValues}
+                validationSchema={BastpSchema}
+                onSubmit={handleBastpSubmit}
+                enableReinitialize={true}
+            >
+                {({ errors, touched, isSubmitting, values, setFieldValue }) => (
+                    <>
+                        <Dialog
+                            isOpen={bastpDialogIsOpen}
+                            onClose={onBastpDialogClose}
+                            onRequestClose={onBastpDialogClose}
+                        >
+                            <Form>
+                                <h5 className="mb-4">
+                                    {isEditBastpMode
+                                        ? 'Edit Tanggal Bastp'
+                                        : 'Tambah Tanggal Bastp'}
+                                </h5>
+
+                                {/* Form Bastp Tanggal Pembayaran */}
+                                <FormItem
+                                    label="Tanggal Pembayaran"
+                                    invalid={
+                                        (errors.tanggal_pembayaran &&
+                                            touched.tanggal_pembayaran) as boolean
+                                    }
+                                    errorMessage={errors.tanggal_pembayaran}
+                                >
+                                    <Field name="tanggal_pembayaran">
+                                        {({ field, form }: FieldProps) => (
+                                            <DatePicker
+                                                placeholder="Pilih Tanggal"
+                                                value={
+                                                    field.value
+                                                        ? new Date(field.value)
+                                                        : null
+                                                }
+                                                inputFormat="DD-MM-YYYY"
+                                                onChange={(date) => {
+                                                    const formattedDate = date
+                                                        ? dayjs(date).format(
+                                                              'YYYY-MM-DD'
+                                                          )
+                                                        : ''
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        formattedDate
+                                                    )
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                {/* Button Dialog Option */}
+                                <div className="text-right mt-6">
+                                    <Button
+                                        className="ltr:mr-2 rtl:ml-2"
+                                        variant="plain"
+                                        onClick={onBastpDialogClose}
+                                        type="button"
+                                        disabled={isSubmitting}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant="solid"
+                                        type="submit"
+                                        loading={isSubmitting}
+                                    >
+                                        {isEditBastpMode ? 'Update' : 'Simpan'}
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Dialog>
+                        {/* <ConfirmDialog
+                            isOpen={terminDeleteConfirmOpen}
+                            type="danger"
+                            title="Hapus Termin"
+                            confirmButtonColor="red-600"
+                            onClose={handleCancelDeleteTermin}
+                            onRequestClose={handleCancelDeleteTermin}
+                            onCancel={handleCancelDeleteTermin}
+                            onConfirm={handleDeleteTermin}
+                        >
+                            <p>
+                                Apakah kamu yakin ingin menghapus termin ini?
+                                {selectedBastpToEdit?.FakturPajak?.id && (
+                                    <span className="block mt-2 text-red-500">
+                                        Faktur yang terkait dengan termin ini
+                                        juga akan dihapus!
+                                    </span>
+                                )}
+                            </p>
+                        </ConfirmDialog> */}
+                    </>
+                )}
             </Formik>
         </Loading>
     )

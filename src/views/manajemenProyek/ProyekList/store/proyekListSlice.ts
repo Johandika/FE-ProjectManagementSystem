@@ -61,7 +61,9 @@ export type ProyekListSlice = {
     loading: boolean
     kliensLoading: boolean
     deleteConfirmation: boolean
+    updateConfirmation: boolean
     selectedProyek: string
+    projectStatus: string
     tableData: TableProyekQueries
     filterData: FilterQueries
     proyekList: Proyek[]
@@ -78,7 +80,6 @@ export const getProyeks = createAsyncThunk(
             GetMasterProyekResponse,
             GetMasterProyekData
         >(data)
-
         return {
             data: response.data,
             total: response.data.totaldataProject, // Simpan total data dari API baru
@@ -125,7 +126,9 @@ const initialState: ProyekListSlice = {
     loading: false,
     kliensLoading: false,
     deleteConfirmation: false,
+    updateConfirmation: false,
     selectedProyek: '',
+    projectStatus: '',
     proyekList: [],
     kliensList: [],
     tableData: initialTableData,
@@ -154,8 +157,14 @@ const proyekListSlice = createSlice({
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
         },
+        toggleUpdateConfirmation: (state, action) => {
+            state.updateConfirmation = action.payload
+        },
         setSelectedProyek: (state, action) => {
             state.selectedProyek = action.payload
+        },
+        setProjectStatus: (state, action) => {
+            state.projectStatus = action.payload
         },
     },
     extraReducers: (builder) => {
@@ -184,7 +193,9 @@ export const {
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
+    toggleUpdateConfirmation,
     setSelectedProyek,
+    setProjectStatus,
     updateKliensList,
 } = proyekListSlice.actions
 

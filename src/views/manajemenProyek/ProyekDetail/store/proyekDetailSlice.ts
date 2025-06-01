@@ -20,6 +20,7 @@ import {
 import { apiGetItem, apiGetItemsByProyek } from '@/services/ItemService'
 import { apiGetSatuans } from '@/services/SatuanService'
 import { apiGetBastps } from '@/services/BastpService'
+import { apiGetTermin } from '@/services/TerminService'
 
 export const SLICE_NAME = 'proyekDetail'
 
@@ -113,6 +114,17 @@ type SatuanData = {
     satuan: string
 }
 
+interface Termin {
+    data: {
+        id?: string
+        nama?: string
+        idProject: string
+        idFakturPajak?: string
+        status?: boolean
+        tanggal_pembayaran?: string
+    }
+}
+
 type SatuansData = SatuanData[]
 type BerkasProyeks = BerkasProyekData[]
 type LokasiProyeks = LokasisByProyek[]
@@ -120,6 +132,7 @@ type SubkonProyek = SubkonByProyek[]
 type AdendumProyek = AdendumByProyek[]
 type ItemProyek = ItemByProyek[]
 type Subkontraktors = SubkonByProyek[]
+type Termins = Termin[]
 
 export type MasterProyekDetailState = {
     loadingBerkasProyeks: boolean
@@ -136,6 +149,7 @@ export type MasterProyekDetailState = {
     loadingItem: boolean
     loadingSatuan: boolean
     loadingBastpProyeks: boolean
+    loadingTermins: boolean
     bastpProyekData?: BastpsByProyek
     satuansData?: SatuansData
     itemsByProyekData?: ItemProyek
@@ -143,6 +157,7 @@ export type MasterProyekDetailState = {
     adendumsByProyekData?: AdendumProyek
     adendumData?: AdendumProyek
     berkasProyekData?: BerkasProyeks
+    terminsData?: Termins
     lokasiData?: LokasiProyeks
     lokasisByProyekData?: LokasiProyeks
     berkasFakturPajaks?: FakturPajak[]
@@ -339,6 +354,17 @@ export const getBastpsByProyek = createAsyncThunk(
     }
 )
 
+// ========================================================================
+// get termin by id
+export const getTermins = createAsyncThunk(
+    SLICE_NAME + '/getTermins',
+    async (data: { id: string }) => {
+        const response = await apiGetTermin<Termin, { id: string }>(data)
+
+        return response.data
+    }
+)
+
 const initialState: MasterProyekDetailState = {
     loadingBerkasProyeks: true,
     loadingFakturPajaks: true,
@@ -354,6 +380,8 @@ const initialState: MasterProyekDetailState = {
     loadingItem: true,
     loadingSatuan: true,
     loadingBastpProyeks: true,
+    loadingTermins: true,
+    terminsData: [],
     bastpProyekData: [],
     satuansData: [],
     lokasisByProyekData: [],
@@ -381,6 +409,13 @@ const proyekDetailSlice = createSlice({
             })
             .addCase(getBastpsByProyek.pending, (state) => {
                 state.loadingBastpProyeks = true
+            })
+            .addCase(getTermins.fulfilled, (state, action) => {
+                state.terminsData = action.payload
+                state.loadingTermins = false
+            })
+            .addCase(getTermins.pending, (state) => {
+                state.loadingTermins = true
             })
             .addCase(getBerkasProyek.fulfilled, (state, action) => {
                 state.berkasProyekData = action.payload

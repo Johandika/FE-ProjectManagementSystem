@@ -244,10 +244,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                                         label: `${satuan.satuan}`,
                                                                                                     })
                                                                                                 )
-                                                                                            console.log(
-                                                                                                'selectedSatuan',
-                                                                                                selectedSatuan
-                                                                                            )
+
                                                                                             return (
                                                                                                 <Select
                                                                                                     field={
@@ -283,7 +280,252 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                 </FormItem>
                                                                             </div>
 
-                                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                                                                {/* Harga satuan material */}
+                                                                                <FormItem
+                                                                                    className="mb-0"
+                                                                                    label="Harga Satuan Material"
+                                                                                    invalid={
+                                                                                        (detailErrors?.harga_satuan_material &&
+                                                                                            detailTouched?.harga_satuan_material) as boolean
+                                                                                    }
+                                                                                    errorMessage={
+                                                                                        detailErrors?.harga_satuan_material
+                                                                                    }
+                                                                                >
+                                                                                    <Field
+                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].harga_satuan_material`}
+                                                                                    >
+                                                                                        {({
+                                                                                            field,
+                                                                                            form,
+                                                                                        }: FieldProps) => (
+                                                                                            <NumericFormat
+                                                                                                {...field}
+                                                                                                customInput={
+                                                                                                    Input
+                                                                                                }
+                                                                                                placeholder="Harga satuan material"
+                                                                                                thousandSeparator="."
+                                                                                                decimalSeparator=","
+                                                                                                onValueChange={(
+                                                                                                    values
+                                                                                                ) => {
+                                                                                                    const hargaSatuanMaterial =
+                                                                                                        Number(
+                                                                                                            values.value
+                                                                                                        )
+                                                                                                    form.setFieldValue(
+                                                                                                        field.name,
+                                                                                                        hargaSatuanMaterial
+                                                                                                    )
+
+                                                                                                    // Get current volume value
+                                                                                                    const volume =
+                                                                                                        form
+                                                                                                            .values
+                                                                                                            .item[
+                                                                                                            itemIndex
+                                                                                                        ]
+                                                                                                            .detail[
+                                                                                                            detailIndex
+                                                                                                        ]
+                                                                                                            .volume ||
+                                                                                                        0
+
+                                                                                                    // Calculate and update derived values
+                                                                                                    const jumlahHargaMaterial =
+                                                                                                        calculateJumlahHargaMaterial(
+                                                                                                            volume,
+                                                                                                            hargaSatuanMaterial
+                                                                                                        )
+                                                                                                    const jumlahHargaJasa =
+                                                                                                        form
+                                                                                                            .values
+                                                                                                            .item[
+                                                                                                            itemIndex
+                                                                                                        ]
+                                                                                                            .detail[
+                                                                                                            detailIndex
+                                                                                                        ]
+                                                                                                            .jumlah_harga_jasa ||
+                                                                                                        0
+                                                                                                    const jumlahTotal =
+                                                                                                        calculateJumlahTotal(
+                                                                                                            jumlahHargaMaterial,
+                                                                                                            jumlahHargaJasa
+                                                                                                        )
+
+                                                                                                    form.setFieldValue(
+                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah_harga_material`,
+                                                                                                        jumlahHargaMaterial
+                                                                                                    )
+                                                                                                    form.setFieldValue(
+                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah`,
+                                                                                                        jumlahTotal
+                                                                                                    )
+                                                                                                }}
+                                                                                            />
+                                                                                        )}
+                                                                                    </Field>
+                                                                                </FormItem>
+
+                                                                                {/* Jumlah harga material */}
+                                                                                <FormItem
+                                                                                    className="mb-0"
+                                                                                    label="Jumlah Harga Material"
+                                                                                    invalid={
+                                                                                        (detailErrors?.jumlah_harga_material &&
+                                                                                            detailTouched?.jumlah_harga_material) as boolean
+                                                                                    }
+                                                                                    errorMessage={
+                                                                                        detailErrors?.jumlah_harga_material
+                                                                                    }
+                                                                                >
+                                                                                    <Field
+                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].jumlah_harga_material`}
+                                                                                    >
+                                                                                        {({
+                                                                                            field,
+                                                                                        }: FieldProps) => (
+                                                                                            <NumericFormat
+                                                                                                {...field}
+                                                                                                customInput={
+                                                                                                    Input
+                                                                                                }
+                                                                                                placeholder="Jumlah harga material"
+                                                                                                thousandSeparator="."
+                                                                                                decimalSeparator=","
+                                                                                                readOnly
+                                                                                                disabled
+                                                                                            />
+                                                                                        )}
+                                                                                    </Field>
+                                                                                </FormItem>
+
+                                                                                {/* Harga satuan jasa */}
+                                                                                <FormItem
+                                                                                    className="mb-0"
+                                                                                    label="Harga Satuan Jasa"
+                                                                                    invalid={
+                                                                                        (detailErrors?.harga_satuan_jasa &&
+                                                                                            detailTouched?.harga_satuan_jasa) as boolean
+                                                                                    }
+                                                                                    errorMessage={
+                                                                                        detailErrors?.harga_satuan_jasa
+                                                                                    }
+                                                                                >
+                                                                                    <Field
+                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].harga_satuan_jasa`}
+                                                                                    >
+                                                                                        {({
+                                                                                            field,
+                                                                                            form,
+                                                                                        }: FieldProps) => (
+                                                                                            <NumericFormat
+                                                                                                {...field}
+                                                                                                customInput={
+                                                                                                    Input
+                                                                                                }
+                                                                                                placeholder="Harga satuan jasa"
+                                                                                                thousandSeparator="."
+                                                                                                decimalSeparator=","
+                                                                                                onValueChange={(
+                                                                                                    values
+                                                                                                ) => {
+                                                                                                    const hargaSatuanJasa =
+                                                                                                        Number(
+                                                                                                            values.value
+                                                                                                        )
+                                                                                                    form.setFieldValue(
+                                                                                                        field.name,
+                                                                                                        hargaSatuanJasa
+                                                                                                    )
+
+                                                                                                    // Get current volume value
+                                                                                                    const volume =
+                                                                                                        form
+                                                                                                            .values
+                                                                                                            .item[
+                                                                                                            itemIndex
+                                                                                                        ]
+                                                                                                            .detail[
+                                                                                                            detailIndex
+                                                                                                        ]
+                                                                                                            .volume ||
+                                                                                                        0
+
+                                                                                                    // Calculate and update derived values
+                                                                                                    const jumlahHargaJasa =
+                                                                                                        calculateJumlahHargaJasa(
+                                                                                                            volume,
+                                                                                                            hargaSatuanJasa
+                                                                                                        )
+                                                                                                    const jumlahHargaMaterial =
+                                                                                                        form
+                                                                                                            .values
+                                                                                                            .item[
+                                                                                                            itemIndex
+                                                                                                        ]
+                                                                                                            .detail[
+                                                                                                            detailIndex
+                                                                                                        ]
+                                                                                                            .jumlah_harga_material ||
+                                                                                                        0
+                                                                                                    const jumlahTotal =
+                                                                                                        calculateJumlahTotal(
+                                                                                                            jumlahHargaMaterial,
+                                                                                                            jumlahHargaJasa
+                                                                                                        )
+
+                                                                                                    form.setFieldValue(
+                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah_harga_jasa`,
+                                                                                                        jumlahHargaJasa
+                                                                                                    )
+                                                                                                    form.setFieldValue(
+                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah`,
+                                                                                                        jumlahTotal
+                                                                                                    )
+                                                                                                }}
+                                                                                            />
+                                                                                        )}
+                                                                                    </Field>
+                                                                                </FormItem>
+
+                                                                                {/* Jumlah harga jasa */}
+                                                                                <FormItem
+                                                                                    className="mb-0"
+                                                                                    label="Jumlah Harga Jasa"
+                                                                                    invalid={
+                                                                                        (detailErrors?.jumlah_harga_jasa &&
+                                                                                            detailTouched?.jumlah_harga_jasa) as boolean
+                                                                                    }
+                                                                                    errorMessage={
+                                                                                        detailErrors?.jumlah_harga_jasa
+                                                                                    }
+                                                                                >
+                                                                                    <Field
+                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].jumlah_harga_jasa`}
+                                                                                    >
+                                                                                        {({
+                                                                                            field,
+                                                                                        }: FieldProps) => (
+                                                                                            <NumericFormat
+                                                                                                {...field}
+                                                                                                customInput={
+                                                                                                    Input
+                                                                                                }
+                                                                                                placeholder="Jumlah harga jasa"
+                                                                                                thousandSeparator="."
+                                                                                                decimalSeparator=","
+                                                                                                readOnly
+                                                                                                disabled
+                                                                                            />
+                                                                                        )}
+                                                                                    </Field>
+                                                                                </FormItem>
+
+                                                                                {/* Volume */}
                                                                                 <FormItem
                                                                                     className="mb-0"
                                                                                     label="Volume"
@@ -381,251 +623,10 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                     </Field>
                                                                                 </FormItem>
 
+                                                                                {/* Jumlah total */}
                                                                                 <FormItem
                                                                                     className="mb-0"
-                                                                                    label="Harga Satuan Material"
-                                                                                    invalid={
-                                                                                        (detailErrors?.harga_satuan_material &&
-                                                                                            detailTouched?.harga_satuan_material) as boolean
-                                                                                    }
-                                                                                    errorMessage={
-                                                                                        detailErrors?.harga_satuan_material
-                                                                                    }
-                                                                                >
-                                                                                    <Field
-                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].harga_satuan_material`}
-                                                                                    >
-                                                                                        {({
-                                                                                            field,
-                                                                                            form,
-                                                                                        }: FieldProps) => (
-                                                                                            <NumericFormat
-                                                                                                {...field}
-                                                                                                customInput={
-                                                                                                    Input
-                                                                                                }
-                                                                                                placeholder="Harga satuan material"
-                                                                                                thousandSeparator="."
-                                                                                                decimalSeparator=","
-                                                                                                onValueChange={(
-                                                                                                    values
-                                                                                                ) => {
-                                                                                                    const hargaSatuanMaterial =
-                                                                                                        Number(
-                                                                                                            values.value
-                                                                                                        )
-                                                                                                    form.setFieldValue(
-                                                                                                        field.name,
-                                                                                                        hargaSatuanMaterial
-                                                                                                    )
-
-                                                                                                    // Get current volume value
-                                                                                                    const volume =
-                                                                                                        form
-                                                                                                            .values
-                                                                                                            .item[
-                                                                                                            itemIndex
-                                                                                                        ]
-                                                                                                            .detail[
-                                                                                                            detailIndex
-                                                                                                        ]
-                                                                                                            .volume ||
-                                                                                                        0
-
-                                                                                                    // Calculate and update derived values
-                                                                                                    const jumlahHargaMaterial =
-                                                                                                        calculateJumlahHargaMaterial(
-                                                                                                            volume,
-                                                                                                            hargaSatuanMaterial
-                                                                                                        )
-                                                                                                    const jumlahHargaJasa =
-                                                                                                        form
-                                                                                                            .values
-                                                                                                            .item[
-                                                                                                            itemIndex
-                                                                                                        ]
-                                                                                                            .detail[
-                                                                                                            detailIndex
-                                                                                                        ]
-                                                                                                            .jumlah_harga_jasa ||
-                                                                                                        0
-                                                                                                    const jumlahTotal =
-                                                                                                        calculateJumlahTotal(
-                                                                                                            jumlahHargaMaterial,
-                                                                                                            jumlahHargaJasa
-                                                                                                        )
-
-                                                                                                    form.setFieldValue(
-                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah_harga_material`,
-                                                                                                        jumlahHargaMaterial
-                                                                                                    )
-                                                                                                    form.setFieldValue(
-                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah`,
-                                                                                                        jumlahTotal
-                                                                                                    )
-                                                                                                }}
-                                                                                            />
-                                                                                        )}
-                                                                                    </Field>
-                                                                                </FormItem>
-
-                                                                                <FormItem
-                                                                                    className="mb-0"
-                                                                                    label="Harga Satuan Jasa"
-                                                                                    invalid={
-                                                                                        (detailErrors?.harga_satuan_jasa &&
-                                                                                            detailTouched?.harga_satuan_jasa) as boolean
-                                                                                    }
-                                                                                    errorMessage={
-                                                                                        detailErrors?.harga_satuan_jasa
-                                                                                    }
-                                                                                >
-                                                                                    <Field
-                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].harga_satuan_jasa`}
-                                                                                    >
-                                                                                        {({
-                                                                                            field,
-                                                                                            form,
-                                                                                        }: FieldProps) => (
-                                                                                            <NumericFormat
-                                                                                                {...field}
-                                                                                                customInput={
-                                                                                                    Input
-                                                                                                }
-                                                                                                placeholder="Harga satuan jasa"
-                                                                                                thousandSeparator="."
-                                                                                                decimalSeparator=","
-                                                                                                onValueChange={(
-                                                                                                    values
-                                                                                                ) => {
-                                                                                                    const hargaSatuanJasa =
-                                                                                                        Number(
-                                                                                                            values.value
-                                                                                                        )
-                                                                                                    form.setFieldValue(
-                                                                                                        field.name,
-                                                                                                        hargaSatuanJasa
-                                                                                                    )
-
-                                                                                                    // Get current volume value
-                                                                                                    const volume =
-                                                                                                        form
-                                                                                                            .values
-                                                                                                            .item[
-                                                                                                            itemIndex
-                                                                                                        ]
-                                                                                                            .detail[
-                                                                                                            detailIndex
-                                                                                                        ]
-                                                                                                            .volume ||
-                                                                                                        0
-
-                                                                                                    // Calculate and update derived values
-                                                                                                    const jumlahHargaJasa =
-                                                                                                        calculateJumlahHargaJasa(
-                                                                                                            volume,
-                                                                                                            hargaSatuanJasa
-                                                                                                        )
-                                                                                                    const jumlahHargaMaterial =
-                                                                                                        form
-                                                                                                            .values
-                                                                                                            .item[
-                                                                                                            itemIndex
-                                                                                                        ]
-                                                                                                            .detail[
-                                                                                                            detailIndex
-                                                                                                        ]
-                                                                                                            .jumlah_harga_material ||
-                                                                                                        0
-                                                                                                    const jumlahTotal =
-                                                                                                        calculateJumlahTotal(
-                                                                                                            jumlahHargaMaterial,
-                                                                                                            jumlahHargaJasa
-                                                                                                        )
-
-                                                                                                    form.setFieldValue(
-                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah_harga_jasa`,
-                                                                                                        jumlahHargaJasa
-                                                                                                    )
-                                                                                                    form.setFieldValue(
-                                                                                                        `item[${itemIndex}].detail[${detailIndex}].jumlah`,
-                                                                                                        jumlahTotal
-                                                                                                    )
-                                                                                                }}
-                                                                                            />
-                                                                                        )}
-                                                                                    </Field>
-                                                                                </FormItem>
-                                                                            </div>
-
-                                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                                                <FormItem
-                                                                                    className="mb-0"
-                                                                                    label="Jumlah Harga Material"
-                                                                                    invalid={
-                                                                                        (detailErrors?.jumlah_harga_material &&
-                                                                                            detailTouched?.jumlah_harga_material) as boolean
-                                                                                    }
-                                                                                    errorMessage={
-                                                                                        detailErrors?.jumlah_harga_material
-                                                                                    }
-                                                                                >
-                                                                                    <Field
-                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].jumlah_harga_material`}
-                                                                                    >
-                                                                                        {({
-                                                                                            field,
-                                                                                        }: FieldProps) => (
-                                                                                            <NumericFormat
-                                                                                                {...field}
-                                                                                                customInput={
-                                                                                                    Input
-                                                                                                }
-                                                                                                placeholder="Jumlah harga material"
-                                                                                                thousandSeparator="."
-                                                                                                decimalSeparator=","
-                                                                                                readOnly
-                                                                                                disabled
-                                                                                            />
-                                                                                        )}
-                                                                                    </Field>
-                                                                                </FormItem>
-
-                                                                                <FormItem
-                                                                                    className="mb-0"
-                                                                                    label="Jumlah Harga Jasa"
-                                                                                    invalid={
-                                                                                        (detailErrors?.jumlah_harga_jasa &&
-                                                                                            detailTouched?.jumlah_harga_jasa) as boolean
-                                                                                    }
-                                                                                    errorMessage={
-                                                                                        detailErrors?.jumlah_harga_jasa
-                                                                                    }
-                                                                                >
-                                                                                    <Field
-                                                                                        name={`item[${itemIndex}].detail[${detailIndex}].jumlah_harga_jasa`}
-                                                                                    >
-                                                                                        {({
-                                                                                            field,
-                                                                                        }: FieldProps) => (
-                                                                                            <NumericFormat
-                                                                                                {...field}
-                                                                                                customInput={
-                                                                                                    Input
-                                                                                                }
-                                                                                                placeholder="Jumlah harga jasa"
-                                                                                                thousandSeparator="."
-                                                                                                decimalSeparator=","
-                                                                                                readOnly
-                                                                                                disabled
-                                                                                            />
-                                                                                        )}
-                                                                                    </Field>
-                                                                                </FormItem>
-
-                                                                                <FormItem
-                                                                                    className="mb-0"
-                                                                                    label="Jumlah Total"
+                                                                                    label="Total"
                                                                                     invalid={
                                                                                         (detailErrors?.jumlah &&
                                                                                             detailTouched?.jumlah) as boolean

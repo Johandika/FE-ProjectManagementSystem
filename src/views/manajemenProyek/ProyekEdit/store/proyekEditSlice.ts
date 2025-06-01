@@ -15,7 +15,11 @@ import {
     apiPutFakturPajak,
 } from '@/services/FakturPajakService'
 import { apiSelectBerkas } from '@/services/BerkasService'
-import { apiUpdateStatusBerkasProyek } from '@/services/BerkasProyekService'
+import {
+    apiGetAllBerkasByProyek,
+    apiGetAllBerkasByTerminId,
+    apiUpdateStatusBerkasProyek,
+} from '@/services/BerkasProyekService'
 import {
     apiDeletePurchaseOrders,
     apiGetPurchaseByProyek,
@@ -33,6 +37,12 @@ interface Lokasi {
     lokasi: string
     longitude: number
     latitude: number
+}
+
+interface BerkasByTerminId {
+    idProject?: string
+    idTerminProject?: string
+    berkas: string[]
 }
 
 interface Subkontraktor {
@@ -103,6 +113,14 @@ interface Termin {
     status?: boolean
 }
 
+interface getAllBerkasByProyekData {
+    id?: string
+    nama?: string
+    keterangan?: string
+    status?: boolean
+    idTerminProject?: string | null
+}
+
 type FakturPajak = {
     id?: string
     nomor?: string
@@ -129,10 +147,17 @@ type Kliens = Klien[]
 type Berkases = Berkas[]
 type Subkontraktors = Subkontraktor[]
 type Termins = Termin[]
+type getAllBerkasByProyekDatas = getAllBerkasByProyekData[]
+type BerkasesByTerminId = BerkasByTerminId[]
 // type GetBerkasProyekResponse = BerkasProyekData[]
 
 type GetKliensResponse = {
     data: Kliens
+    total: number
+}
+
+type GetAllBerkasesByTerminIdResponse = {
+    data: BerkasesByTerminId
     total: number
 }
 
@@ -172,10 +197,14 @@ export type MasterProyekEditState = {
     updateBerkasStatus: boolean
     proyekData: ProyekData
     loadingUpdateBerkasStatus: boolean
+    loadingGetAllBerkasesByTermin: boolean
+    getAllBerkasesByTerminIdData?: GetAllBerkasesByTerminIdResponse
     kliensData?: GetKliensResponse
     berkasesData?: GetBerkasesResponse
     subkontraktorsData?: GetSubkontraktorsResponse
     terminsData?: Termins
+    getAllBerkasByProyekData?: getAllBerkasByProyekDatas
+    loadingGetAllBerkasByProyek: boolean
     fakturPajakData?: FakturPajak[]
     fakturPajakByProyekData?: FakturPajak[]
     selectBerkasData?: SelectBerkas[]
@@ -207,7 +236,6 @@ export const selectBerkas = createAsyncThunk(
     SLICE_NAME + '/selectBerkas',
     async () => {
         const response = await apiSelectBerkas<SelectBerkas[]>()
-        console.log(response.data)
         return response.data
     }
 )
@@ -260,7 +288,6 @@ export const getFakturPajak = createAsyncThunk(
         const response = await apiGetFakturPajak<FakturPajak, { id: string }>(
             data
         )
-        console.log('id', data)
         return response.data
     }
 )
@@ -273,6 +300,32 @@ export const getFakturPajakByProyekId = createAsyncThunk(
             FakturPajak,
             { id: string }
         >(data)
+        return response.data
+    }
+)
+
+// get all berkases by termin id
+export const getAllBerkasesByTermin = createAsyncThunk(
+    SLICE_NAME + '/getAllBerkasesByTermin',
+    async (data: { id: string }) => {
+        const response = await apiGetAllBerkasByTerminId<
+            FakturPajak,
+            { id: string }
+        >(data)
+        console.log('response.data getAllBerkasesByTermin', response.data)
+        return response.data
+    }
+)
+
+// get all berkases by proyek
+export const getAllBerkasByProyek = createAsyncThunk(
+    SLICE_NAME + '/getAllBerkasByProyek',
+    async (data: { id: string }) => {
+        const response = await apiGetAllBerkasByProyek<
+            FakturPajak,
+            { id: string }
+        >(data)
+        console.log('response.data getAllBerkasesByTermin', response.data)
         return response.data
     }
 )
@@ -359,7 +412,6 @@ export const deletePurchase = async <T, U extends Record<string, unknown>>(
     data: U
 ) => {
     const response = await apiDeletePurchaseOrders<T, U>(data)
-    console.log('response deletePurchase', response)
     return response.data
 }
 
@@ -381,8 +433,12 @@ const initialState: MasterProyekEditState = {
     loadingFakturPajak: true,
     loadingPurchaseOrders: true,
     loadingFakturPajakByProyekData: true,
+    loadingGetAllBerkasByProyek: true,
+    loadingGetAllBerkasesByTermin: true,
     terminsData: [],
+    getAllBerkasByProyekData: [],
     selectBerkasData: [],
+    getAllBerkasesByTerminIdData: [],
 
     // loadingBerkasProyeks: true,
     // berkasProyekData: [],
@@ -415,6 +471,13 @@ const proyekEditSlice = createSlice({
             .addCase(getTermins.pending, (state) => {
                 state.loadingTermins = true
             })
+            .addCase(getAllBerkasByProyek.fulfilled, (state, action) => {
+                state.getAllBerkasByProyekData = action.payload
+                state.loadingGetAllBerkasByProyek = false
+            })
+            .addCase(getAllBerkasByProyek.pending, (state) => {
+                state.loadingGetAllBerkasByProyek = true
+            })
             .addCase(updateBerkasProyekStatus.fulfilled, (state, action) => {
                 state.updateBerkasStatus = action.payload
                 state.loadingTermins = false
@@ -442,6 +505,13 @@ const proyekEditSlice = createSlice({
             })
             .addCase(getFakturPajakByProyekId.pending, (state) => {
                 state.loadingFakturPajakByProyekData = true
+            })
+            .addCase(getAllBerkasesByTermin.fulfilled, (state, action) => {
+                state.getAllBerkasesByTerminIdData = action.payload
+                state.loadingGetAllBerkasesByTermin = false
+            })
+            .addCase(getAllBerkasesByTermin.pending, (state) => {
+                state.loadingGetAllBerkasesByTermin = true
             })
             .addCase(getKliens.fulfilled, (state, action) => {
                 state.kliensData = action.payload

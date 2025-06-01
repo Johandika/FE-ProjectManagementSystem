@@ -6,8 +6,8 @@ import type {
     ResetPassword,
     SignInResponse,
     SignUpResponse,
+    Register,
 } from '@/@types/auth'
-import { apiCreateRole, apiGetRoles } from './RoleService'
 
 export async function apiSignIn(data: SignInCredential) {
     return ApiService.fetchData<SignInResponse>({
@@ -25,10 +25,11 @@ export async function apiSignUp(data: SignUpCredential) {
     })
 }
 
-export async function apiSignOut() {
+export async function apiSignOut(data: { id: string }) {
     return ApiService.fetchData({
-        url: '/sign-out',
+        url: '/user/logout',
         method: 'post',
+        data,
     })
 }
 
@@ -40,36 +41,21 @@ export async function apiForgotPassword(data: ForgotPassword) {
     })
 }
 
-export async function apiRegister(data) {
-    console.log('data', data)
-    await apiCreateRole({
-        nama: 'Suped_Admin',
-        keterangan: '-',
-    })
-
-    const roles = await apiGetRoles()
-    const idRole = roles?.data.data[0].id
-    const proceedData = {
-        ...data,
-        idRole,
-    }
-    console.log('proceedData', proceedData)
-
+export async function apiRegister(data: Register) {
     const res = await ApiService.fetchData({
         url: '/user/register',
         method: 'post',
-        data: proceedData,
+        data,
     })
-
-    console.log('res', res)
 
     return res
 }
 
-export async function apiResetPassword(data: ResetPassword) {
+export async function apiResetPassword(data: { id: string }) {
+    console.log('dataiii', data.id)
     return ApiService.fetchData({
-        url: '/reset-password',
-        method: 'post',
+        url: `/user/reset-password/${data.id}`,
+        method: 'patch',
         data,
     })
 }

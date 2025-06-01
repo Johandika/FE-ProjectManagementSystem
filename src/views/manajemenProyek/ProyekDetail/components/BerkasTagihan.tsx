@@ -1,445 +1,3 @@
-// import {
-//     Button,
-//     Checkbox,
-//     Dialog,
-//     FormItem,
-//     Input,
-//     Notification,
-//     Select,
-//     toast,
-// } from '@/components/ui'
-// import { ChangeEvent, useEffect, useState } from 'react'
-// import * as Yup from 'yup'
-
-// import reducer, {
-//     useAppDispatch,
-//     getProyek,
-//     selectBerkas,
-//     useAppSelector,
-//     updateBerkasProyekStatus,
-//     // Add these new actions:
-// } from '../../ProyekEdit/store'
-// import { injectReducer } from '@/store'
-// import { Loading, ConfirmDialog, AdaptableCard } from '@/components/shared'
-// import { isEmpty } from 'lodash'
-// import { Field, FieldProps, Form, Formik } from 'formik'
-// import {
-//     apiCreateBerkasProyek,
-//     apiDeleteBerkasProyek,
-// } from '@/services/BerkasProyekService'
-// import { HiOutlineTrash } from 'react-icons/hi'
-// import DescriptionSection from './DesriptionSection'
-
-// injectReducer('proyekEdit', reducer)
-
-// // Schema validation for form
-// const BastpSchema = Yup.object().shape({
-//     idBerkas: Yup.string().required('Required'),
-// })
-
-// // Interface for form initial values
-// interface BastpFormValues {
-//     idProject: string
-//     keterangan: string
-//     idBerkas: string
-// }
-
-// // Interface for API request
-// interface BastpFormModel {
-//     idProject: string
-//     keterangan: string
-//     idBerkas: string
-//     // Add any other properties needed for the API
-// }
-
-// export default function BerkasTagihan() {
-//     const dispatch = useAppDispatch()
-//     const [dialogIsOpen, setIsOpen] = useState(false)
-//     const [selectedBastp, setSelectedBastp] = useState<string | null>(null)
-//     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-
-//     const proyekData = useAppSelector(
-//         (state) => state.proyekEdit.data.proyekData
-//     )
-//     const selectBerkasData = useAppSelector(
-//         (state) => state.proyekEdit.data.selectBerkasData.data
-//     )
-
-//     const loading = useAppSelector((state) => state.proyekEdit.data.loading)
-
-//     const loadingSelectBerkas = useAppSelector(
-//         (state) => state.proyekEdit.data.loadingSelectBerkas
-//     )
-
-//     // Initial values for form
-//     const initialValues: BastpFormValues = {
-//         idProject: '',
-//         keterangan: '',
-//         idBerkas: '',
-//     }
-
-//     // Fungsi handler untuk checkbox
-//     const onCheck =
-//         (item: any) =>
-//         async (checked: boolean, e: ChangeEvent<HTMLInputElement>) => {
-//             // Buat objek baru dengan status yang diperbarui
-//             const updatedItem = {
-//                 ...item,
-//                 status: checked,
-//             }
-
-//             const data = { id: updatedItem.id, status: updatedItem.status }
-
-//             // Dispatch action untuk update
-//             try {
-//                 // Dispatch action untuk update
-//                 const result = await dispatch(updateBerkasProyekStatus(data))
-
-//                 // Show success notification if update was successful
-//                 if (result.payload.statusCode === 200) {
-//                     popNotification('updated')
-//                 } else {
-//                     toast.push(
-//                         <Notification
-//                             title="Error updating BASTP"
-//                             type="danger"
-//                             duration={2500}
-//                         >
-//                             {result.payload.message}
-//                         </Notification>,
-//                         {
-//                             placement: 'top-center',
-//                         }
-//                     )
-//                 }
-//             } catch (error) {
-//                 console.error('Error updating BASTP status:', error)
-
-//                 // Show error notification
-//                 toast.push(
-//                     <Notification
-//                         title="Error updating BASTP"
-//                         type="danger"
-//                         duration={2500}
-//                     >
-//                         An error occurred while updating the BASTP status
-//                     </Notification>,
-//                     {
-//                         placement: 'top-center',
-//                     }
-//                 )
-//             }
-//         }
-
-//     const fetchData = (data: { id: string }) => {
-//         dispatch(getProyek(data))
-//         dispatch(selectBerkas())
-//     }
-
-//     const openDialog = () => {
-//         setIsOpen(true)
-//     }
-
-//     const onDialogClose = (e: React.MouseEvent) => {
-//         console.log('onDialogClose', e)
-//         setIsOpen(false)
-//     }
-
-//     const openDeleteDialog = (id: string) => {
-//         setSelectedBastp(id)
-//         setDeleteDialogOpen(true)
-//     }
-
-//     const onDeleteDialogClose = () => {
-//         setDeleteDialogOpen(false)
-//         setSelectedBastp(null)
-//     }
-
-//     const onDelete = async () => {
-//         if (!selectedBastp) return
-
-//         try {
-//             const success = await apiDeleteBerkasProyek<boolean>({
-//                 id: selectedBastp,
-//             })
-
-//             if (success) {
-//                 // Get the project ID from the URL
-//                 const path = location.pathname.substring(
-//                     location.pathname.lastIndexOf('/') + 1
-//                 )
-
-//                 popNotification('deleted')
-//                 // Refresh data to show updated list
-//                 fetchData({ id: path })
-//             }
-//         } catch (error) {
-//             console.error('Error deleting BASTP:', error)
-//             toast.push(
-//                 <Notification
-//                     title="Error deleting BASTP"
-//                     type="danger"
-//                     duration={2500}
-//                 >
-//                     An error occurred while deleting the BASTP
-//                 </Notification>,
-//                 {
-//                     placement: 'top-center',
-//                 }
-//             )
-//         } finally {
-//             setDeleteDialogOpen(false)
-//             setSelectedBastp(null)
-//         }
-//     }
-
-//     const popNotification = (keyword: string) => {
-//         toast.push(
-//             <Notification
-//                 title={`Successfully ${keyword}`}
-//                 type="success"
-//                 duration={2500}
-//             >
-//                 BASTP successfully {keyword}
-//             </Notification>,
-//             {
-//                 placement: 'top-center',
-//             }
-//         )
-//     }
-
-//     const handleSubmit = async (
-//         values: BastpFormValues,
-//         { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
-//     ) => {
-//         setSubmitting(true)
-
-//         try {
-//             // Get the project ID from the URL
-//             const path = location.pathname.substring(
-//                 location.pathname.lastIndexOf('/') + 1
-//             )
-
-//             // Create a new object with the form values and add the idProject
-//             const requestData = {
-//                 ...values,
-//                 idProject: path,
-//             }
-//             console.log('requestData', requestData)
-
-//             const successCreateBerkasProyek = await apiCreateBerkasProyek<
-//                 boolean,
-//                 BastpFormModel
-//             >(requestData)
-
-//             if (successCreateBerkasProyek) {
-//                 popNotification('added')
-//                 // Refresh data to show new BASTP
-//                 fetchData({ id: path })
-//             }
-//         } catch (error) {
-//             console.error('Error creating BASTP:', error)
-//         } finally {
-//             setSubmitting(false)
-//             setIsOpen(false)
-//         }
-//     }
-
-//     useEffect(() => {
-//         const path = location.pathname.substring(
-//             location.pathname.lastIndexOf('/') + 1
-//         )
-//         const rquestParam = { id: path }
-//         fetchData(rquestParam)
-
-//         // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, [location.pathname])
-
-//     return (
-//         <Loading loading={loading}>
-//             <>
-//                 <AdaptableCard divider className="border-none">
-//                     <div className="flex justify-between items-center ">
-//                         <DescriptionSection
-//                             title="Informasi berkas Tagihan"
-//                             desc="Informasi berkas tagihan proyek"
-//                         />
-//                         <Button
-//                             size="sm"
-//                             variant="twoTone"
-//                             onClick={openDialog}
-//                             className="w-fit text-xs"
-//                             type="button"
-//                         >
-//                             Tambah Berkas
-//                         </Button>
-//                     </div>
-//                 </AdaptableCard>
-//                 <div className="flex flex-col">
-//                     {!isEmpty(proyekData) && (
-//                         <>
-//                             {proyekData?.BerkasProjects?.length > 0 ? (
-//                                 proyekData.BerkasProjects?.map(
-//                                     (item: any, index) => (
-//                                         <div
-//                                             key={item.id}
-//                                             className={`flex flex-row justify-between items-center  p-4
-//                                         ${
-//                                             index ===
-//                                             proyekData?.BerkasProjects?.length -
-//                                                 1
-//                                                 ? 'rounded-b-md border'
-//                                                 : index === 0
-//                                                 ? 'rounded-t-md border-t border-x'
-//                                                 : 'border-t border-x'
-//                                         }
-//                                             `}
-//                                         >
-//                                             <Checkbox
-//                                                 defaultChecked={item.status}
-//                                                 onChange={(checked, e) =>
-//                                                     onCheck(item)(checked, e)
-//                                                 }
-//                                             >
-//                                                 {item.nama}
-//                                             </Checkbox>
-
-//                                             <Button
-//                                                 type="button"
-//                                                 shape="circle"
-//                                                 variant="plain"
-//                                                 size="sm"
-//                                                 className="text-red-500"
-//                                                 icon={<HiOutlineTrash />}
-//                                                 onClick={() =>
-//                                                     openDeleteDialog(item.id)
-//                                                 }
-//                                             />
-//                                         </div>
-//                                     )
-//                                 )
-//                             ) : (
-//                                 <div>Tidak ada data berkas Tagihan</div>
-//                             )}
-//                         </>
-//                     )}
-//                 </div>
-
-//                 {/* Delete Confirmation Dialog */}
-//                 <ConfirmDialog
-//                     isOpen={deleteDialogOpen}
-//                     onClose={onDeleteDialogClose}
-//                     onRequestClose={onDeleteDialogClose}
-//                     type="danger"
-//                     title="Delete BASTP"
-//                     onConfirm={onDelete}
-//                 >
-//                     <p>Apakah kamu yakin ingin menghapus berkas Tagihan ini?</p>
-//                 </ConfirmDialog>
-
-//                 {/* Dialog Form for adding BASTP */}
-//                 <Formik
-//                     initialValues={initialValues}
-//                     validationSchema={BastpSchema}
-//                     onSubmit={handleSubmit}
-//                 >
-//                     {({ errors, touched, isSubmitting }) => (
-//                         <Dialog
-//                             isOpen={dialogIsOpen}
-//                             onClose={onDialogClose}
-//                             onRequestClose={onDialogClose}
-//                         >
-//                             <Form>
-//                                 <h5 className="mb-4">Tambah BASTP</h5>
-
-//                                 {/* Form */}
-//                                 <div className="flex flex-col max-h-[60vh] border-b-[1px] pb-4 ">
-//                                     {/* Nama */}
-
-//                                     <FormItem
-//                                         label="Pilih Berkas Tagihan"
-//                                         invalid={
-//                                             (errors.idBerkas &&
-//                                                 touched.idBerkas) as boolean
-//                                         }
-//                                         errorMessage={errors.idBerkas}
-//                                     >
-//                                         <Field name="idBerkas">
-//                                             {({ field, form }: FieldProps) => {
-//                                                 // Find the selected client based on current idClient value
-//                                                 const selectedBerkas =
-//                                                     field.value
-//                                                         ? selectBerkasData.find(
-//                                                               (berkas) =>
-//                                                                   berkas.id ===
-//                                                                   field.value
-//                                                           )
-//                                                         : null
-
-//                                                 // Map clients to options format required by Select component
-//                                                 const berkasOption =
-//                                                     selectBerkasData.map(
-//                                                         (berkas) => ({
-//                                                             value: berkas.id,
-//                                                             label: `${berkas.nama}`,
-//                                                         })
-//                                                     )
-
-//                                                 return (
-//                                                     <Select
-//                                                         field={field}
-//                                                         form={form}
-//                                                         options={berkasOption}
-//                                                         value={
-//                                                             selectedBerkas
-//                                                                 ? {
-//                                                                       value: selectedBerkas.id,
-//                                                                       label: `${selectedBerkas.nama}`,
-//                                                                   }
-//                                                                 : null
-//                                                         }
-//                                                         placeholder="Pilih berkas"
-//                                                         onChange={(option) => {
-//                                                             form.setFieldValue(
-//                                                                 field.name,
-//                                                                 option?.value
-//                                                             )
-//                                                         }}
-//                                                     />
-//                                                 )
-//                                             }}
-//                                         </Field>
-//                                     </FormItem>
-//                                 </div>
-
-//                                 {/* Button Dialog Option */}
-//                                 <div className="text-right mt-6">
-//                                     <Button
-//                                         className="ltr:mr-2 rtl:ml-2"
-//                                         variant="plain"
-//                                         onClick={onDialogClose}
-//                                         type="button"
-//                                         disabled={isSubmitting}
-//                                     >
-//                                         Cancel
-//                                     </Button>
-//                                     <Button
-//                                         variant="solid"
-//                                         type="submit"
-//                                         loading={isSubmitting}
-//                                     >
-//                                         Simpan
-//                                     </Button>
-//                                 </div>
-//                             </Form>
-//                         </Dialog>
-//                     )}
-//                 </Formik>
-//             </>
-//         </Loading>
-//     )
-// }
-
 import {
     Button,
     Checkbox,
@@ -459,31 +17,33 @@ import reducer, {
     selectBerkas,
     useAppSelector,
     updateBerkasProyekStatus,
-    // Add these new actions:
+    getAllBerkasesByTermin,
+    getAllBerkasByProyek,
 } from '../../ProyekEdit/store'
 import { injectReducer } from '@/store'
 import { Loading, ConfirmDialog, AdaptableCard } from '@/components/shared'
 import { isEmpty } from 'lodash'
 import { Field, FieldProps, Form, Formik } from 'formik'
 import {
-    apiCreateBerkasProyek,
+    apiCreateBerkasMultiple,
     apiDeleteBerkasProyek,
 } from '@/services/BerkasProyekService'
 import { HiOutlineTrash } from 'react-icons/hi'
 import DescriptionSection from './DesriptionSection'
+import { IoIosAdd } from 'react-icons/io'
 
 injectReducer('proyekEdit', reducer)
 
 // Schema validation for form
-const BastpSchema = Yup.object().shape({
-    idBerkas: Yup.string().required('Required'),
+const BerkasTagihanSchema = Yup.object().shape({
+    // idBerkas: Yup.string().required('Required'),
 })
 
 // Interface for form initial values
-interface BastpFormValues {
-    idProject: string
-    keterangan: string
-    idBerkas: string
+interface BerkasTagihanFormValues {
+    idProject: string | null
+    berkas: string[]
+    idTerminProject: string | null
 }
 
 // Interface for API request
@@ -505,29 +65,44 @@ interface StatusChangeItem {
 export default function BerkasTagihan() {
     const dispatch = useAppDispatch()
     const [dialogIsOpen, setIsOpen] = useState(false)
-    const [selectedBastp, setSelectedBastp] = useState<string | null>(null)
+    const [selectedBerkasTagihan, setSelectedBerkasTagihan] = useState<
+        string | null
+    >(null)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [isEditBerkasTagihanMode, setIsEditBerkasTagihanMode] =
+        useState(false)
+    const [selectedBerkasTagihanToEdit, setSelectedBerkasTagihanToEdit] =
+        useState<any>(null)
+    const [berkasTagihanDialogIsOpen, setBerkasTagihanDialogIsOpen] =
+        useState(false)
+    const [berkasTagihanFormInitialValues, setBerkasTagihanFormInitialValues] =
+        useState<BerkasTagihanFormValues>({
+            berkas: [],
+            idTerminProject: null,
+            idProject: null,
+        })
 
     // New state for status change confirmation
     const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false)
     const [statusChangeItem, setStatusChangeItem] =
         useState<StatusChangeItem | null>(null)
 
-    const proyekData = useAppSelector(
-        (state) => state.proyekEdit.data.proyekData
-    )
-    const selectBerkasData = useAppSelector(
-        (state) => state.proyekEdit.data.selectBerkasData.data
-    )
+    const {
+        proyekData,
+        terminsData,
+        selectBerkasData,
+        getAllBerkasByProyekData,
+    } = useAppSelector((state) => state.proyekEdit.data)
 
-    const loading = useAppSelector((state) => state.proyekEdit.data.loading)
-
-    const loadingSelectBerkas = useAppSelector(
-        (state) => state.proyekEdit.data.loadingSelectBerkas
-    )
+    const {
+        loading,
+        loadingTermins,
+        loadingSelectBerkas,
+        loadingGetAllBerkasByProyek,
+    } = useAppSelector((state) => state.proyekEdit.data)
 
     // Initial values for form
-    const initialValues: BastpFormValues = {
+    const initialValues: BerkasTagihanFormValues = {
         idProject: '',
         keterangan: '',
         idBerkas: '',
@@ -619,6 +194,7 @@ export default function BerkasTagihan() {
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
         dispatch(selectBerkas())
+        dispatch(getAllBerkasByProyek(data))
     }
 
     const openDialog = () => {
@@ -631,21 +207,30 @@ export default function BerkasTagihan() {
     }
 
     const openDeleteDialog = (id: string) => {
-        setSelectedBastp(id)
+        setSelectedBerkasTagihan(id)
         setDeleteDialogOpen(true)
     }
 
     const onDeleteDialogClose = () => {
         setDeleteDialogOpen(false)
-        setSelectedBastp(null)
+        setSelectedBerkasTagihan(null)
     }
 
-    const onDelete = async () => {
-        if (!selectedBastp) return
+    const onBerkasTagihanDialogClose = () => {
+        setBerkasTagihanDialogIsOpen(false)
+        // setIsEditBerkasTagihanMode(false)
+        setSelectedBerkasTagihanToEdit(null)
+    }
 
+    console.log('getAllBerkasByProyekData', getAllBerkasByProyekData)
+
+    const onDelete = async () => {
+        if (!selectedBerkasTagihan) return
+
+        console.log('selectedBerkasTagihan', selectedBerkasTagihan)
         try {
             const success = await apiDeleteBerkasProyek<boolean>({
-                id: selectedBastp,
+                id: selectedBerkasTagihan,
             })
 
             if (success) {
@@ -674,7 +259,7 @@ export default function BerkasTagihan() {
             )
         } finally {
             setDeleteDialogOpen(false)
-            setSelectedBastp(null)
+            setSelectedBerkasTagihan(null)
         }
     }
 
@@ -693,8 +278,8 @@ export default function BerkasTagihan() {
         )
     }
 
-    const handleSubmit = async (
-        values: BastpFormValues,
+    const handleBerkasTagihanSubmit = async (
+        values: BerkasTagihanFormValues,
         { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
     ) => {
         setSubmitting(true)
@@ -708,11 +293,13 @@ export default function BerkasTagihan() {
             // Create a new object with the form values and add the idProject
             const requestData = {
                 ...values,
+                berkas: values.berkas,
+                idTerminProject: berkasTagihanFormInitialValues.idTerminProject,
                 idProject: path,
             }
             console.log('requestData', requestData)
 
-            const successCreateBerkasProyek = await apiCreateBerkasProyek<
+            const successCreateBerkasProyek = await apiCreateBerkasMultiple<
                 boolean,
                 BastpFormModel
             >(requestData)
@@ -726,7 +313,7 @@ export default function BerkasTagihan() {
             console.error('Error creating BASTP:', error)
         } finally {
             setSubmitting(false)
-            setIsOpen(false)
+            setBerkasTagihanDialogIsOpen(false)
         }
     }
 
@@ -740,8 +327,29 @@ export default function BerkasTagihan() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
+    const handleOpenDialog = (idTermin: string) => {
+        setIsEditBerkasTagihanMode(idTermin)
+        setSelectedBerkasTagihanToEdit(idTermin)
+        console.log('idTermin', idTermin)
+
+        setBerkasTagihanFormInitialValues({
+            ...berkasTagihanFormInitialValues,
+            idTerminProject: idTermin, // Simpan ID termin yang dipilih
+        })
+
+        setBerkasTagihanDialogIsOpen(true)
+    }
+
+    console.log('selectberkas', selectBerkasData)
     return (
-        <Loading loading={loading}>
+        <Loading
+            loading={
+                loading ||
+                loadingTermins ||
+                loadingSelectBerkas ||
+                loadingGetAllBerkasByProyek
+            }
+        >
             <>
                 <AdaptableCard divider className="border-none">
                     <div className="flex justify-between items-center ">
@@ -749,30 +357,25 @@ export default function BerkasTagihan() {
                             title="Informasi berkas Tagihan"
                             desc="Informasi berkas tagihan proyek"
                         />
-                        <Button
-                            size="sm"
-                            variant="twoTone"
-                            onClick={openDialog}
-                            className="w-fit text-xs"
-                            type="button"
-                        >
-                            Tambah Berkas
-                        </Button>
                     </div>
                 </AdaptableCard>
                 <div className="flex flex-col">
-                    {!isEmpty(proyekData) && (
+                    {!isEmpty(terminsData) && (
                         <>
-                            {proyekData?.BerkasProjects?.length > 0 ? (
-                                proyekData.BerkasProjects?.map(
-                                    (item: any, index) => (
+                            {terminsData?.length > 0 ? (
+                                terminsData.map((item: any, index) => {
+                                    const berkasProyekPerTermin =
+                                        getAllBerkasByProyekData?.data?.filter(
+                                            (data) =>
+                                                data.idTerminProject === item.id
+                                        ) ?? []
+
+                                    return (
                                         <div
                                             key={item.id}
                                             className={`flex flex-row justify-between items-center  p-4
                                         ${
-                                            index ===
-                                            proyekData?.BerkasProjects?.length -
-                                                1
+                                            index === terminsData?.length - 1
                                                 ? 'rounded-b-md border'
                                                 : index === 0
                                                 ? 'rounded-t-md border-t border-x'
@@ -780,29 +383,85 @@ export default function BerkasTagihan() {
                                         }
                                             `}
                                         >
-                                            <Checkbox
-                                                checked={item.status}
-                                                onChange={(checked, e) =>
-                                                    onCheck(item)(checked, e)
-                                                }
-                                            >
-                                                {item.nama}
-                                            </Checkbox>
-
-                                            <Button
-                                                type="button"
-                                                shape="circle"
-                                                variant="plain"
-                                                size="sm"
-                                                className="text-red-500"
-                                                icon={<HiOutlineTrash />}
-                                                onClick={() =>
-                                                    openDeleteDialog(item.id)
-                                                }
-                                            />
+                                            <div className="flex flex-col space-y-1">
+                                                <div className="text-gray-900 dark:text-gray-100 font-semibold">
+                                                    Termin {index + 1}
+                                                </div>
+                                                {berkasProyekPerTermin.length >
+                                                0 ? (
+                                                    berkasProyekPerTermin.map(
+                                                        (itemBerkas: any) => (
+                                                            <div
+                                                                key={
+                                                                    itemBerkas.id
+                                                                }
+                                                                className="flex flex-row items-center "
+                                                            >
+                                                                <Checkbox
+                                                                    checked={
+                                                                        itemBerkas.status
+                                                                    }
+                                                                    onChange={(
+                                                                        checked,
+                                                                        e
+                                                                    ) =>
+                                                                        onCheck(
+                                                                            itemBerkas
+                                                                        )(
+                                                                            checked,
+                                                                            e
+                                                                        )
+                                                                    }
+                                                                    className="flex items-center"
+                                                                >
+                                                                    <div>
+                                                                        {
+                                                                            itemBerkas.nama
+                                                                        }
+                                                                    </div>
+                                                                </Checkbox>
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="xs"
+                                                                    className="text-red-500"
+                                                                    icon={
+                                                                        <HiOutlineTrash />
+                                                                    }
+                                                                    onClick={() =>
+                                                                        openDeleteDialog(
+                                                                            itemBerkas.id
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )
+                                                    )
+                                                ) : (
+                                                    <div>-</div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Button
+                                                    type="button"
+                                                    shape="circle"
+                                                    variant="twoTone"
+                                                    size="sm"
+                                                    className="w-fit text-xs text-indigo-500"
+                                                    icon={<IoIosAdd />}
+                                                    onClick={() =>
+                                                        handleOpenDialog(
+                                                            item.id
+                                                        )
+                                                    }
+                                                >
+                                                    Tambah Berkas
+                                                </Button>
+                                            </div>
                                         </div>
                                     )
-                                )
+                                })
                             ) : (
                                 <div>Tidak ada data berkas Tagihan</div>
                             )}
@@ -845,72 +504,73 @@ export default function BerkasTagihan() {
                     </p>
                 </ConfirmDialog>
 
-                {/* Dialog Form for adding BASTP */}
+                {/* Dialog Form for adding berkas tagihan */}
                 <Formik
-                    initialValues={initialValues}
-                    validationSchema={BastpSchema}
-                    onSubmit={handleSubmit}
+                    initialValues={berkasTagihanFormInitialValues}
+                    validationSchema={BerkasTagihanSchema}
+                    onSubmit={handleBerkasTagihanSubmit}
+                    enableReinitialize={true}
                 >
-                    {({ errors, touched, isSubmitting }) => (
-                        <Dialog
-                            isOpen={dialogIsOpen}
-                            onClose={onDialogClose}
-                            onRequestClose={onDialogClose}
-                        >
-                            <Form>
-                                <h5 className="mb-4">Tambah BASTP</h5>
+                    {({
+                        errors,
+                        touched,
+                        isSubmitting,
+                        values,
+                        setFieldValue,
+                    }) => (
+                        <>
+                            <Dialog
+                                isOpen={berkasTagihanDialogIsOpen}
+                                onClose={onBerkasTagihanDialogClose}
+                                onRequestClose={onBerkasTagihanDialogClose}
+                            >
+                                <Form>
+                                    <h5 className="mb-4">Pilih Berkas</h5>
 
-                                {/* Form */}
-                                <div className="flex flex-col max-h-[60vh] border-b-[1px] pb-4 ">
-                                    {/* Nama */}
-
+                                    {/* Form Bastp Tanggal Pembayaran */}
                                     <FormItem
                                         label="Pilih Berkas Tagihan"
                                         invalid={
-                                            (errors.idBerkas &&
-                                                touched.idBerkas) as boolean
+                                            (errors.berkas &&
+                                                touched.berkas) as boolean
                                         }
-                                        errorMessage={errors.idBerkas}
+                                        errorMessage={errors.berkas}
                                     >
-                                        <Field name="idBerkas">
+                                        <Field name="berkas">
                                             {({ field, form }: FieldProps) => {
-                                                // Find the selected client based on current idClient value
-                                                const selectedBerkas =
-                                                    field.value
-                                                        ? selectBerkasData.find(
-                                                              (berkas) =>
-                                                                  berkas.id ===
-                                                                  field.value
-                                                          )
-                                                        : null
-
-                                                // Map clients to options format required by Select component
-                                                const berkasOption =
-                                                    selectBerkasData.map(
-                                                        (berkas) => ({
-                                                            value: berkas.id,
-                                                            label: `${berkas.nama}`,
+                                                // Ubah format data dari API menjadi format yang bisa digunakan oleh react-select
+                                                const options =
+                                                    selectBerkasData.data.map(
+                                                        (item: any) => ({
+                                                            value: item.id,
+                                                            label: item.nama,
                                                         })
                                                     )
-
                                                 return (
                                                     <Select
-                                                        field={field}
-                                                        form={form}
-                                                        options={berkasOption}
-                                                        value={
-                                                            selectedBerkas
-                                                                ? {
-                                                                      value: selectedBerkas.id,
-                                                                      label: `${selectedBerkas.nama}`,
-                                                                  }
-                                                                : null
-                                                        }
-                                                        placeholder="Pilih berkas"
-                                                        onChange={(option) => {
+                                                        isMulti
+                                                        placeholder="Please Select"
+                                                        defaultValue={[]}
+                                                        options={options}
+                                                        value={options.filter(
+                                                            (option: any) =>
+                                                                field.value?.includes(
+                                                                    option.value
+                                                                )
+                                                        )}
+                                                        onChange={(
+                                                            selectedOptions: any
+                                                        ) => {
+                                                            const values =
+                                                                selectedOptions.map(
+                                                                    (
+                                                                        option: any
+                                                                    ) =>
+                                                                        option.value
+                                                                )
                                                             form.setFieldValue(
-                                                                field.name,
-                                                                option?.value
+                                                                'berkas',
+                                                                values
                                                             )
                                                         }}
                                                     />
@@ -918,29 +578,32 @@ export default function BerkasTagihan() {
                                             }}
                                         </Field>
                                     </FormItem>
-                                </div>
 
-                                {/* Button Dialog Option */}
-                                <div className="text-right mt-6">
-                                    <Button
-                                        className="ltr:mr-2 rtl:ml-2"
-                                        variant="plain"
-                                        onClick={onDialogClose}
-                                        type="button"
-                                        disabled={isSubmitting}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        variant="solid"
-                                        type="submit"
-                                        loading={isSubmitting}
-                                    >
-                                        Simpan
-                                    </Button>
-                                </div>
-                            </Form>
-                        </Dialog>
+                                    {/* Button Dialog Option */}
+                                    <div className="text-right mt-6">
+                                        <Button
+                                            className="ltr:mr-2 rtl:ml-2"
+                                            variant="plain"
+                                            onClick={onBerkasTagihanDialogClose}
+                                            type="button"
+                                            disabled={isSubmitting}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant="solid"
+                                            type="submit"
+                                            loading={isSubmitting}
+                                        >
+                                            {'Simpan'}
+                                            {/* {isEditBerkasTagihanMode
+                                                ? 'Update'
+                                                : 'Simpan'} */}
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </Dialog>
+                        </>
                     )}
                 </Formik>
             </>

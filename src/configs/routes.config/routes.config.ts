@@ -155,16 +155,40 @@ export const protectedRoutes = [
     },
     // Pengaturan
     {
-        key: 'settings.pengaturanPengguna',
-        path: '/pengaturan/pengguna',
-        component: lazy(() => import('@/views/pengaturan/Pengguna')),
+        key: 'apps.peran',
+        path: '/peran-dan-pengguna/peran',
+        component: lazy(() => import('@/views/peranPengguna/Peran/PeranList')),
         authority: [],
     },
     {
-        key: 'settings.pengaturanPeran',
-        path: '/pengaturan/peran',
-        component: lazy(() => import('@/views/pengaturan/Peran')),
+        key: 'apps.pengguna',
+        path: '/peran-dan-pengguna/pengguna',
+        component: lazy(
+            () => import('@/views/peranPengguna/Pengguna/PenggunaList')
+        ),
         authority: [],
+    },
+    {
+        key: 'apps.peranDanPengguna',
+        path: '/peran-dan-pengguna/pengguna-edit/:proyekId',
+        component: lazy(
+            () => import('@/views/peranPengguna/Pengguna/PenggunaEdit')
+        ),
+        authority: [],
+        meta: {
+            header: 'Ubah Pengguna',
+        },
+    },
+    {
+        key: 'apps.peranDanPengguna',
+        path: '/peran-dan-pengguna/pengguna-new',
+        component: lazy(
+            () => import('@/views/peranPengguna/Pengguna/PenggunaNew')
+        ),
+        authority: [],
+        meta: {
+            header: 'Tambah Pengguna',
+        },
     },
     // Notifikasi
     {

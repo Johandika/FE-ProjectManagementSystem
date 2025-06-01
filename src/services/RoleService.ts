@@ -10,14 +10,24 @@ export async function apiGetRoles<T, U extends Record<string, unknown>>() {
     return res
 }
 
+// select roles
+export async function apiSelectRoles<T, U extends Record<string, unknown>>() {
+    const res = await ApiService.fetchData<T>({
+        url: '/select/role',
+        method: 'get',
+    })
+
+    return res
+}
+
 // get one role by id
 export async function apiGetRole<T, U extends Record<string, unknown>>(
-    params: U
+    data: U
 ) {
     const res = await ApiService.fetchData<T>({
-        url: `/role/${params.id}`,
+        url: `/role/${data.id}`,
         method: 'get',
-        params,
+        data,
     })
     return res.data
 }

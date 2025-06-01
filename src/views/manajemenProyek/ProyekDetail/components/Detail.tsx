@@ -180,13 +180,18 @@ export default function Detail() {
                                 </div>
                             </div>
                             <div className="flex flex-col gap-0 border-b py-4">
-                                <div className="text-sm">
-                                    Waktu Pengerjaan (hari) :
-                                </div>
+                                <div className="text-sm">Timeline</div>
                                 <div className="text-base font-semibold text-neutral-500">
-                                    {proyekData.timeline}
+                                    {formatDate(
+                                        proyekData.timeline_awal || '-'
+                                    )}{' '}
+                                    /{' '}
+                                    {formatDate(
+                                        proyekData.timeline_akhir || '-'
+                                    )}
                                 </div>
                             </div>
+
                             {/* Retensi */}
                             <div className="flex flex-col gap-0 border-b py-4">
                                 <div className="text-sm">Retensi :</div>

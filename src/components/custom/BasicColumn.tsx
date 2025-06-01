@@ -19,7 +19,6 @@ const BasicColumn = () => {
         dispatch(getDashboard(query)) // contoh param request
     }, [dispatch])
 
-    console.log('dataDashboard', dataDashboard)
     const data2 = [
         {
             name: 'jumlah_proyek',

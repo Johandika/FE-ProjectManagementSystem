@@ -3,7 +3,6 @@ import reducer, {
     getAllNotification,
     useAppSelector,
     useAppDispatch,
-    getOneNotificationAndRead,
 } from '../store'
 
 import { injectReducer } from '@/store'
@@ -12,13 +11,10 @@ import {
     Avatar,
     AvatarProps,
     Button,
-    Card,
     Notification,
-    Timeline,
     toast,
 } from '@/components/ui'
-import { HiOutlineTrash, HiTag } from 'react-icons/hi'
-import { GoBellFill } from 'react-icons/go'
+import { HiOutlineBell, HiOutlineTrash, HiTag } from 'react-icons/hi'
 import { formatWaktuNotifikasi } from '@/utils/formatDate'
 import {
     apiDeleteOneNotification,
@@ -28,14 +24,6 @@ import {
 injectReducer('notification', reducer)
 
 type TimelineAvatarProps = AvatarProps
-
-const TimelineAvatar = ({ children, ...rest }: TimelineAvatarProps) => {
-    return (
-        <Avatar {...rest} size={25} shape="circle">
-            {children}
-        </Avatar>
-    )
-}
 
 export default function AllNotification() {
     const dispatch = useAppDispatch()
@@ -145,32 +133,13 @@ export default function AllNotification() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
-    console.log('dataNotification', dataNotification)
-
     return (
         <Loading loading={loading}>
             <div>
-                {dataNotification &&
+                {dataNotification && dataNotification.length > 0 ? (
                     dataNotification.map((item, index) => (
                         <div
                             key={item.id}
-                            media={
-                                <TimelineAvatar
-                                    className={`text-white dark:text-gray-100
-                                   ${
-                                       item.type === 'timeline'
-                                           ? 'bg-amber-500'
-                                           : item.type === 'adendum'
-                                           ? 'bg-blue-500'
-                                           : item.type === 'faktur_pajak'
-                                           ? 'bg-green-500'
-                                           : ''
-                                   }
-                                    `}
-                                >
-                                    <GoBellFill />
-                                </TimelineAvatar>
-                            }
                             className={`py-2 
                                 ${index === 0 ? 'border-t' : ''}
                                 ${openDetailId === item.id ? 'bg-slate-50' : ''}
@@ -182,9 +151,27 @@ export default function AllNotification() {
                             }
                         >
                             <div className="my-1 flex items-center">
-                                <sdivan className="font-semibold text-gray-900 dark:text-gray-100">
+                                <Avatar
+                                    shape="circle"
+                                    className={`
+                                            ${
+                                                item.type === 'timeline'
+                                                    ? 'bg-amber-100 text-amber-600'
+                                                    : item.type === 'adendum'
+                                                    ? 'bg-blue-100 text-blue-600'
+                                                    : item.type ===
+                                                      'faktur_pajak'
+                                                    ? 'bg-green-100 text-green-600'
+                                                    : item.type === 'project'
+                                                    ? 'bg-fuchsia-100 text-fuchsia-600'
+                                                    : ''
+                                            }
+                                            dark:bg-blue-500/20 dark:text-blue-100`}
+                                    icon={<HiOutlineBell />}
+                                />
+                                <span className="ml-3 font-semibold text-gray-900 dark:text-gray-100">
                                     {item.type}
-                                </sdivan>
+                                </span>
                                 <span className="mx-2">diinfokan pada</span>
                                 <span className="">
                                     {formatWaktuNotifikasi(item.createdAt)}{' '}
@@ -261,7 +248,10 @@ export default function AllNotification() {
                                 </div>
                             )}
                         </div>
-                    ))}
+                    ))
+                ) : (
+                    <div>data empty</div>
+                )}
             </div>
         </Loading>
     )
