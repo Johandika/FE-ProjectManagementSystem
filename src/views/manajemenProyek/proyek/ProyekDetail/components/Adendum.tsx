@@ -22,7 +22,7 @@ import DatePicker from '@/components/ui/DatePicker'
 import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 import {
-    apiCreateAdendum,
+    // apiCreateAdendum,
     apiDeleteAdendum,
     apiEditAdendum,
     apiGetAdendum,
@@ -251,7 +251,7 @@ export default function Adendum() {
                                     })
                                 } else {
                                     // Handle create with API call
-                                    result = await apiCreateAdendum(requestData)
+                                    // result = await apiCreateAdendum(requestData)
                                 }
 
                                 setIsSubmitting(false)

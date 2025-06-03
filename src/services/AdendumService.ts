@@ -1,5 +1,23 @@
 import ApiService from './ApiService'
 
+// get all adendum
+export async function apiGetAdendums<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    const params = new URLSearchParams()
+
+    if (data.idProject) params.append('idProject', data.idProject.toString())
+    if (data.page) params.append('page', data.page.toString())
+    if (data.limit) params.append('limit', data.limit.toString())
+
+    const url = `/adendum${params.toString() ? `?${params.toString()}` : ''}`
+
+    return ApiService.fetchData<T>({
+        url,
+        method: 'get',
+    })
+}
+
 // get all adendum by project
 export async function apiGetAdendumsByProyek<
     T,
@@ -27,12 +45,37 @@ export async function apiGetAdendum<T, U extends Record<string, unknown>>(
     return res.data
 }
 
-// create adendum
-export async function apiCreateAdendum<T, U extends Record<string, unknown>>(
-    data: U
-) {
+// create adendum timeline
+export async function apiCreateAdendumTimeline<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
     return ApiService.fetchData<T>({
-        url: '/adendum',
+        url: '/adendum/timeline',
+        method: 'post',
+        data,
+    })
+}
+
+// create adendum lokasi
+export async function apiCreateAdendumLokasi<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: '/adendum/lokasi',
+        method: 'post',
+        data,
+    })
+}
+
+// create adendum nilai kontrak
+export async function apiCreateAdendumNilaiKontrak<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: '/adendum/nilai-kontrak',
         method: 'post',
         data,
     })

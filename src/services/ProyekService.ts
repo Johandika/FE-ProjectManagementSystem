@@ -14,6 +14,7 @@ export interface GetProyeksRequest {
 export async function apiGetProyeks<T, U extends GetProyeksRequest>(data: U) {
     // Membangun query string parameters
     const params = new URLSearchParams()
+
     // Menangani pagination
     if (data.page) params.append('page', data.page.toString())
     if (data.limit) params.append('limit', data.limit.toString())

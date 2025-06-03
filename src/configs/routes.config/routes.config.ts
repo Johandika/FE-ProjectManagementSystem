@@ -86,6 +86,15 @@ export const protectedRoutes = [
             header: 'Tambah Tender',
         },
     },
+    // Adendum
+    {
+        key: 'apps.adendum',
+        path: '/manajemen-proyek/adendum',
+        component: lazy(
+            () => import('@/views/manajemenProyek/adendum/AdendumList')
+        ),
+        authority: [],
+    },
     // Klien
     {
         key: 'apps.klien',
