@@ -1,6 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableProyekQueries, TableQueries } from '@/@types/common'
-import { apiGetAdendums } from '@/services/AdendumService'
+import {
+    apiGetAdendums,
+    apiGetAdendumsByProyek,
+} from '@/services/AdendumService'
 
 type Adendum = {
     id: string
@@ -34,6 +37,8 @@ export type MasterAdendumListSlice = {
     tableData: TableQueries & { totalPage?: number }
     filterData: FilterQueries
     adendumsList: Adendum[]
+    adendumsByProyekList: Adendum[]
+    loadingAdendumsByProyek: boolean
 }
 
 type GetMasterAdendumData = TableProyekQueries & { filterData?: FilterQueries }
@@ -58,6 +63,23 @@ export const getAdendums = createAsyncThunk(
     }
 )
 
+//get all
+export const getAdendumsByProyek = createAsyncThunk(
+    SLICE_NAME + '/getAdendumsByProyek',
+    async (data: GetMasterAdendumData) => {
+        const response = await apiGetAdendumsByProyek<
+            GetMasterAdendumResponse,
+            GetMasterAdendumData
+        >(data)
+
+        console.log('response.data.data', response.data)
+        // return response.data
+        return {
+            data: response.data,
+        }
+    }
+)
+
 export const initialTableData: TableQueries = {
     total: 0,
     pageIndex: 1,
@@ -72,6 +94,8 @@ const initialState: MasterAdendumListSlice = {
     selectedAdendum: '',
     adendumStatus: '',
     adendumsList: [],
+    adendumsByProyekList: [],
+    loadingAdendumsByProyek: false,
     tableData: initialTableData,
     filterData: {
         name: '',
@@ -117,6 +141,13 @@ const adendumListSlice = createSlice({
             })
             .addCase(getAdendums.pending, (state) => {
                 state.loading = true
+            })
+            .addCase(getAdendumsByProyek.fulfilled, (state, action) => {
+                state.adendumsByProyekList = action.payload.data
+                state.loadingAdendumsByProyek = false
+            })
+            .addCase(getAdendumsByProyek.pending, (state) => {
+                state.loadingAdendumsByProyek = true
             })
     },
 })

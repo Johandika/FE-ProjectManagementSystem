@@ -61,8 +61,6 @@ export async function apiUpdatePassword<T, U extends Record<string, unknown>>(
 export async function apiDeleteUser<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('data deeta', data.id)
-
     return ApiService.fetchData<T>({
         url: `/user/softDeleted/${data.id}`,
         method: 'patch',

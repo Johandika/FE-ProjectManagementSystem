@@ -54,7 +54,6 @@ export async function apiRegister(data: Register) {
 }
 
 export async function apiResetPassword(data: { id: string }) {
-    console.log('dataiii', data.id)
     return ApiService.fetchData({
         url: `/user/reset-password/${data.id}`,
         method: 'patch',

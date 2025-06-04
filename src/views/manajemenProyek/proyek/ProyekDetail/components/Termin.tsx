@@ -594,7 +594,7 @@ export default function Termin() {
                                     }
                                          sm:flex-row justify-center sm:justify-between`}
                                     >
-                                        <div className="border-r p-6 flex flex-1 flex-row ">
+                                        <div className="p-6 flex flex-1 flex-row ">
                                             <div className="flex flex-col w-full items-center sm:items-start ">
                                                 <span>{termin.keterangan}</span>
                                                 <span className="font-bold text-2xl">
