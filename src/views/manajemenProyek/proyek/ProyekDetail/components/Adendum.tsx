@@ -127,7 +127,7 @@ export default function Adendum() {
                 </div>
                 <div className="overflow-x-auto">
                     {/* Timeline */}
-                    {adendumByProyekData &&
+                    {adendumByProyekData && adendumByProyekData.length > 0 ? (
                         adendumByProyekData.map((item, index) => (
                             <div
                                 className={`flex flex-row items-center p-6 relative min-w-[540px]
@@ -290,15 +290,14 @@ export default function Adendum() {
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    {loadingAdendumsByProyek &&
-                        adendumByProyekData.length >= 0 && (
-                            <div className="text-center py-5">
-                                <p className="text-gray-500 dark:text-gray-400">
-                                    Belum ada adendum untuk proyek ini
-                                </p>
-                            </div>
-                        )}
+                        ))
+                    ) : (
+                        <div className="text-center py-5">
+                            <p className="text-gray-500 dark:text-gray-400">
+                                Belum ada adendum untuk proyek ini
+                            </p>
+                        </div>
+                    )}
                 </div>
             </AdaptableCard>
             <ConfirmDialog
