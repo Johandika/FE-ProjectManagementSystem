@@ -63,7 +63,12 @@ const ProyekEdit = () => {
     ) => {
         setSubmitting(true)
 
-        const success = await updateProyek(values)
+        const proceedData = {
+            ...values,
+            pic: values.pic?.toUpperCase(),
+        }
+
+        const success = await updateProyek(proceedData)
         setSubmitting(false)
         if (success) {
             popNotification('updated')

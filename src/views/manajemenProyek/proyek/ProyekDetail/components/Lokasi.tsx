@@ -1,85 +1,3 @@
-// import React, { useEffect } from 'react'
-// import { IoLocationSharp } from 'react-icons/io5'
-// import classNames from 'classnames'
-// import isLastChild from '@/utils/isLastChild'
-// import DescriptionSection from './DesriptionSection'
-// import reducer, {
-//     getLokasisByProyek,
-//     useAppDispatch,
-//     useAppSelector,
-// } from '../store'
-// import { injectReducer } from '@/store'
-
-// injectReducer('proyekDetail', reducer)
-
-// export default function Lokasi({ lokasis = [] }) {
-//     const dispatch = useAppDispatch()
-
-//     const lokasiData = useAppSelector(
-//         (state) => state.proyekDetail.data.lokasisByProyekData?.data
-//     )
-
-//     const fetchData = (data: { id: string }) => {
-//         dispatch(getLokasisByProyek(data))
-//     }
-
-//     useEffect(() => {
-//         const path = location.pathname.substring(
-//             location.pathname.lastIndexOf('/') + 1
-//         )
-//         const rquestParam = { id: path }
-//         fetchData(rquestParam)
-
-//         // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, [location.pathname])
-
-//     console.log('lokasiData', lokasiData)
-//     return (
-//         <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
-//             <DescriptionSection
-//                 title="Informasi Lokasi"
-//                 desc="Informasi lokasi proyek"
-//             />
-//             {lokasiData && lokasiData?.length > 0 ? (
-//                 <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-//                     {lokasiData?.map((data: any, index) => (
-//                         <a
-//                             key={data.id}
-//                             href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
-//                             target="_blank"
-//                             rel="noopener noreferrer"
-//                             className={classNames(
-//                                 'flex items-center px-4 py-6 group',
-//                                 !isLastChild(lokasis, index) &&
-//                                     'border-b border-gray-200 dark:border-gray-600'
-//                             )}
-//                         >
-//                             <div className="flex items-center">
-//                                 <div className="text-3xl">
-//                                     <IoLocationSharp className="group-hover:text-blue-600 transition" />
-//                                 </div>
-//                                 <div className="ml-3 rtl:mr-3">
-//                                     <div className="flex items-center">
-//                                         <div className="text-gray-900 dark:text-gray-100 font-semibold">
-//                                             {data.lokasi}
-//                                         </div>
-//                                     </div>
-//                                     <span>
-//                                         lat: {data.latitude}, long:{' '}
-//                                         {data.longitude}
-//                                     </span>
-//                                 </div>
-//                             </div>
-//                         </a>
-//                     ))}
-//                 </div>
-//             ) : (
-//                 <div>Lokasi tidak terdaftar</div>
-//             )}
-//         </div>
-//     )
-// }
-
 import React, { useState, useEffect } from 'react'
 import { IoLocationSharp } from 'react-icons/io5'
 import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi'
@@ -99,14 +17,18 @@ import Button from '@/components/ui/Button'
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import { ConfirmDialog, Loading } from '@/components/shared'
 import * as Yup from 'yup'
-import { Notification, toast } from '@/components/ui'
+import { Dialog, Notification, toast } from '@/components/ui'
 import {
     apiCreateLokasi,
     apiDeleteLokasi,
     apiEditLokasi,
 } from '@/services/LokasiService'
+import { apiCreateAdendumLokasi } from '@/services/AdendumService'
 
-// Type definitions for location data
+export interface SetSubmitting {
+    (isSubmitting: boolean): void
+}
+
 type Lokasi = {
     id: string
     lokasi: string
@@ -122,6 +44,22 @@ type FormValues = {
     tempLongitude: string | number
     tempIdProject: string
 }
+
+interface AdendumLokasiFormValues {
+    idProject?: string
+    lokasi_sebelum: string
+    lokasi_adendum: string
+    latitude_sebelum: string
+    latitude_adendum: string
+    longitude_sebelum: string
+    longitude_adendum: string
+}
+
+const AdendumLokasiSchema = Yup.object().shape({
+    lokasi_adendum: Yup.string().required('Lokasi adendum wajib diisi'),
+    latitude_adendum: Yup.string().required('Latitude adendum wajib diisi'),
+    longitude_adendum: Yup.string().required('Longitude adendum wajib diisi'),
+})
 
 // Validation schema for the form fields
 const validationSchema = Yup.object().shape({
@@ -142,6 +80,17 @@ export default function Lokasi() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
+    const [dialogAdendumLokasiOpen, setDialogAdendumLokasiOpen] =
+        useState(false)
+    const [adendumLokasiFormInitialValues, setAdendumLokasiFormInitialValues] =
+        useState<AdendumLokasiFormValues>({
+            lokasi_sebelum: '',
+            lokasi_adendum: '',
+            latitude_sebelum: '',
+            latitude_adendum: '',
+            longitude_sebelum: '',
+            longitude_adendum: '',
+        })
 
     const dispatch = useAppDispatch()
     const projectId = location.pathname.substring(
@@ -173,14 +122,16 @@ export default function Lokasi() {
     }
 
     // Success notification helper
-    const popNotification = (keyword: string) => {
+    const popNotification = (keyword: string, adendum?: string) => {
         toast.push(
             <Notification
                 title={`Berhasil ${keyword}`}
                 type="success"
                 duration={2500}
             >
-                Data lokasi berhasil {keyword}
+                {adendum
+                    ? `${adendum} lokasi berhasil ${keyword}`
+                    : `Data  lokasi berhasil ${keyword}`}
             </Notification>,
             {
                 placement: 'top-center',
@@ -188,13 +139,62 @@ export default function Lokasi() {
         )
     }
 
-    // Mock API functions for demo - replace with actual API calls
-    // const apiCreateLokasi = async (data: any) => {
-    //     console.log(data)
-    //     return {
-    //         data: { statusCode: 200, message: 'Lokasi created successfully' },
-    //     }
-    // }
+    const handleCloseAdendum = () => {
+        setDialogAdendumLokasiOpen(false)
+        setAdendumLokasiFormInitialValues({
+            lokasi_sebelum: '',
+            lokasi_adendum: '',
+            latitude_sebelum: '',
+            latitude_adendum: '',
+            longitude_sebelum: '',
+            longitude_adendum: '',
+        })
+    }
+
+    const handleAdendumLokasiSubmit = async (
+        values: AdendumLokasiFormValues,
+        { setSubmitting }: { setSubmitting: SetSubmitting }
+    ) => {
+        setSubmitting(true)
+
+        const processedData = {
+            ...values,
+            idProject: projectId,
+        }
+
+        try {
+            let result = await apiCreateAdendumLokasi(processedData)
+
+            if (result && result.data?.statusCode === 201) {
+                popNotification('berhasil ditambahkan', 'Adendum')
+
+                setAdendumLokasiFormInitialValues({
+                    lokasi_sebelum: '',
+                    lokasi_adendum: '',
+                    latitude_sebelum: '',
+                    latitude_adendum: '',
+                    longitude_sebelum: '',
+                    longitude_adendum: '',
+                })
+
+                setDialogAdendumLokasiOpen(false)
+
+                // Refresh
+                dispatch(getLokasisByProyek({ id: projectId }))
+            }
+        } catch (error) {
+            toast.push(
+                <Notification title="Error" type="danger" duration={2500}>
+                    {error
+                        ? error.response.data?.message
+                        : 'Gagal membuat adendum lokasi'}
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
 
     return (
         <Loading loading={loading || isSubmitting}>
@@ -322,25 +322,19 @@ export default function Lokasi() {
                         resetFormFields()
                     }
 
-                    const handleEdit = (index: number) => {
+                    const handleAdendum = (index: number) => {
                         if (lokasiData) {
                             const lokasi = lokasiData[index]
+                            setDialogAdendumLokasiOpen(true)
 
-                            // Set temporary values for editing
-                            setFieldValue('tempLokasi', lokasi.lokasi)
-                            setFieldValue('tempLatitude', lokasi.latitude)
-                            setFieldValue('tempLongitude', lokasi.longitude)
-                            setFieldValue('tempIdProject', lokasi.idProject)
-
-                            setEditIndex(index)
-                            setShowForm(true)
+                            setAdendumLokasiFormInitialValues({
+                                ...adendumLokasiFormInitialValues,
+                                lokasi_sebelum: lokasi.lokasi,
+                                latitude_sebelum: lokasi.latitude,
+                                longitude_sebelum: lokasi.longitude,
+                            })
+                            setDialogAdendumLokasiOpen(true)
                         }
-                    }
-
-                    // Function to open confirmation dialog
-                    const handleConfirmDelete = (index: number) => {
-                        setDeleteIndex(index)
-                        setDialogOpen(true)
                     }
 
                     // Function to close confirmation dialog
@@ -535,7 +529,7 @@ export default function Lokasi() {
                                                     <div
                                                         key={data.id}
                                                         className={classNames(
-                                                            'flex items-center justify-between px-4 py-6',
+                                                            'flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-6 gap-4 sm:gap-0',
                                                             !isLastChild(
                                                                 lokasiData,
                                                                 index
@@ -577,33 +571,17 @@ export default function Lokasi() {
                                                             <Button
                                                                 type="button"
                                                                 shape="circle"
-                                                                variant="plain"
+                                                                variant="twoTone"
                                                                 size="sm"
-                                                                icon={
-                                                                    <HiOutlinePencil />
-                                                                }
                                                                 className="text-indigo-500"
                                                                 onClick={() =>
-                                                                    handleEdit(
+                                                                    handleAdendum(
                                                                         index
                                                                     )
                                                                 }
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                className="text-red-500"
-                                                                icon={
-                                                                    <HiOutlineTrash />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleConfirmDelete(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
+                                                            >
+                                                                Adendum Lokasi
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 )
@@ -637,6 +615,179 @@ export default function Lokasi() {
                         </Form>
                     )
                 }}
+            </Formik>
+            {/* Form Adendum Nilai Kontrak*/}
+            <Formik
+                initialValues={adendumLokasiFormInitialValues}
+                validationSchema={AdendumLokasiSchema}
+                enableReinitialize={true}
+                onSubmit={handleAdendumLokasiSubmit}
+            >
+                {({ errors, touched, isSubmitting, values, setFieldValue }) => (
+                    <>
+                        <Dialog
+                            isOpen={dialogAdendumLokasiOpen}
+                            onClose={handleCloseAdendum}
+                            onRequestClose={handleCloseAdendum}
+                        >
+                            <Form>
+                                <h5 className="mb-4">Adendum Lokasi</h5>
+                                <div className="overflow-auto ">
+                                    <div className="max-h-[400px] ">
+                                        {/* Lokasi Sebelum dan Sesudah*/}
+                                        <div className="flex flex-col sm:flex-row gap0 sm:gap-4 ">
+                                            <FormItem
+                                                label="Lokasi Sebelum"
+                                                invalid={
+                                                    (errors.lokasi_sebelum &&
+                                                        touched.lokasi_sebelum) as boolean
+                                                }
+                                                errorMessage={
+                                                    errors.lokasi_sebelum
+                                                }
+                                                className="w-full"
+                                            >
+                                                <Field
+                                                    disabled
+                                                    type="text"
+                                                    autoComplete="off"
+                                                    name="lokasi_sebelum"
+                                                    placeholder="Nama Lokasi"
+                                                    component={Input}
+                                                />
+                                            </FormItem>
+                                            <FormItem
+                                                label="Lokasi Adendum"
+                                                invalid={
+                                                    (errors.lokasi_adendum &&
+                                                        touched.lokasi_adendum) as boolean
+                                                }
+                                                errorMessage={
+                                                    errors.lokasi_adendum
+                                                }
+                                                className="w-full"
+                                            >
+                                                <Field
+                                                    type="text"
+                                                    autoComplete="off"
+                                                    name="lokasi_adendum"
+                                                    placeholder="Nama Lokasi"
+                                                    component={Input}
+                                                />
+                                            </FormItem>
+                                        </div>
+
+                                        {/* Longitude Sebelum dan Sesudah*/}
+                                        <div className="flex flex-col sm:flex-row gap0 sm:gap-4 ">
+                                            <FormItem
+                                                label="Longitude Sebelum"
+                                                invalid={
+                                                    (errors.lokasi_sebelum &&
+                                                        touched.lokasi_sebelum) as boolean
+                                                }
+                                                errorMessage={
+                                                    errors.lokasi_sebelum
+                                                }
+                                                className="w-full"
+                                            >
+                                                <Field
+                                                    disabled
+                                                    type="text"
+                                                    autoComplete="off"
+                                                    name="longitude_sebelum"
+                                                    placeholder="Contoh: -6.2088"
+                                                    component={Input}
+                                                />
+                                            </FormItem>
+                                            <FormItem
+                                                label="Longitude Adendum"
+                                                invalid={
+                                                    (errors.longitude_adendum &&
+                                                        touched.longitude_adendum) as boolean
+                                                }
+                                                errorMessage={
+                                                    errors.longitude_adendum
+                                                }
+                                                className="w-full"
+                                            >
+                                                <Field
+                                                    type="text"
+                                                    autoComplete="off"
+                                                    name="longitude_adendum"
+                                                    placeholder="Contoh: 106.8456"
+                                                    component={Input}
+                                                />
+                                            </FormItem>
+                                        </div>
+
+                                        {/* Latitude Sebelum dan Sesudah*/}
+                                        <div className="flex flex-col sm:flex-row  gap0 sm:gap-4 ">
+                                            <FormItem
+                                                label="Latitude Sebelum"
+                                                invalid={
+                                                    (errors.latitude_sebelum &&
+                                                        touched.latitude_sebelum) as boolean
+                                                }
+                                                errorMessage={
+                                                    errors.latitude_sebelum
+                                                }
+                                                className="w-full"
+                                            >
+                                                <Field
+                                                    disabled
+                                                    type="text"
+                                                    autoComplete="off"
+                                                    name="latitude_sebelum"
+                                                    placeholder="Contoh: -6.2088"
+                                                    component={Input}
+                                                />
+                                            </FormItem>
+                                            <FormItem
+                                                label="Latitude Adendum"
+                                                invalid={
+                                                    (errors.latitude_adendum &&
+                                                        touched.latitude_adendum) as boolean
+                                                }
+                                                errorMessage={
+                                                    errors.latitude_adendum
+                                                }
+                                                className="w-full"
+                                            >
+                                                <Field
+                                                    type="text"
+                                                    autoComplete="off"
+                                                    name="latitude_adendum"
+                                                    placeholder="Contoh: 106.8456"
+                                                    component={Input}
+                                                />
+                                            </FormItem>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Button Dialog Option */}
+                                <div className="text-right mt-6">
+                                    <Button
+                                        className="ltr:mr-2 rtl:ml-2"
+                                        variant="plain"
+                                        type="button"
+                                        disabled={isSubmitting}
+                                        onClick={handleCloseAdendum}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant="solid"
+                                        type="submit"
+                                        loading={isSubmitting}
+                                    >
+                                        Simpan
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Dialog>
+                    </>
+                )}
             </Formik>
         </Loading>
     )

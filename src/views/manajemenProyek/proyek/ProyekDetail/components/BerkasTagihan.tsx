@@ -202,7 +202,6 @@ export default function BerkasTagihan() {
     }
 
     const onDialogClose = (e: React.MouseEvent) => {
-        console.log('onDialogClose', e)
         setIsOpen(false)
     }
 
@@ -222,12 +221,9 @@ export default function BerkasTagihan() {
         setSelectedBerkasTagihanToEdit(null)
     }
 
-    console.log('getAllBerkasByProyekData', getAllBerkasByProyekData)
-
     const onDelete = async () => {
         if (!selectedBerkasTagihan) return
 
-        console.log('selectedBerkasTagihan', selectedBerkasTagihan)
         try {
             const success = await apiDeleteBerkasProyek<boolean>({
                 id: selectedBerkasTagihan,
@@ -297,7 +293,6 @@ export default function BerkasTagihan() {
                 idTerminProject: berkasTagihanFormInitialValues.idTerminProject,
                 idProject: path,
             }
-            console.log('requestData', requestData)
 
             const successCreateBerkasProyek = await apiCreateBerkasMultiple<
                 boolean,
@@ -330,7 +325,6 @@ export default function BerkasTagihan() {
     const handleOpenDialog = (idTermin: string) => {
         setIsEditBerkasTagihanMode(idTermin)
         setSelectedBerkasTagihanToEdit(idTermin)
-        console.log('idTermin', idTermin)
 
         setBerkasTagihanFormInitialValues({
             ...berkasTagihanFormInitialValues,
@@ -340,7 +334,6 @@ export default function BerkasTagihan() {
         setBerkasTagihanDialogIsOpen(true)
     }
 
-    console.log('selectberkas', selectBerkasData)
     return (
         <Loading
             loading={

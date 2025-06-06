@@ -122,10 +122,14 @@ const ProyekNew = () => {
         values: FormModel,
         setSubmitting: SetSubmitting
     ) => {
-        setSubmitting(true)
-        const success = await addProyek(values, setSubmitting)
-        setSubmitting(false)
+        const proceedData = {
+            ...values,
+            pic: values.pic?.toUpperCase(),
+        }
 
+        setSubmitting(true)
+        const success = await addProyek(proceedData, setSubmitting)
+        setSubmitting(false)
         if (success) {
             toast.push(
                 <Notification

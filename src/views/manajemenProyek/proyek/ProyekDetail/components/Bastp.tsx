@@ -129,7 +129,6 @@ export default function Bastp() {
                 }
             } else {
                 // Create new termin
-                console.log('processedData', processedData)
 
                 success = await apiUpdateTanggalPembayaranBastp(processedData)
                 if (success) {

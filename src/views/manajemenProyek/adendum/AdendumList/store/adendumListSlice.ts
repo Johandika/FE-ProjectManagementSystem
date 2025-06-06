@@ -7,8 +7,10 @@ import {
 
 type Adendum = {
     id: string
-    nama: string
-    keterangan: string
+    status: string
+    dasar_adendum: string
+    DetailAdendums: any[]
+    tanggal: string
 }
 
 type Adendums = Adendum[]

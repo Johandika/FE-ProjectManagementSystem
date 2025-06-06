@@ -37,7 +37,6 @@ export default function Adendum() {
         (state) => state.adendumList.data.deleteConfirmation
     )
 
-    console.log('dialogDelete', dialogDelete)
     // Fetch adendums when component mounts
     useEffect(() => {
         const requestParam = { id: projectId }
@@ -90,8 +89,6 @@ export default function Adendum() {
         // setDialogOpen(true)
         try {
             const success = await apiDeleteAdendum({ id: idAdendum })
-
-            console.log('success', success)
 
             if (success.data.statusCode === 200) {
                 popNotification('dihapus')
@@ -152,6 +149,24 @@ export default function Adendum() {
                                                   'Lokasi'
                                                 ? 'Adendum Lokasi'
                                                 : 'Adendum Nilai Kontrak'}
+                                            {item.status ===
+                                            'Tidak Disetujui' ? (
+                                                <span className="text-red-500">
+                                                    {' '}
+                                                    (Ditolak)
+                                                </span>
+                                            ) : item.status ===
+                                              'Sudah Disetujui' ? (
+                                                <span className="text-green-500">
+                                                    {' '}
+                                                    (Disetujui)
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400">
+                                                    {' '}
+                                                    ( Belum Disetujui)
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="absolute right-0 -top-2 bg-slate-100 text-gray-500 px-4 rounded-bl-md py-2 text-xs">

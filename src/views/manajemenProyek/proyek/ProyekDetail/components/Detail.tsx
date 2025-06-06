@@ -10,18 +10,85 @@ import { useLocation } from 'react-router-dom'
 import DescriptionSection from './DesriptionSection'
 import { injectReducer } from '@/store'
 import { formatDate } from '@/utils/formatDate'
-import { Button, Notification, toast } from '@/components/ui'
+import * as Yup from 'yup'
+import {
+    Button,
+    DatePicker,
+    Dialog,
+    FormItem,
+    Input,
+    Notification,
+    toast,
+} from '@/components/ui'
 import { apiUpdateStatusRetensi } from '@/services/ProyekService'
 import { ConfirmDialog } from '@/components/shared'
+import { Field, FieldProps, Form, Formik } from 'formik'
+import dayjs from 'dayjs'
+import {
+    apiCreateAdendumNilaiKontrak,
+    apiCreateAdendumTimeline,
+} from '@/services/AdendumService'
+import { NumericFormat } from 'react-number-format'
+import { extractNumberFromString } from '@/utils/extractNumberFromString'
 
 injectReducer('proyekEdit', reducer)
+
+interface AdendumTimelineFormValues {
+    idProject?: string
+    timeline_awal_sebelum: string
+    timeline_awal_adendum: string
+    timeline_akhir_sebelum: string
+    timeline_akhir_adendum: string
+}
+
+interface AdendumNilaiKontrakFormValues {
+    idProject?: string
+    nilai_kontrak_sebelum: string
+    nilai_kontrak_sesudah: string
+}
+
+export interface SetSubmitting {
+    (isSubmitting: boolean): void
+}
+
+const AdendumTimelineSchema = Yup.object().shape({
+    timeline_awal_adendum: Yup.string().required('Timeline awal wajib diisi'),
+    timeline_akhir_adendum: Yup.string().required('Timeline akhir wajib diisi'),
+})
+
+const AdendumNilaiKontrakSchema = Yup.object().shape({
+    nilai_kontrak_sesudah: Yup.string().required(
+        'Nilai kontrak awal wajib diisi'
+    ),
+})
 
 export default function Detail() {
     const dispatch = useAppDispatch()
     const location = useLocation()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false)
+    const [dialogAdendumNilaiKontrakOpen, setDialogAdendumNilaiKontrakOpen] =
+        useState(false)
+
+    const [dialogAdendumTimelineOpen, setDialogAdendumTimelineOpen] =
+        useState(false)
     const [statusChangeItem, setStatusChangeItem] = useState(null)
+    const [
+        adendumNilaiKontrakFormInitialValues,
+        setAdendumNilaiKontrakFormInitialValues,
+    ] = useState<AdendumNilaiKontrakFormValues>({
+        nilai_kontrak_sebelum: '',
+        nilai_kontrak_sesudah: '',
+    })
+    const [
+        adendumTimelineFormInitialValues,
+        setAdendumTimelineFormInitialValues,
+    ] = useState<AdendumTimelineFormValues>({
+        timeline_awal_adendum: '',
+        timeline_akhir_adendum: '',
+        timeline_awal_sebelum: '',
+        timeline_akhir_sebelum: '',
+    })
 
     const { proyekData } = useAppSelector((state) => state.proyekEdit.data)
 
@@ -37,13 +104,30 @@ export default function Detail() {
         dispatch(getTermins(data))
     }
 
-    const handleOpenStatusChangeDialog = () => {
-        setStatusChangeItem({
-            id: proyekData.id,
-            newStatus: !proyekData.status_retensi,
-            nama: proyekData.pekerjaan,
-        })
-        setStatusChangeDialogOpen(true)
+    const handleOpenStatusChangeDialog = (typeDialog: string) => {
+        if (typeDialog === 'Ubah Status') {
+            setStatusChangeItem({
+                id: proyekData.id,
+                newStatus: !proyekData.status_retensi,
+                nama: proyekData.pekerjaan,
+            })
+            setStatusChangeDialogOpen(true)
+        }
+        if (typeDialog === 'Adendum Nilai Kontrak') {
+            setAdendumNilaiKontrakFormInitialValues({
+                ...adendumTimelineFormInitialValues,
+                nilai_kontrak_sebelum: proyekData.nilai_kontrak || '',
+            })
+            setDialogAdendumNilaiKontrakOpen(true)
+        }
+        if (typeDialog === 'Timeline') {
+            setAdendumTimelineFormInitialValues({
+                ...adendumTimelineFormInitialValues,
+                timeline_awal_sebelum: proyekData.timeline_awal || '',
+                timeline_akhir_sebelum: proyekData.timeline_akhir || '',
+            })
+            setDialogAdendumTimelineOpen(true)
+        }
     }
 
     const confirmStatusChange = async () => {
@@ -96,6 +180,129 @@ export default function Detail() {
         setStatusChangeDialogOpen(false)
     }
 
+    // Success notification helper
+    const popNotification = (keyword: string) => {
+        toast.push(
+            <Notification
+                title={`Berhasil ${keyword}`}
+                type="success"
+                duration={2500}
+            >
+                Data Adendum {keyword}
+            </Notification>,
+            {
+                placement: 'top-center',
+            }
+        )
+    }
+
+    const handleAdendumTimelineSubmit = async (
+        values: AdendumTimelineFormValues,
+        { setSubmitting }: { setSubmitting: SetSubmitting }
+    ) => {
+        setSubmitting(true)
+        const projectId = proyekData.id
+
+        const processedData = {
+            ...values,
+            idProject: projectId || '',
+        }
+
+        try {
+            let result = await apiCreateAdendumTimeline(processedData)
+
+            if (result && result.data?.statusCode === 201) {
+                popNotification('berhasil ditambahkan')
+
+                setAdendumTimelineFormInitialValues({
+                    timeline_awal_adendum: '',
+                    timeline_akhir_adendum: '',
+                    timeline_awal_sebelum: '',
+                    timeline_akhir_sebelum: '',
+                })
+
+                setDialogAdendumTimelineOpen(false)
+
+                // Refresh
+                dispatch(getProyek({ id: projectId }))
+            }
+        } catch (error) {
+            toast.push(
+                <Notification title="Error" type="danger" duration={2500}>
+                    {error
+                        ? error.response.data?.message
+                        : 'Gagal menambahkan BASTP'}
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    const handleAdendumNilaiKontrakSubmit = async (
+        values: AdendumNilaiKontrakFormValues,
+        { setSubmitting }: { setSubmitting: SetSubmitting }
+    ) => {
+        setSubmitting(true)
+        const projectId = proyekData.id
+
+        const processedData = {
+            ...values,
+            nilai_kontrak_sebelum: extractNumberFromString(
+                values.nilai_kontrak_sebelum
+            ),
+            nilai_kontrak_sesudah: extractNumberFromString(
+                values.nilai_kontrak_sesudah
+            ),
+            idProject: projectId || '',
+        }
+
+        try {
+            let result = await apiCreateAdendumNilaiKontrak(processedData)
+
+            if (result && result.data?.statusCode === 201) {
+                popNotification('berhasil ditambahkan')
+
+                setAdendumNilaiKontrakFormInitialValues({
+                    nilai_kontrak_sebelum: '',
+                    nilai_kontrak_sesudah: '',
+                })
+
+                setDialogAdendumNilaiKontrakOpen(false)
+
+                // Refresh
+                dispatch(getProyek({ id: projectId }))
+            }
+        } catch (error) {
+            toast.push(
+                <Notification title="Error" type="danger" duration={2500}>
+                    {error
+                        ? error.response.data?.message
+                        : 'Gagal menambahkan BASTP'}
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    const handleCloseAdendum = () => {
+        setDialogAdendumTimelineOpen(false)
+        setDialogAdendumNilaiKontrakOpen(false)
+        setAdendumNilaiKontrakFormInitialValues({
+            nilai_kontrak_sebelum: '',
+            nilai_kontrak_sesudah: '',
+        })
+        setAdendumTimelineFormInitialValues({
+            timeline_awal_adendum: '',
+            timeline_akhir_adendum: '',
+            timeline_awal_sebelum: '',
+            timeline_akhir_sebelum: '',
+        })
+    }
+
     useEffect(() => {
         const path = location.pathname.substring(
             location.pathname.lastIndexOf('/') + 1
@@ -107,7 +314,6 @@ export default function Detail() {
         // dispatch(getBerkases()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
-
     return (
         <section className=" ">
             <div>
@@ -157,13 +363,28 @@ export default function Detail() {
                                     {proyekData.status || '-'}
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-0 border-b py-4">
-                                <div className="text-sm">Nilai Kontrak :</div>
-                                <div className="text-base font-semibold text-neutral-500">
-                                    {proyekData.nilai_kontrak?.toLocaleString(
-                                        'id-ID'
-                                    ) || '-'}
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4  border-b py-4 items-start sm:items-center">
+                                <div>
+                                    <div className="text-sm">
+                                        Nilai Kontrak :
+                                    </div>
+                                    <div className="text-base font-semibold text-neutral-500">
+                                        {proyekData.nilai_kontrak?.toLocaleString(
+                                            'id-ID'
+                                        ) || '-'}
+                                    </div>
                                 </div>
+                                <Button
+                                    size="xs"
+                                    variant="solid"
+                                    onClick={() =>
+                                        handleOpenStatusChangeDialog(
+                                            'Adendum Nilai Kontrak'
+                                        )
+                                    }
+                                >
+                                    Adendum Nilai Kontrak
+                                </Button>
                             </div>
                             <div className="flex flex-col gap-0 border-b py-4">
                                 <div className="text-sm">Uang Muka :</div>
@@ -179,17 +400,28 @@ export default function Detail() {
                                     {proyekData.progress}
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-0 border-b py-4">
-                                <div className="text-sm">Timeline</div>
-                                <div className="text-base font-semibold text-neutral-500">
-                                    {formatDate(
-                                        proyekData.timeline_awal || '-'
-                                    )}{' '}
-                                    /{' '}
-                                    {formatDate(
-                                        proyekData.timeline_akhir || '-'
-                                    )}
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 border-b py-4 items-start sm:items-center">
+                                <div>
+                                    <div className="text-sm">Timeline</div>
+                                    <div className="text-base font-semibold text-neutral-500">
+                                        {formatDate(
+                                            proyekData.timeline_awal || '-'
+                                        )}{' '}
+                                        /{' '}
+                                        {formatDate(
+                                            proyekData.timeline_akhir || '-'
+                                        )}
+                                    </div>
                                 </div>
+                                <Button
+                                    size="xs"
+                                    variant="solid"
+                                    onClick={() =>
+                                        handleOpenStatusChangeDialog('Timeline')
+                                    }
+                                >
+                                    Adendum Timeline
+                                </Button>
                             </div>
 
                             {/* Retensi */}
@@ -228,30 +460,34 @@ export default function Detail() {
                                             {!isSubmitting &&
                                                 (proyekData.status_retensi ===
                                                 true ? (
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex flex-col sm:flex-row  sm:items-center items-start gap-2">
                                                         <div className="text-green-500">
                                                             Sudah Dibayar
                                                         </div>
                                                         <Button
                                                             size="xs"
                                                             variant="solid"
-                                                            onClick={
-                                                                handleOpenStatusChangeDialog
+                                                            onClick={() =>
+                                                                handleOpenStatusChangeDialog(
+                                                                    'Ubah Status'
+                                                                )
                                                             }
                                                         >
                                                             Ubah Status
                                                         </Button>
                                                     </div>
                                                 ) : (
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex flex-col sm:flex-row  sm:items-center items-start gap-2">
                                                         <div className="text-rose-500">
                                                             Belum Bayar
                                                         </div>
                                                         <Button
                                                             size="xs"
                                                             variant="solid"
-                                                            onClick={
-                                                                handleOpenStatusChangeDialog
+                                                            onClick={() =>
+                                                                handleOpenStatusChangeDialog(
+                                                                    'Ubah Status'
+                                                                )
                                                             }
                                                         >
                                                             Ubah Status
@@ -273,68 +509,9 @@ export default function Detail() {
                         </div>
                     </div>
                 </div>
-
-                {/* Subkontraktor */}
-                {/* <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
-                    <DescriptionSection
-                        title="Informasi Subkontraktor"
-                        desc="Informasi subkontraktor proyek"
-                    />
-                    {proyekData.SubkonProjects && (
-                        <div className="rounded-lg border border-gray-200 dark:border-gray-600">
-                            {proyekData.SubkonProjects?.map((data, index) => (
-                                <section
-                                    key={data.id}
-                                    className={classNames(
-                                        'flex items-center px-4 py-6 group',
-                                        !isLastChild(
-                                            proyekData.SubkonProjects as [],
-                                            index
-                                        ) &&
-                                            'border-b border-gray-200 dark:border-gray-600'
-                                    )}
-                                >
-                                    <div className="flex items-center">
-                                        <div className="text-3xl">
-                                            <BiHardHat />
-                                        </div>
-                                        <div className="ml-3 rtl:mr-3">
-                                            <div className="flex items-center gap-1">
-                                                <div className="text-gray-900 dark:text-gray-100 font-semibold">
-                                                    {data.nama}
-                                                </div>
-                                                <span>
-                                                    ({data.nomor_surat})
-                                                </span>
-                                            </div>
-                                            <div>
-                                                {data.nilai_subkontrak?.toLocaleString(
-                                                    'id-ID'
-                                                )}
-                                            </div>
-                                            <span>
-                                                {formatDate(
-                                                    data.waktu_mulai_pelaksanaan ||
-                                                        ''
-                                                )}{' '}
-                                                s.d.{' '}
-                                                {formatDate(
-                                                    data.waktu_selesai_pelaksanaan ||
-                                                        ''
-                                                )}
-                                            </span>
-                                            <div>{data.keterangan}</div>
-                                        </div>
-                                    </div>
-                                </section>
-                            ))}
-                        </div>
-                    )}
-                    {!proyekData.SubkonProjects && (
-                        <div>Subkontraktor tidak terdaftar</div>
-                    )}
-                </div> */}
             </div>
+
+            {/* Dialog update status */}
             <ConfirmDialog
                 isOpen={statusChangeDialogOpen}
                 onClose={cancelStatusChange}
@@ -355,6 +532,319 @@ export default function Detail() {
                     ?
                 </p>
             </ConfirmDialog>
+
+            {/* Form Adendum Timeline */}
+            <Formik
+                initialValues={adendumTimelineFormInitialValues}
+                validationSchema={AdendumTimelineSchema}
+                enableReinitialize={true}
+                onSubmit={handleAdendumTimelineSubmit}
+            >
+                {({ errors, touched, isSubmitting, values, setFieldValue }) => (
+                    <>
+                        <Dialog
+                            isOpen={dialogAdendumTimelineOpen}
+                            onClose={handleCloseAdendum}
+                            onRequestClose={handleCloseAdendum}
+                        >
+                            <Form>
+                                <h5 className="mb-4">Adendum Timeline</h5>
+
+                                <div className="flex flex-col sm:flex-row gap-0 sm:gap-4">
+                                    {/* Timeline Awal Sebelum*/}
+                                    <FormItem
+                                        label="Timeline Awal Sebelum"
+                                        invalid={
+                                            (errors.timeline_awal_sebelum &&
+                                                touched.timeline_awal_sebelum) as boolean
+                                        }
+                                        errorMessage={
+                                            errors.timeline_awal_sebelum
+                                        }
+                                    >
+                                        <Field name="timeline_awal_sebelum">
+                                            {({ field, form }: FieldProps) => (
+                                                <DatePicker
+                                                    disabled
+                                                    placeholder="Pilih Tanggal"
+                                                    value={
+                                                        field.value
+                                                            ? new Date(
+                                                                  field.value
+                                                              )
+                                                            : null
+                                                    }
+                                                    inputFormat="DD-MM-YYYY"
+                                                    onChange={(date) => {
+                                                        const formattedDate =
+                                                            date
+                                                                ? dayjs(
+                                                                      date
+                                                                  ).format(
+                                                                      'YYYY-MM-DD'
+                                                                  )
+                                                                : ''
+                                                        form.setFieldValue(
+                                                            field.name,
+                                                            formattedDate
+                                                        )
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                    {/* Timeline Awal Adendum*/}
+                                    <FormItem
+                                        label="Timeline Awal Adendum"
+                                        invalid={
+                                            (errors.timeline_awal_adendum &&
+                                                touched.timeline_awal_adendum) as boolean
+                                        }
+                                        errorMessage={
+                                            errors.timeline_awal_adendum
+                                        }
+                                    >
+                                        <Field name="timeline_awal_adendum">
+                                            {({ field, form }: FieldProps) => (
+                                                <DatePicker
+                                                    placeholder="Pilih Tanggal"
+                                                    value={
+                                                        field.value
+                                                            ? new Date(
+                                                                  field.value
+                                                              )
+                                                            : null
+                                                    }
+                                                    inputFormat="DD-MM-YYYY"
+                                                    onChange={(date) => {
+                                                        const formattedDate =
+                                                            date
+                                                                ? dayjs(
+                                                                      date
+                                                                  ).format(
+                                                                      'YYYY-MM-DD'
+                                                                  )
+                                                                : ''
+                                                        form.setFieldValue(
+                                                            field.name,
+                                                            formattedDate
+                                                        )
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-0 sm:gap-4">
+                                    {/* Timeline Akhir Sebelum*/}
+                                    <FormItem
+                                        label="Timeline Akhir Sebelum"
+                                        invalid={
+                                            (errors.timeline_akhir_sebelum &&
+                                                touched.timeline_akhir_sebelum) as boolean
+                                        }
+                                        errorMessage={
+                                            errors.timeline_akhir_sebelum
+                                        }
+                                    >
+                                        <Field name="timeline_akhir_sebelum">
+                                            {({ field, form }: FieldProps) => (
+                                                <DatePicker
+                                                    disabled
+                                                    placeholder="Pilih Tanggal"
+                                                    value={
+                                                        field.value
+                                                            ? new Date(
+                                                                  field.value
+                                                              )
+                                                            : null
+                                                    }
+                                                    inputFormat="DD-MM-YYYY"
+                                                    onChange={(date) => {
+                                                        const formattedDate =
+                                                            date
+                                                                ? dayjs(
+                                                                      date
+                                                                  ).format(
+                                                                      'YYYY-MM-DD'
+                                                                  )
+                                                                : ''
+                                                        form.setFieldValue(
+                                                            field.name,
+                                                            formattedDate
+                                                        )
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                    {/* Timeline Akhir Adendum*/}
+                                    <FormItem
+                                        label="Timeline Akhir Adendum"
+                                        invalid={
+                                            (errors.timeline_akhir_adendum &&
+                                                touched.timeline_akhir_adendum) as boolean
+                                        }
+                                        errorMessage={
+                                            errors.timeline_akhir_adendum
+                                        }
+                                    >
+                                        <Field name="timeline_akhir_adendum">
+                                            {({ field, form }: FieldProps) => (
+                                                <DatePicker
+                                                    placeholder="Pilih Tanggal"
+                                                    value={
+                                                        field.value
+                                                            ? new Date(
+                                                                  field.value
+                                                              )
+                                                            : null
+                                                    }
+                                                    inputFormat="DD-MM-YYYY"
+                                                    onChange={(date) => {
+                                                        const formattedDate =
+                                                            date
+                                                                ? dayjs(
+                                                                      date
+                                                                  ).format(
+                                                                      'YYYY-MM-DD'
+                                                                  )
+                                                                : ''
+                                                        form.setFieldValue(
+                                                            field.name,
+                                                            formattedDate
+                                                        )
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                </div>
+
+                                {/* Button Dialog Option */}
+                                <div className="text-right mt-6">
+                                    <Button
+                                        className="ltr:mr-2 rtl:ml-2"
+                                        variant="plain"
+                                        type="button"
+                                        disabled={isSubmitting}
+                                        onClick={handleCloseAdendum}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant="solid"
+                                        type="submit"
+                                        loading={isSubmitting}
+                                    >
+                                        Simpan
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Dialog>
+                    </>
+                )}
+            </Formik>
+
+            {/* Form Adendum Nilai Kontrak*/}
+            <Formik
+                initialValues={adendumNilaiKontrakFormInitialValues}
+                validationSchema={AdendumNilaiKontrakSchema}
+                enableReinitialize={true}
+                onSubmit={handleAdendumNilaiKontrakSubmit}
+            >
+                {({ errors, touched, isSubmitting, values, setFieldValue }) => (
+                    <>
+                        <Dialog
+                            isOpen={dialogAdendumNilaiKontrakOpen}
+                            onClose={handleCloseAdendum}
+                            onRequestClose={handleCloseAdendum}
+                        >
+                            <Form>
+                                <h5 className="mb-4">Adendum Nilai Kontrak</h5>
+
+                                {/* Nilai Kontrak Sebelum*/}
+                                <FormItem
+                                    label="Nilai Kontrak Awal Sebelum"
+                                    invalid={
+                                        (errors.nilai_kontrak_sebelum &&
+                                            touched.nilai_kontrak_sebelum) as boolean
+                                    }
+                                    errorMessage={errors.nilai_kontrak_sebelum}
+                                >
+                                    <Field name="nilai_kontrak_sebelum">
+                                        {({ field, form }: FieldProps) => (
+                                            <NumericFormat
+                                                {...field}
+                                                disabled
+                                                customInput={Input}
+                                                placeholder="Nilai Kontrak"
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                onValueChange={(values) => {
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        values.value
+                                                    )
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                {/* Nilai Kontrak Sesudah*/}
+                                <FormItem
+                                    label="Nilai Kontrak Sesudah"
+                                    invalid={
+                                        (errors.nilai_kontrak_sesudah &&
+                                            touched.nilai_kontrak_sesudah) as boolean
+                                    }
+                                    errorMessage={errors.nilai_kontrak_sesudah}
+                                >
+                                    <Field name="nilai_kontrak_sesudah">
+                                        {({ field, form }: FieldProps) => (
+                                            <NumericFormat
+                                                {...field}
+                                                customInput={Input}
+                                                placeholder="0"
+                                                thousandSeparator="."
+                                                decimalSeparator=","
+                                                onValueChange={(values) => {
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        values.value
+                                                    )
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                {/* Button Dialog Option */}
+                                <div className="text-right mt-6">
+                                    <Button
+                                        className="ltr:mr-2 rtl:ml-2"
+                                        variant="plain"
+                                        type="button"
+                                        disabled={isSubmitting}
+                                        onClick={handleCloseAdendum}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant="solid"
+                                        type="submit"
+                                        loading={isSubmitting}
+                                    >
+                                        Simpan
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Dialog>
+                    </>
+                )}
+            </Formik>
         </section>
     )
 }
