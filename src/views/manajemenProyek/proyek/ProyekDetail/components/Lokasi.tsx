@@ -79,6 +79,7 @@ export default function Lokasi() {
     const [editIndex, setEditIndex] = useState<number | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [dialogOpen, setDialogOpen] = useState(false)
+    const [dataLokasiId, setDataLokasiId] = useState({})
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
     const [dialogAdendumLokasiOpen, setDialogAdendumLokasiOpen] =
         useState(false)
@@ -160,6 +161,7 @@ export default function Lokasi() {
         const processedData = {
             ...values,
             idProject: projectId,
+            idLokasi: dataLokasiId.id,
         }
 
         try {
@@ -326,6 +328,7 @@ export default function Lokasi() {
                         if (lokasiData) {
                             const lokasi = lokasiData[index]
                             setDialogAdendumLokasiOpen(true)
+                            setDataLokasiId(lokasi)
 
                             setAdendumLokasiFormInitialValues({
                                 ...adendumLokasiFormInitialValues,
@@ -616,7 +619,7 @@ export default function Lokasi() {
                     )
                 }}
             </Formik>
-            {/* Form Adendum Nilai Kontrak*/}
+            {/* Form Adendum Lokasi*/}
             <Formik
                 initialValues={adendumLokasiFormInitialValues}
                 validationSchema={AdendumLokasiSchema}
