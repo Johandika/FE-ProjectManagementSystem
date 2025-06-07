@@ -5,6 +5,7 @@ import * as Yup from 'yup'
 import dayjs from 'dayjs'
 import { getDashboard, useAppDispatch, useAppSelector } from '@/store'
 import { Loading } from '../shared'
+import { TbFilter } from 'react-icons/tb'
 
 interface DashboardData {
     total_proyek: number
@@ -61,7 +62,7 @@ export default function Holding({ dataAwal }: any) {
     }
 
     return (
-        <div className="flex flex-col">
+        <div>
             {/* Filter Tanggal */}
             <Formik
                 initialValues={bastpFormInitialValues}
@@ -70,129 +71,153 @@ export default function Holding({ dataAwal }: any) {
                 enableReinitialize
             >
                 {({ errors, touched }) => (
-                    <Form className="flex flex-col md:flex-row gap-0 md:gap-4 mt-0 md:mt-4 mb-4 sm:mb-0">
-                        {/* Tanggal Awal */}
-                        <FormItem
-                            label="Tanggal Awal"
-                            invalid={
-                                (errors.tanggal_awal &&
-                                    touched.tanggal_awal) as boolean
-                            }
-                            errorMessage={errors.tanggal_awal}
-                        >
-                            <Field name="tanggal_awal">
-                                {({ field, form }: FieldProps) => (
-                                    <DatePicker
-                                        placeholder="Pilih Tanggal"
-                                        value={
-                                            field.value
-                                                ? new Date(field.value)
-                                                : null
-                                        }
-                                        inputFormat="DD-MM-YYYY"
-                                        onChange={(date) => {
-                                            const formattedDate = date
-                                                ? dayjs(date).format(
-                                                      'YYYY-MM-DD'
-                                                  )
-                                                : ''
-                                            form.setFieldValue(
-                                                field.name,
-                                                formattedDate
-                                            )
-                                        }}
-                                    />
-                                )}
-                            </Field>
-                        </FormItem>
+                    <Form className="flex flex-col justify-between md:flex-row gap-0 md:gap-4 mt-0 md:mt-4  sm:mb-0">
+                        <div className=" lg:mb-0">
+                            <h3>Dashboard</h3>
+                            <p>Ringkasan data proyek</p>
+                        </div>
 
-                        {/* Tanggal Akhir */}
-                        <FormItem
-                            label="Tanggal Akhir"
-                            invalid={
-                                (errors.tanggal_akhir &&
-                                    touched.tanggal_akhir) as boolean
-                            }
-                            errorMessage={errors.tanggal_akhir}
-                        >
-                            <Field name="tanggal_akhir">
-                                {({ field, form }: FieldProps) => (
-                                    <DatePicker
-                                        placeholder="Pilih Tanggal"
-                                        value={
-                                            field.value
-                                                ? new Date(field.value)
-                                                : null
-                                        }
-                                        inputFormat="DD-MM-YYYY"
-                                        onChange={(date) => {
-                                            const formattedDate = date
-                                                ? dayjs(date).format(
-                                                      'YYYY-MM-DD'
-                                                  )
-                                                : ''
-                                            form.setFieldValue(
-                                                field.name,
-                                                formattedDate
-                                            )
-                                        }}
-                                    />
-                                )}
-                            </Field>
-                        </FormItem>
+                        <div className="flex flex-row gap-4">
+                            {/* Tanggal Awal */}
+                            <FormItem
+                                label="Tanggal Awal"
+                                invalid={
+                                    (errors.tanggal_awal &&
+                                        touched.tanggal_awal) as boolean
+                                }
+                                errorMessage={errors.tanggal_awal}
+                            >
+                                <Field name="tanggal_awal">
+                                    {({ field, form }: FieldProps) => (
+                                        <DatePicker
+                                            placeholder="Pilih Tanggal"
+                                            size="sm"
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : null
+                                            }
+                                            inputFormat="DD-MM-YYYY"
+                                            onChange={(date) => {
+                                                const formattedDate = date
+                                                    ? dayjs(date).format(
+                                                          'YYYY-MM-DD'
+                                                      )
+                                                    : ''
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    formattedDate
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                            </FormItem>
 
-                        <Button
-                            type="submit"
-                            variant="solid"
-                            className="mt-[21px]"
-                        >
-                            Filter
-                        </Button>
+                            {/* Tanggal Akhir */}
+                            <FormItem
+                                label="Tanggal Akhir"
+                                invalid={
+                                    (errors.tanggal_akhir &&
+                                        touched.tanggal_akhir) as boolean
+                                }
+                                errorMessage={errors.tanggal_akhir}
+                            >
+                                <Field name="tanggal_akhir">
+                                    {({ field, form }: FieldProps) => (
+                                        <DatePicker
+                                            size="sm"
+                                            placeholder="Pilih Tanggal"
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : null
+                                            }
+                                            inputFormat="DD-MM-YYYY"
+                                            onChange={(date) => {
+                                                const formattedDate = date
+                                                    ? dayjs(date).format(
+                                                          'YYYY-MM-DD'
+                                                      )
+                                                    : ''
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    formattedDate
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                            </FormItem>
+
+                            <Button
+                                size="sm"
+                                type="submit"
+                                icon={<TbFilter />}
+                                variant="default"
+                                className="mt-[21px]"
+                            >
+                                Filter
+                            </Button>
+                        </div>
                     </Form>
                 )}
             </Formik>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg mt-4">
                 {/* Card 1: Total Proyek */}
-                <div className="bg-slate-50 rounded-lg shadow p-6 border-l-4 border-blue-500">
-                    <h2 className="text-gray-600 text-sm font-normal ">
-                        Total Proyek
-                    </h2>
-                    <p className="text-2xl font-semibold text-slate-900 mt-2">
+                <div className=" rounded-lg p-4 border">
+                    <p className="text-sm">Total Proyek</p>
+
+                    <p className="text-xl font-bold text-slate-900 mt-2">
                         {dataAwal?.total_proyek}
                     </p>
                 </div>
 
                 {/* Card 2: Total Nilai Kontrak */}
-                <div className="bg-slate-50 rounded-lg shadow p-6 border-l-4 border-green-500">
-                    <h2 className="text-gray-600 text-sm font-normal ">
-                        Total Nilai Kontrak
-                    </h2>
-                    <p className="text-2xl font-semibold text-slate-900 mt-2">
+                <div className=" rounded-lg p-4 border">
+                    <p className="text-sm">Total Nilai Kontrak</p>
+                    <p className="text-xl font-bold text-slate-900 mt-2">
                         {formatCurrency(dataAwal?.total_nilai_kontrak)}
                     </p>
+                    <div className="mt-2 flex flex-col ">
+                        <div>
+                            <span className="text-green-600">
+                                Sudah Dibayar:{' '}
+                            </span>
+                            <span>
+                                {formatCurrency(dataAwal?.nilai_sudah_dibayar)}
+                            </span>
+                        </div>
+                        <div>
+                            <span className="text-red-600">
+                                Sudah Ditagih:{' '}
+                            </span>
+                            <span>
+                                {formatCurrency(dataAwal?.nilai_sudah_ditagih)}
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Card 3: Total Faktur Pajak */}
-                <div className="bg-slate-50 rounded-lg shadow p-6 border-l-4 border-purple-500">
-                    <h2 className="text-gray-600 text-sm font-normal ">
-                        Total Faktur Pajak
-                    </h2>
-                    <p className="text-2xl font-semibold text-slate-900 mt-2">
+                <div className=" rounded-lg p-4 border">
+                    <p className="text-sm">Total Faktur Pajak</p>
+                    <p className="text-xl font-bold text-slate-900 mt-2">
                         {dataAwal?.total_faktur_pajak}
                     </p>
                 </div>
 
                 {/* Card 4: Nilai Sudah Dibayar */}
-                <div className="bg-slate-50 rounded-lg shadow p-6 border-l-4 border-yellow-500">
-                    <h2 className="text-gray-600 text-sm font-normal ">
+                {/* <div className=" rounded-lg p-4 border">
+                    <p className="text-sm">
                         Nilai Sudah Dibayar
-                    </h2>
-                    <p className="text-2xl font-semibold text-slate-900 mt-2">
+                    </p>
+                    <p className="text-xl font-bold text-slate-900 mt-2">
                         {formatCurrency(dataAwal?.nilai_sudah_dibayar)}
                     </p>
                     <div className="mt-2">
-                        <span className="text-sm text-gray-500">
+p-4 border">
                             {Math.round(
                                 (dataAwal?.nilai_sudah_dibayar /
                                     dataAwal?.total_nilai_kontrak) *
@@ -201,18 +226,18 @@ export default function Holding({ dataAwal }: any) {
                             % dari total kontrak
                         </span>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Card 5: Nilai Sudah Ditagih */}
-                <div className="bg-slate-50 rounded-lg shadow p-6 border-l-4 border-red-500">
-                    <h2 className="text-gray-600 text-sm font-normal ">
+                {/* <div className=" rounded-lg p-4 border">
+                    <p className="text-sm">
                         Nilai Sudah Ditagih
-                    </h2>
-                    <p className="text-2xl font-semibold text-slate-900 mt-2">
+                    </p>
+                    <p className="text-xl font-bold text-slate-900 mt-2">
                         {formatCurrency(dataAwal?.nilai_sudah_ditagih)}
                     </p>
                     <div className="mt-2">
-                        <span className="text-sm text-gray-500">
+p-4 border">
                             {Math.round(
                                 (dataAwal?.nilai_sudah_ditagih /
                                     dataAwal?.total_nilai_kontrak) *
@@ -221,17 +246,15 @@ export default function Holding({ dataAwal }: any) {
                             % dari total kontrak
                         </span>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Card 6: Total Tender */}
-                <div className="bg-slate-50 rounded-lg shadow p-6 border-l-4 border-indigo-500">
-                    <h2 className="text-gray-600 text-sm font-normal ">
-                        Total Tender
-                    </h2>
-                    <p className="text-2xl font-semibold text-slate-900 mt-2">
+                <div className=" rounded-lg p-4 border">
+                    <p className="text-sm">Total Tender</p>
+                    <p className="text-xl font-bold text-slate-900 mt-2">
                         {dataAwal?.total_tender}
                     </p>
-                    <div className="mt-2 flex space-x-4 text-sm">
+                    <div className="mt-2 flex spacetext-sm gap-2">
                         <div>
                             <span className="text-green-600">Diterima: </span>
                             <span>{dataAwal?.total_tender_diterima}</span>

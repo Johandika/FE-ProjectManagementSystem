@@ -16,33 +16,38 @@ const BasicBarVertical = ({ dataAwal }: any) => {
     }
 
     return (
-        <Chart
-            options={{
-                plotOptions: {
-                    bar: {
-                        horizontal: true,
+        <div className="flex flex-col w-full sm:w-3/4 border p-4 rounded-md">
+            <div className="mb-4 lg:mb-0">
+                <h4>Statistik Proyek & Tender</h4>
+            </div>
+            <Chart
+                options={{
+                    plotOptions: {
+                        bar: {
+                            horizontal: true,
+                        },
                     },
-                },
-                colors: COLORS,
-                dataLabels: {
-                    enabled: true,
-                    formatter: function (val: any) {
-                        return formatNumber(val)
-                    },
-                },
-                xaxis: {
-                    categories: category,
-                    labels: {
+                    colors: COLORS,
+                    dataLabels: {
+                        enabled: true,
                         formatter: function (val: any) {
                             return formatNumber(val)
                         },
                     },
-                },
-            }}
-            series={data}
-            type="bar"
-            height={300}
-        />
+                    xaxis: {
+                        categories: category,
+                        labels: {
+                            formatter: function (val: any) {
+                                return formatNumber(val)
+                            },
+                        },
+                    },
+                }}
+                series={data}
+                type="bar"
+                height={300}
+            />
+        </div>
     )
 }
 

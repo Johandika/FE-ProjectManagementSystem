@@ -24,18 +24,18 @@ const Dashboard = () => {
     }, [dispatch])
     return (
         <div>
-            <div className="mb-4 lg:mb-0">
-                <h3>Dashboard</h3>
-                <p>Ringkasan data proyek</p>
-            </div>
-            <div className="grid grid-cols-1 space-y-4">
+            <div className="grid grid-cols-1 gap-4">
                 <Loading loading={loadingDashboard}>
                     <Holding dataAwal={dataAwal} />
-                    {/* Horizontal */}
-                    <BasicBarVertical dataAwal={dataAwal} />
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        {/* Horizontal */}
+                        <BasicBarVertical dataAwal={dataAwal} />
+                        <SimplePie dataAwal={dataAwal} />
+                    </div>
+
                     {/* Vertikal */}
-                    <BasicBarHorizontal dataAwal={dataAwal} />
-                    <SimplePie dataAwal={dataAwal} />
+                    {/* <BasicBarHorizontal dataAwal={dataAwal} /> */}
                 </Loading>
             </div>
         </div>
