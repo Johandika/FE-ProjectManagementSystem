@@ -4,7 +4,7 @@ import { SLICE_BASE_NAME } from './constants'
 export type UserState = {
     email?: string
     authorization?: string
-    role?: string
+    authority?: string
     username?: string
 }
 
@@ -20,7 +20,7 @@ const userSlice = createSlice({
         setUser(state, action: PayloadAction<UserState>) {
             state.email = action.payload?.email
             state.username = action.payload?.username
-            state.role = action.payload?.role
+            state.authority = action.payload?.authority
             state.authorization = action.payload?.authorization
         },
     },

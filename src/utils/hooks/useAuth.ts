@@ -43,7 +43,7 @@ function useAuth() {
                 // Menyiapkan data user dari respons
                 const userData = {
                     username: resp.data.username || '',
-                    role: resp.data.role || '',
+                    authority: resp.data.role || '',
                     email: resp.data.email || '',
                     authorization: resp.data.authorization || '',
                 }

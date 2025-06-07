@@ -44,14 +44,8 @@ const BastpSchema = Yup.object().shape({
     tanggal_akhir: Yup.string().required('Wajib diisi'),
 })
 
-export default function Holding({ data }: HoldingProps) {
+export default function Holding({ dataAwal }: any) {
     const dispatch = useAppDispatch()
-    const { dataDashboard, loadingDashboard } = useAppSelector(
-        (state: any) => state.base.common
-    )
-
-    const dataAwal = dataDashboard?.data
-
     // Format number to currency (IDR)
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -61,26 +55,18 @@ export default function Holding({ data }: HoldingProps) {
             maximumFractionDigits: 0,
         }).format(value)
     }
-
-    const handleBastpSubmit = (values: BastpFormValues) => {
+    const handleFilter = (values: BastpFormValues) => {
         // Lakukan aksi filter di sini
         dispatch(getDashboard(values))
     }
 
-    useEffect(() => {
-        const today = dayjs()
-        const tanggal_awal = today.startOf('month').format('YYYY-MM-DD')
-        const tanggal_akhir = today.format('YYYY-MM-DD')
-
-        dispatch(getDashboard({ tanggal_awal, tanggal_akhir }))
-    }, [dispatch])
     return (
-        <Loading loading={loadingDashboard} className="flex flex-col">
+        <div className="flex flex-col">
             {/* Filter Tanggal */}
             <Formik
                 initialValues={bastpFormInitialValues}
                 validationSchema={BastpSchema}
-                onSubmit={handleBastpSubmit}
+                onSubmit={handleFilter}
                 enableReinitialize
             >
                 {({ errors, touched }) => (
@@ -257,6 +243,6 @@ export default function Holding({ data }: HoldingProps) {
                     </div>
                 </div>
             </div>
-        </Loading>
+        </div>
     )
 }

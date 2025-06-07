@@ -1,12 +1,17 @@
 import Chart from 'react-apexcharts'
 import { COLORS } from '@/constants/chart.constant'
 
-const SimplePie = () => {
+const SimplePie = ({ dataAwal }) => {
+    const dataGrafikPie = dataAwal?.grafik_pie_tender
+    const data = dataGrafikPie?.data
+    const category = dataGrafikPie?.key
+    console.log('data', data)
+    console.log('category', category)
     return (
         <Chart
             options={{
                 colors: COLORS,
-                labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+                labels: category,
                 responsive: [
                     {
                         breakpoint: 480,
@@ -21,7 +26,7 @@ const SimplePie = () => {
                     },
                 ],
             }}
-            series={[44, 55, 13, 43, 22]}
+            series={data}
             height={300}
             type="pie"
         />

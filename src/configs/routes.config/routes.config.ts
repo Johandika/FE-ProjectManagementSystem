@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import authRoute from './authRoute'
 import type { Routes } from '@/@types/routes'
+import { SUPER_ADMIN } from '@/constants/roles.constant'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -93,6 +94,13 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/manajemenProyek/adendum/AdendumList')
         ),
+        authority: [SUPER_ADMIN],
+    },
+    // Timeline
+    {
+        key: 'apps.adendum',
+        path: '/manajemen-proyek/timeline',
+        component: lazy(() => import('@/views/manajemenProyek/timeline')),
         authority: [],
     },
     // Klien
@@ -242,6 +250,13 @@ export const protectedRoutes = [
     {
         path: '/semua-notifikasi',
         component: lazy(() => import('@/views/notifikasi/Notifikasi')),
+        authority: [],
+    },
+    // Logs
+    {
+        key: 'apps.logs',
+        path: '/logs',
+        component: lazy(() => import('@/views/logs/LogList')),
         authority: [],
     },
 ]

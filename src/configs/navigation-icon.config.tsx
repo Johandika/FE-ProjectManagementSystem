@@ -4,7 +4,7 @@ import { BiMoneyWithdraw } from 'react-icons/bi'
 import { CgFileDocument } from 'react-icons/cg'
 import { RiArchiveDrawerLine } from 'react-icons/ri'
 import { FiDatabase } from 'react-icons/fi'
-import { LuUserRound } from 'react-icons/lu'
+import { LuNotebookText, LuUserRound } from 'react-icons/lu'
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -17,6 +17,7 @@ const navigationIcon: NavigationIcons = {
     laporan: <TbReportSearch />,
     peranDanPengguna: <LuUserRound />,
     master: <FiDatabase />,
+    logs: <LuNotebookText />,
 }
 
 export default navigationIcon

@@ -4,6 +4,7 @@ import {
     NAV_ITEM_TYPE_ITEM,
 } from '@/constants/navigation.constant'
 import type { NavigationTree } from '@/@types/navigation'
+import { DEVELOPER, SUPER_ADMIN } from '@/constants/roles.constant'
 
 const appsNavigationConfig: NavigationTree[] = [
     {
@@ -15,7 +16,7 @@ const appsNavigationConfig: NavigationTree[] = [
         type: NAV_ITEM_TYPE_TITLE,
         authority: [],
         subMenu: [
-            // Menu1
+            // Dashboard
             {
                 key: 'apps.dashboard',
                 path: '/dashboard',
@@ -26,7 +27,7 @@ const appsNavigationConfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-            // Menu2
+            // Manajemen Proyek
             {
                 key: 'apps.manajemenProyek',
                 path: '/manajemen-proyek',
@@ -53,7 +54,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item2',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [],
+                        authority: [SUPER_ADMIN],
                         subMenu: [],
                     },
                     {
@@ -63,7 +64,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item3',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [],
+                        authority: [SUPER_ADMIN],
                         subMenu: [],
                     },
                     {
@@ -73,12 +74,12 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item4',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [],
+                        authority: [SUPER_ADMIN],
                         subMenu: [],
                     },
                 ],
             },
-            // Menu3
+            // Master
             {
                 key: 'apps.master',
                 path: '/master',
@@ -130,7 +131,7 @@ const appsNavigationConfig: NavigationTree[] = [
                     },
                 ],
             },
-            // Menu4
+            // Peran Pengguna
             {
                 key: 'apps.peranDanPengguna',
                 path: '/peran-dan-pengguna',
@@ -161,6 +162,17 @@ const appsNavigationConfig: NavigationTree[] = [
                         subMenu: [],
                     },
                 ],
+            },
+            // Logs
+            {
+                key: 'apps.logs',
+                path: '/logs',
+                title: 'Logs',
+                translateKey: 'nav.apps.logs',
+                icon: 'logs',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [SUPER_ADMIN, DEVELOPER],
+                subMenu: [],
             },
         ],
     },

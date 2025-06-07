@@ -70,7 +70,7 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
                     <MdOutlinePassword />
                 </span>
             )}
-            {user.role === 'Super Admin' && (
+            {user.authority === 'Super Admin' && (
                 <span
                     className={`cursor-pointer p-2 hover:${textTheme}`}
                     onClick={(e) => {
@@ -87,7 +87,7 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
             >
                 <HiOutlinePencil />
             </span>
-            {user.role === 'Super Admin' && (
+            {user.authority === 'Super Admin' && (
                 <span
                     className="cursor-pointer p-2 hover:text-red-500"
                     onClick={onDelete}
@@ -119,7 +119,7 @@ const PenggunaTable = () => {
     const { penggunaList } = useAppSelector((state) => state.penggunaList.data)
 
     const filteredPenggunaList = useMemo(() => {
-        if (user.role === 'Super Admin') {
+        if (user.authority === 'Super Admin') {
             return penggunaList
         }
         return penggunaList.filter((pengguna) => pengguna.email === user.email)

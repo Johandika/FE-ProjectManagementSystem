@@ -6,6 +6,6 @@ export interface NavigationTree {
     translateKey: string
     icon: string
     type: 'title' | 'collapse' | 'item'
-    authorization: string[]
+    authority: string[]
     subMenu: NavigationTree[]
 }
