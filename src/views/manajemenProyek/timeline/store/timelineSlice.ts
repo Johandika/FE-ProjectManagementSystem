@@ -1,41 +1,43 @@
+import { apiGetTimelines } from '@/services/TimelineService'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 // import { apiGetCrmCalendar } from '@/services/CrmService'
 
-type Event = {
+type Timeline = {
     id: string
     title: string
     start: string
     end?: string
-    eventColor: string
+    timelineColor: string
     groupId?: undefined
 }
 
-type Events = Event[]
+type Timelines = Timeline[]
 
-type GetCrmCalendarResponse = Events
+type GetCrmCalendarResponse = Timelines
 
 export type CalendarState = {
     loading: boolean
-    eventList: Events
+    timelineList: Timelines
     dialogOpen: boolean
     selected: {
         type: string
-    } & Partial<Event>
+    } & Partial<Timeline>
 }
 
 export const SLICE_NAME = 'crmCalendar'
 
-// export const getEvents = createAsyncThunk(
-//     SLICE_NAME + '/getEvents',
-//     async () => {
-//         const response = await apiGetCrmCalendar<GetCrmCalendarResponse>()
-//         return response.data
-//     }
-// )
+export const getTimelines = createAsyncThunk(
+    SLICE_NAME + '/getTimelines',
+    async (data) => {
+        const response = await apiGetTimelines<GetCrmCalendarResponse>(data)
+
+        return response.data
+    }
+)
 
 const initialState: CalendarState = {
     loading: false,
-    eventList: [],
+    timelineList: [],
     dialogOpen: false,
     selected: {
         type: '',
@@ -46,8 +48,8 @@ const calendarSlice = createSlice({
     name: `${SLICE_NAME}/state`,
     initialState,
     reducers: {
-        updateEvent: (state, action) => {
-            state.eventList = action.payload
+        updateTimeline: (state, action) => {
+            state.timelineList = action.payload
         },
         openDialog: (state) => {
             state.dialogOpen = true
@@ -60,13 +62,13 @@ const calendarSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // builder.addCase(getEvents.fulfilled, (state, action) => {
-        //     state.eventList = action.payload
-        // })
+        builder.addCase(getTimelines.fulfilled, (state, action) => {
+            state.timelineList = action.payload
+        })
     },
 })
 
-export const { updateEvent, openDialog, closeDialog, setSelected } =
+export const { updateTimeline, openDialog, closeDialog, setSelected } =
     calendarSlice.actions
 
 export default calendarSlice.reducer

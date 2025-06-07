@@ -98,7 +98,7 @@ export const protectedRoutes = [
     },
     // Timeline
     {
-        key: 'apps.adendum',
+        key: 'apps.timeline',
         path: '/manajemen-proyek/timeline',
         component: lazy(() => import('@/views/manajemenProyek/timeline')),
         authority: [],

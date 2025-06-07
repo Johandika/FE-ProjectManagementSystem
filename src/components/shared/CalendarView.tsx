@@ -18,6 +18,7 @@ type EventColors = Record<
 interface CalendarViewProps extends CalendarOptions {
     wrapperClass?: string
     eventColors?: (colors: EventColors) => EventColors
+    onDatesSet?: (start: string, end: string) => void
 }
 
 const defaultColorList: Record<
@@ -114,8 +115,17 @@ const CalendarView = (props: CalendarViewProps) => {
     const {
         wrapperClass,
         eventColors = () => defaultColorList,
+        onDatesSet,
         ...rest
     } = props
+
+    // Fungsi untuk menangkap perubahan tanggal
+    const handleDatesSet = (arg: any) => {
+        const { start, end } = arg
+        if (onDatesSet) {
+            onDatesSet(start, end)
+        }
+    }
 
     return (
         <div className={classNames('calendar', wrapperClass)}>
@@ -176,6 +186,7 @@ const CalendarView = (props: CalendarViewProps) => {
                     )
                 }}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                datesSet={handleDatesSet}
                 {...rest}
             />
         </div>

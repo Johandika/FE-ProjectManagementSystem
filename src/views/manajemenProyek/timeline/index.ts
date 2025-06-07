@@ -1,3 +1,3 @@
-import timeline from './Calendar'
+import timeline from './Timeline'
 
 export default timeline

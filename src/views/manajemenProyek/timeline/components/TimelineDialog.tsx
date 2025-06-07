@@ -12,6 +12,7 @@ import { HiCheck } from 'react-icons/hi'
 import { components, ControlProps, OptionProps } from 'react-select'
 import * as Yup from 'yup'
 import dayjs from 'dayjs'
+import { formatDate } from '@/utils/formatDate'
 
 type FormModel = {
     title: string
@@ -20,11 +21,11 @@ type FormModel = {
     color: string
 }
 
-export type EventParam = {
+export type TimelineParam = {
     id: string
     title: string
     start: string
-    eventColor: string
+    timelineColor: string
     end?: string
 }
 
@@ -34,13 +35,11 @@ type ColorOption = {
     color: string
 }
 
-type EventDialogProps = {
-    submit: (eventData: EventParam, type: string) => void
+type TimelineDialogProps = {
+    submit: (timelineData: TimelineParam, type: string) => void
 }
 
 const { Control } = components
-
-const { useUniqueId } = hooks
 
 const colorOptions = [
     {
@@ -163,18 +162,17 @@ const CustomControl = ({ children, ...props }: ControlProps<ColorOption>) => {
 }
 
 const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Event title Required'),
+    title: Yup.string().required('Timeline title Required'),
     startDate: Yup.date().required('Start Date Required'),
     endDate: Yup.date(),
     color: Yup.string().required('Color Required'),
 })
 
-const EventDialog = ({ submit }: EventDialogProps) => {
+const TimelineDialog = ({ submit }: TimelineDialogProps) => {
     const dispatch = useAppDispatch()
 
     const open = useAppSelector((state) => state.crmCalendar.data.dialogOpen)
     const selected = useAppSelector((state) => state.crmCalendar.data.selected)
-    const newId = useUniqueId('event-')
 
     const handleDialogClose = () => {
         dispatch(closeDialog())
@@ -183,20 +181,7 @@ const EventDialog = ({ submit }: EventDialogProps) => {
     const handleSubmit = (
         values: FormModel,
         setSubmitting: (isSubmitting: boolean) => void
-    ) => {
-        setSubmitting(false)
-        const eventData: EventParam = {
-            id: selected.id || newId,
-            title: values.title,
-            start: dayjs(values.startDate).format(),
-            eventColor: values.color,
-        }
-        if (values.endDate) {
-            eventData.end = dayjs(values.endDate).format()
-        }
-        submit?.(eventData, selected.type)
-        dispatch(closeDialog())
-    }
+    ) => {}
 
     return (
         <Dialog
@@ -204,9 +189,7 @@ const EventDialog = ({ submit }: EventDialogProps) => {
             onClose={handleDialogClose}
             onRequestClose={handleDialogClose}
         >
-            <h5 className="mb-4">
-                {selected.type === 'NEW' ? 'Add New Event' : 'Edit Event'}
-            </h5>
+            <h5 className="mb-4">Detail Timeline Proyek</h5>
             <div>
                 <Formik
                     enableReinitialize
@@ -218,7 +201,7 @@ const EventDialog = ({ submit }: EventDialogProps) => {
                         endDate: selected.end
                             ? dayjs(selected.end).toDate()
                             : '',
-                        color: selected.eventColor || colorOptions[0].value,
+                        color: selected.timelineColor || colorOptions[0].value,
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values, { setSubmitting }) => {
@@ -229,11 +212,12 @@ const EventDialog = ({ submit }: EventDialogProps) => {
                         <Form>
                             <FormContainer>
                                 <FormItem
-                                    label="User Name"
+                                    label="Pekerjaan"
                                     invalid={errors.title && touched.title}
                                     errorMessage={errors.title}
                                 >
                                     <Field
+                                        disabled
                                         type="text"
                                         autoComplete="off"
                                         name="title"
@@ -241,59 +225,74 @@ const EventDialog = ({ submit }: EventDialogProps) => {
                                         component={Input}
                                     />
                                 </FormItem>
+                                <div className="flex flex-row gap-4">
+                                    <FormItem
+                                        label="Timeline Awal"
+                                        invalid={
+                                            errors.startDate &&
+                                            touched.startDate
+                                        }
+                                        errorMessage={errors.startDate}
+                                    >
+                                        <Field
+                                            name="startDate"
+                                            placeholder="Date"
+                                        >
+                                            {({ field, form }: FieldProps) => (
+                                                <DatePicker
+                                                    disabled
+                                                    field={field}
+                                                    form={form}
+                                                    inputFormat="DD-MM-YYYY"
+                                                    value={field.value}
+                                                    onChange={(date) => {
+                                                        form.setFieldValue(
+                                                            field.name,
+                                                            date
+                                                        )
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                    <FormItem
+                                        label="Timeline Akhir"
+                                        invalid={
+                                            errors.endDate && touched.endDate
+                                        }
+                                        errorMessage={errors.endDate}
+                                    >
+                                        <Field
+                                            name="endDate"
+                                            placeholder="Date"
+                                        >
+                                            {({ field, form }: FieldProps) => (
+                                                <DatePicker
+                                                    disabled
+                                                    inputFormat="DD-MM-YYYY"
+                                                    field={field}
+                                                    form={form}
+                                                    value={field.value}
+                                                    onChange={(date) => {
+                                                        form.setFieldValue(
+                                                            field.name,
+                                                            date
+                                                        )
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                </div>
                                 <FormItem
-                                    label="Start Date"
-                                    invalid={
-                                        errors.startDate && touched.startDate
-                                    }
-                                    errorMessage={errors.startDate}
-                                >
-                                    <Field name="startDate" placeholder="Date">
-                                        {({ field, form }: FieldProps) => (
-                                            <DatePicker
-                                                field={field}
-                                                form={form}
-                                                value={field.value}
-                                                onChange={(date) => {
-                                                    form.setFieldValue(
-                                                        field.name,
-                                                        date
-                                                    )
-                                                }}
-                                            />
-                                        )}
-                                    </Field>
-                                </FormItem>
-                                <FormItem
-                                    label="End Date"
-                                    invalid={errors.endDate && touched.endDate}
-                                    errorMessage={errors.endDate}
-                                >
-                                    <Field name="endDate" placeholder="Date">
-                                        {({ field, form }: FieldProps) => (
-                                            <DatePicker
-                                                field={field}
-                                                form={form}
-                                                value={field.value}
-                                                onChange={(date) => {
-                                                    form.setFieldValue(
-                                                        field.name,
-                                                        date
-                                                    )
-                                                }}
-                                            />
-                                        )}
-                                    </Field>
-                                </FormItem>
-                                <FormItem
-                                    label="Prefered"
-                                    asterisk={true}
+                                    label="Warna"
                                     invalid={errors.color && touched.color}
                                     errorMessage={errors.color}
                                 >
                                     <Field name="color">
                                         {({ field, form }: FieldProps) => (
                                             <Select<ColorOption>
+                                                isDisabled
                                                 field={field}
                                                 form={form}
                                                 options={colorOptions}
@@ -316,11 +315,6 @@ const EventDialog = ({ submit }: EventDialogProps) => {
                                         )}
                                     </Field>
                                 </FormItem>
-                                <FormItem className="mb-0 text-right rtl:text-left">
-                                    <Button variant="solid" type="submit">
-                                        Submit
-                                    </Button>
-                                </FormItem>
                             </FormContainer>
                         </Form>
                     )}
@@ -330,4 +324,4 @@ const EventDialog = ({ submit }: EventDialogProps) => {
     )
 }
 
-export default EventDialog
+export default TimelineDialog
