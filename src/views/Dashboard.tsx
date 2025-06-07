@@ -18,7 +18,7 @@ const Dashboard = () => {
     useEffect(() => {
         const today = dayjs()
         const tanggal_awal = today.startOf('month').format('YYYY-MM-DD')
-        const tanggal_akhir = today.format('YYYY-MM-DD')
+        const tanggal_akhir = today.endOf('month').format('YYYY-MM-DD')
 
         dispatch(getDashboard({ tanggal_awal, tanggal_akhir }))
     }, [dispatch])
@@ -31,7 +31,10 @@ const Dashboard = () => {
                     <div className="flex flex-col sm:flex-row gap-4">
                         {/* Horizontal */}
                         <BasicBarVertical dataAwal={dataAwal} />
-                        <SimplePie dataAwal={dataAwal} />
+                        <SimplePie
+                            dataAwal={dataAwal}
+                            loading={loadingDashboard}
+                        />
                     </div>
 
                     {/* Vertikal */}

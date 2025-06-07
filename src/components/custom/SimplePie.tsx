@@ -1,19 +1,23 @@
 import Chart from 'react-apexcharts'
 import { theme } from 'twin.macro'
+import { Loading } from '../shared'
 
 const twColor: Record<string, string> = theme`colors`
 
-const SimplePie = ({ dataAwal }: any) => {
+const SimplePie = ({ dataAwal, loading }: any) => {
     const dataGrafikPie = dataAwal?.grafik_pie_tender
     const data = dataGrafikPie?.data
     const category = dataGrafikPie?.key
 
-    const formatNumber = (number) => {
+    const formatNumber = (number: number) => {
         return number.toLocaleString('id-ID')
     }
 
     return (
-        <div className="flex flex-col w-full sm:w-1/4 border p-4 rounded-md">
+        <Loading
+            loading={loading}
+            className="flex flex-col w-full sm:w-1/4 border p-4 rounded-md"
+        >
             <div className="mb-4 lg:mb-0">
                 <h4>Statistik Nilai Tender</h4>
             </div>
@@ -62,7 +66,7 @@ const SimplePie = ({ dataAwal }: any) => {
                 height={300}
                 type="donut"
             />
-        </div>
+        </Loading>
     )
 }
 
