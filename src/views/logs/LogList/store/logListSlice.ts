@@ -1,7 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import type { TableProyekQueries, TableQueries } from '@/@types/common'
+import type {
+    TableLogQueries,
+    TableProyekQueries,
+    TableQueries,
+} from '@/@types/common'
 
 import { apiGetLogs } from '@/services/LogService'
+import { apiGetUsers } from '@/services/UserService'
 
 type Log = {
     id: string
@@ -12,7 +17,23 @@ type Log = {
     User: { id: string; nama: string; email: string }
 }
 
+type User = {
+    id: string
+    nama: string
+    email: string
+    nomor_telepon: string
+    status_aktif: boolean
+    status_login: boolean
+    last_login: string
+    idRole: string
+    Role: {
+        id: string
+        nama: string
+    }
+}
+
 type Logs = Log[]
+type Users = User[]
 
 type GetMasterLogResponse = {
     statusCode: number
@@ -27,13 +48,16 @@ type FilterQueries = {
     category: string[]
     status: number[]
     productStatus: number
+    idUser: string
 }
 
 export type MasterLogListSlice = {
     loading: boolean
+    loadingPenggunas: boolean
     tableData: TableQueries & { totalPage?: number }
     filterData: FilterQueries
     logsList: Log[]
+    penggunaList: Users[]
 }
 
 type GetMasterLogData = TableProyekQueries & { filterData?: FilterQueries }
@@ -48,6 +72,7 @@ export const getLogs = createAsyncThunk(
             GetMasterLogResponse,
             GetMasterLogData
         >(data)
+        console.log('data response log', response.data)
 
         // return response.data
         return {
@@ -58,21 +83,35 @@ export const getLogs = createAsyncThunk(
     }
 )
 
-export const initialTableData: TableQueries = {
+// get all penggunas
+export const getPenggunas = createAsyncThunk(
+    SLICE_NAME + '/getPenggunas',
+    async () => {
+        const response = await apiGetUsers()
+
+        return response.data
+    }
+)
+
+export const initialTableData: TableLogQueries = {
     total: 0,
     pageIndex: 1,
     pageSize: 10,
     query: '',
+    idUser: '',
 }
 
 const initialState: MasterLogListSlice = {
     loading: false,
+    loadingPenggunas: false,
     logsList: [],
+    penggunaList: [],
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'd'],
-        status: [0, 1, 2],
+        category: [],
+        status: [],
+        idUser: '',
         productStatus: 0,
     },
 }
@@ -98,6 +137,13 @@ const logListSlice = createSlice({
             })
             .addCase(getLogs.pending, (state) => {
                 state.loading = true
+            })
+            .addCase(getPenggunas.fulfilled, (state, action) => {
+                state.penggunaList = action.payload
+                state.loadingPenggunas = false
+            })
+            .addCase(getPenggunas.pending, (state) => {
+                state.loadingPenggunas = true
             })
     },
 })

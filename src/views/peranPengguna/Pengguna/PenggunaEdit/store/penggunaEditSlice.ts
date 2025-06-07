@@ -1,8 +1,4 @@
-import {
-    apiGetOneUser,
-    apiGetUsers,
-    apiUpdateUser,
-} from '@/services/UserService'
+import { apiGetOneUser, apiGetUsers } from '@/services/UserService'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 type PenggunaData = {

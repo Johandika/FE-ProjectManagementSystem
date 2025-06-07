@@ -51,14 +51,6 @@ export const getPenggunas = createAsyncThunk(
     }
 )
 
-// export const deletePengguna = async (data: { id: string | string[] }) => {
-//     const response = await apiDeleteuse<
-//         boolean,
-//         { id: string | string[] }
-//     >(data)
-//     return response.data
-// }
-
 export const initialTableData: TableQueries = {
     total: 0,
     pageIndex: 1,

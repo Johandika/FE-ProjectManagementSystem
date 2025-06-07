@@ -15,7 +15,7 @@ type Log = {
     nilai_kontrak: string
     tanggal_pengajuan: string
     client: string
-    idClient?: string
+    idUser?: string
     status: string
 }
 
@@ -37,19 +37,19 @@ const LogTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize])
+    }, [pageIndex, pageSize, filterData])
 
     useEffect(() => {
         if (tableRef) {
             tableRef.current?.resetSorting()
         }
-    }, [filterData])
+    }, [filterData, pageIndex, pageSize])
 
     const tableData = useMemo(
         () => ({ pageIndex, pageSize, query, total }),
         [pageIndex, pageSize, query, total]
     )
-
+    // console.log('filterDataokkjmss', filterData)
     const fetchData = () => {
         dispatch(
             getLogs({
@@ -60,8 +60,6 @@ const LogTable = () => {
             })
         )
     }
-
-    console.log('data', data)
 
     const columns: ColumnDef<Log>[] = useMemo(
         () => [
@@ -155,11 +153,6 @@ const LogTable = () => {
         dispatch(setTableData(newTableData))
     }
 
-    console.log({
-        total: tableData.total as number,
-        pageIndex: tableData.pageIndex as number,
-        pageSize: tableData.pageSize as number,
-    })
     return (
         <>
             <LogTableDropdown

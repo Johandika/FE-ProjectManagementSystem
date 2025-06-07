@@ -12,6 +12,14 @@ export type TableQueries = {
     pageSize?: number
     query?: string
 }
+
+export type TableLogQueries = {
+    total?: number
+    pageIndex?: number
+    pageSize?: number
+    query?: string
+    idUser: string
+}
 export type TableProyekQueries = {
     total?: number
     pageIndex?: number

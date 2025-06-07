@@ -1,17 +1,13 @@
 import { useState, useRef, forwardRef, useEffect } from 'react'
-import { HiOutlineFilter, HiOutlineSearch } from 'react-icons/hi'
+import { HiOutlineFilter } from 'react-icons/hi'
 import {
-    getProyeks,
     setFilterData,
-    initialTableData,
     useAppDispatch,
     useAppSelector,
     getKliens,
 } from '../store'
 import { FormItem, FormContainer } from '@/components/ui/Form'
-import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import Checkbox from '@/components/ui/Checkbox'
 import Radio from '@/components/ui/Radio'
 import Drawer from '@/components/ui/Drawer'
 import { Field, Form, Formik, FormikProps, FieldProps } from 'formik'
