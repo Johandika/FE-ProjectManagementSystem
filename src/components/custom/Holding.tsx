@@ -190,7 +190,7 @@ export default function Holding({ dataAwal }: any) {
                             </span>
                         </div>
                         <div>
-                            <span className="text-red-600">
+                            <span className="text-indigo-600">
                                 Sudah Ditagih:{' '}
                             </span>
                             <span>
