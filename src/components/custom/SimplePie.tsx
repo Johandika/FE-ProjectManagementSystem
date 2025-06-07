@@ -3,7 +3,7 @@ import { theme } from 'twin.macro'
 
 const twColor: Record<string, string> = theme`colors`
 
-const SimplePie = ({ dataAwal: any }) => {
+const SimplePie = ({ dataAwal }: any) => {
     const dataGrafikPie = dataAwal?.grafik_pie_tender
     const data = dataGrafikPie?.data
     const category = dataGrafikPie?.key
