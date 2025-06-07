@@ -1,33 +1,10 @@
-import React, { useEffect } from 'react'
+import { useState } from 'react'
 import { Button, DatePicker, FormItem } from '../ui'
 import { Field, FieldProps, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import dayjs from 'dayjs'
-import { getDashboard, useAppDispatch, useAppSelector } from '@/store'
-import { Loading } from '../shared'
+import { useAppDispatch } from '@/store'
 import { TbFilter } from 'react-icons/tb'
-
-interface DashboardData {
-    total_proyek: number
-    total_nilai_kontrak: number
-    nilai_sudah_dibayar: number
-    nilai_sudah_ditagih: number
-    total_tender: number
-    total_nilai_tender: number
-    total_tender_pengajuan: number
-    total_nilai_tender_pengajuan: number
-    total_tender_diterima: number
-    total_nilai_tender_diterima: number
-    total_tender_ditolak: number
-    total_nilai_tender_ditolak: number
-    total_faktur_pajak: number
-}
-
-interface HoldingProps {
-    data: {
-        data: DashboardData
-    }
-}
 
 interface BastpFormValues {
     tanggal_awal: string
@@ -37,7 +14,7 @@ interface BastpFormValues {
 const today = dayjs()
 const bastpFormInitialValues: BastpFormValues = {
     tanggal_awal: today.startOf('month').format('YYYY-MM-DD'),
-    tanggal_akhir: today.format('YYYY-MM-DD'),
+    tanggal_akhir: today.endOf('month').format('YYYY-MM-DD'),
 }
 
 const BastpSchema = Yup.object().shape({
@@ -45,8 +22,14 @@ const BastpSchema = Yup.object().shape({
     tanggal_akhir: Yup.string().required('Wajib diisi'),
 })
 
-export default function Holding({ dataAwal }: any) {
-    const dispatch = useAppDispatch()
+export default function Holding({
+    dataAwal,
+    tanggalAwal,
+    tanggalAkhir,
+    setTanggalAwal,
+    setTanggalAkhir,
+    handleFilter,
+}: any) {
     // Format number to currency (IDR)
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -56,18 +39,19 @@ export default function Holding({ dataAwal }: any) {
             maximumFractionDigits: 0,
         }).format(value)
     }
-    const handleFilter = (values: BastpFormValues) => {
-        // Lakukan aksi filter di sini
-        dispatch(getDashboard(values))
-    }
 
     return (
         <div>
             {/* Filter Tanggal */}
             <Formik
-                initialValues={bastpFormInitialValues}
+                initialValues={{
+                    tanggal_awal: tanggalAwal,
+                    tanggal_akhir: tanggalAkhir,
+                }}
                 validationSchema={BastpSchema}
-                onSubmit={handleFilter}
+                onSubmit={(values) => {
+                    handleFilter(values)
+                }}
                 enableReinitialize
             >
                 {({ errors, touched }) => (
@@ -108,6 +92,7 @@ export default function Holding({ dataAwal }: any) {
                                                     field.name,
                                                     formattedDate
                                                 )
+                                                setTanggalAwal(formattedDate)
                                             }}
                                         />
                                     )}
@@ -144,6 +129,7 @@ export default function Holding({ dataAwal }: any) {
                                                     field.name,
                                                     formattedDate
                                                 )
+                                                setTanggalAkhir(formattedDate)
                                             }}
                                         />
                                     )}
