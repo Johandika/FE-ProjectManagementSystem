@@ -31,10 +31,7 @@ const Dashboard = () => {
                     <div className="flex flex-col sm:flex-row gap-4">
                         {/* Horizontal */}
                         <BasicBarVertical dataAwal={dataAwal} />
-                        <SimplePie
-                            dataAwal={dataAwal}
-                            loading={loadingDashboard}
-                        />
+                        <SimplePie dataAwal={dataAwal} />
                     </div>
 
                     {/* Vertikal */}
