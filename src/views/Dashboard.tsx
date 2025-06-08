@@ -35,6 +35,15 @@ const Dashboard = () => {
         )
     }
 
+    useEffect(() => {
+        dispatch(
+            getDashboard({
+                tanggal_awal: tanggalAwal,
+                tanggal_akhir: tanggalAkhir,
+            })
+        )
+    }, [])
+
     return (
         <div>
             <div className="grid grid-cols-1 gap-4">

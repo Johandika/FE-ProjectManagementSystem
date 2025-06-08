@@ -8,10 +8,12 @@ import {
 import {
     getTenders,
     setTableData,
-    setSelectedProduct,
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
+    setUpdateConfirmation,
+    setSelectedTender,
+    setTenderStatus,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import TenderDeleteConfirmation from './TenderDeleteConfirmation'
@@ -23,6 +25,8 @@ import type {
     ColumnDef,
 } from '@/components/shared/DataTable'
 import { formatDate } from '@/utils/formatDate'
+import { Button } from '@/components/ui'
+import TenderUpdateStatusConfirmation from './TenderUpdateStatusConfirmation'
 
 type Product = {
     id: string
@@ -31,6 +35,7 @@ type Product = {
     tanggal_pengajuan: string
     client: string
     idClient?: string
+    status: string
 }
 
 const ActionColumn = ({ row }: { row: Product }) => {
@@ -60,24 +65,29 @@ const ActionColumn = ({ row }: { row: Product }) => {
 
     return (
         <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onCreateProject}
-            >
-                <HiOutlineDocumentAdd />
-            </span>
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
-            >
-                <HiOutlinePencil />
-            </span>
-            <span
-                className="cursor-pointer p-2 hover:text-red-500"
-                onClick={onDelete}
-            >
-                <HiOutlineTrash />
-            </span>
+            {row.status === 'Pengajuan' ? (
+                <>
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={onEdit}
+                    >
+                        <HiOutlinePencil />
+                    </span>
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={onDelete}
+                    >
+                        <HiOutlineTrash />
+                    </span>
+                </>
+            ) : row.status === 'Diterima' ? (
+                <span
+                    className={`cursor-pointer p-2 hover:${textTheme}`}
+                    onClick={onCreateProject}
+                >
+                    <HiOutlineDocumentAdd />
+                </span>
+            ) : null}
         </div>
     )
 }
@@ -118,6 +128,13 @@ const TenderTable = () => {
     const fetchData = () => {
         dispatch(getTenders({ pageIndex, pageSize, sort, query, filterData }))
     }
+
+    const handleUpdateStatus = async (status: string, id: string) => {
+        dispatch(setUpdateConfirmation(true))
+        dispatch(setSelectedTender(id))
+        dispatch(setTenderStatus(status))
+    }
+
     const columns: ColumnDef<Product>[] = useMemo(
         () => [
             {
@@ -153,7 +170,7 @@ const TenderTable = () => {
                 },
             },
             {
-                header: 'Tanggal Pengajuan',
+                header: 'Tgl. Pengajuan',
                 accessorKey: 'tanggal_pengajuan',
                 minWidth: 150,
                 cell: (props) => {
@@ -161,6 +178,57 @@ const TenderTable = () => {
                     return (
                         <span className="capitalize">
                             {formatDate(row.tanggal_pengajuan)}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Status',
+                accessorKey: 'status',
+                minWidth: 150,
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span className="capitalize">
+                            {row.status === 'Pengajuan' ? (
+                                <div className="gap-2 flex flex-row">
+                                    <Button
+                                        size="xs"
+                                        variant="solid"
+                                        onClick={(e) => {
+                                            handleUpdateStatus(
+                                                'Diterima',
+                                                row.id
+                                            )
+                                            e.stopPropagation()
+                                        }}
+                                    >
+                                        Diterima
+                                    </Button>
+                                    <Button
+                                        size="xs"
+                                        variant="solid"
+                                        color="rose"
+                                        onClick={(e) => {
+                                            handleUpdateStatus(
+                                                'Ditolak',
+                                                row.id
+                                            )
+                                            e.stopPropagation()
+                                        }}
+                                    >
+                                        Ditolak
+                                    </Button>
+                                </div>
+                            ) : row.status === 'Diterima' ? (
+                                <span className="text-green-500">
+                                    {row.status}
+                                </span>
+                            ) : (
+                                <span className="text-rose-500">
+                                    {row.status}
+                                </span>
+                            )}
                         </span>
                     )
                 },
@@ -213,6 +281,7 @@ const TenderTable = () => {
                 onSort={onSort}
             />
             <TenderDeleteConfirmation />
+            <TenderUpdateStatusConfirmation />
         </>
     )
 }

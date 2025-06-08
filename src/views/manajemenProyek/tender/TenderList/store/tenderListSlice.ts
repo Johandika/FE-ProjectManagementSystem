@@ -30,7 +30,9 @@ type FilterQueries = {
 export type MasterTenderListSlice = {
     loading: boolean
     deleteConfirmation: boolean
-    selectedProduct: string
+    selectedTender: string
+    tenderStatus: string
+    updateConfirmation: boolean
     tableData: TableQueries & { totalPage?: number }
     filterData: FilterQueries
     productList: Tender[]
@@ -71,7 +73,9 @@ export const initialTableData: TableQueries = {
 const initialState: MasterTenderListSlice = {
     loading: false,
     deleteConfirmation: false,
-    selectedProduct: '',
+    selectedTender: '',
+    updateConfirmation: false,
+    tenderStatus: '',
     productList: [],
     tableData: initialTableData,
     filterData: {
@@ -86,9 +90,6 @@ const tenderListSlice = createSlice({
     name: `${SLICE_NAME}/state`,
     initialState,
     reducers: {
-        updateProductList: (state, action) => {
-            state.productList = action.payload
-        },
         setTableData: (state, action) => {
             state.tableData = action.payload
         },
@@ -98,8 +99,14 @@ const tenderListSlice = createSlice({
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
         },
-        setSelectedProduct: (state, action) => {
-            state.selectedProduct = action.payload
+        setSelectedTender: (state, action) => {
+            state.selectedTender = action.payload
+        },
+        setUpdateConfirmation: (state, action) => {
+            state.updateConfirmation = action.payload
+        },
+        setTenderStatus: (state, action) => {
+            state.tenderStatus = action.payload
         },
     },
     extraReducers: (builder) => {
@@ -117,11 +124,12 @@ const tenderListSlice = createSlice({
 })
 
 export const {
-    updateProductList,
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
-    setSelectedProduct,
+    setSelectedTender,
+    setUpdateConfirmation,
+    setTenderStatus,
 } = tenderListSlice.actions
 
 export default tenderListSlice.reducer

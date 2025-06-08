@@ -464,17 +464,6 @@ export default function Detail() {
                                                         <div className="text-green-500">
                                                             Sudah Dibayar
                                                         </div>
-                                                        <Button
-                                                            size="xs"
-                                                            variant="solid"
-                                                            onClick={() =>
-                                                                handleOpenStatusChangeDialog(
-                                                                    'Ubah Status'
-                                                                )
-                                                            }
-                                                        >
-                                                            Ubah Status
-                                                        </Button>
                                                     </div>
                                                 ) : (
                                                     <div className="flex flex-col sm:flex-row  sm:items-center items-start gap-2">
