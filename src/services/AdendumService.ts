@@ -4,9 +4,11 @@ import ApiService from './ApiService'
 export async function apiGetAdendums<T, U extends Record<string, unknown>>(
     data: U
 ) {
+    console.log('data masuk adendums', data)
     const params = new URLSearchParams()
 
     if (data.idProject) params.append('idProject', data.idProject.toString())
+    if (data.query) params.append('search', data.query.toString())
     if (data.page) params.append('page', data.page.toString())
     if (data.limit) params.append('limit', data.limit.toString())
 

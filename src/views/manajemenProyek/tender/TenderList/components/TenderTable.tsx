@@ -126,7 +126,15 @@ const TenderTable = () => {
     )
 
     const fetchData = () => {
-        dispatch(getTenders({ pageIndex, pageSize, sort, query, filterData }))
+        dispatch(
+            getTenders({
+                page: pageIndex,
+                limit: pageSize,
+                sort,
+                query,
+                filterData: filterData,
+            })
+        )
     }
 
     const handleUpdateStatus = async (status: string, id: string) => {

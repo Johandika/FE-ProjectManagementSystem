@@ -101,7 +101,7 @@ const initialState: MasterAdendumListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'd'],
+        category: [],
         status: [0, 1, 2],
         productStatus: 0,
     },

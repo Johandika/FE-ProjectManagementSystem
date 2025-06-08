@@ -16,7 +16,7 @@ type GetMasterTenderResponse = {
     statusCode: number
     message: string
     data: Tenders
-    totaldataClient: number
+    totaldataTender: number
     totalPage: number
 }
 
@@ -50,10 +50,11 @@ export const getTenders = createAsyncThunk(
             GetMasterTenderResponse,
             GetMasterTenderData
         >(data)
+        console.log('response getTenders', response.data)
         // return response.data
         return {
             data: response.data.data,
-            total: response.data.totaldataClient,
+            total: response.data.totaldataTender,
             totalPage: response.data.totalPage,
         }
     }
@@ -64,10 +65,6 @@ export const initialTableData: TableQueries = {
     pageIndex: 1,
     pageSize: 10,
     query: '',
-    sort: {
-        order: '',
-        key: '',
-    },
 }
 
 const initialState: MasterTenderListSlice = {
@@ -80,7 +77,7 @@ const initialState: MasterTenderListSlice = {
     tableData: initialTableData,
     filterData: {
         name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'd'],
+        category: [],
         status: [0, 1, 2],
         productStatus: 0,
     },
@@ -114,7 +111,7 @@ const tenderListSlice = createSlice({
             .addCase(getTenders.fulfilled, (state, action) => {
                 state.productList = action.payload.data
                 state.tableData.total = action.payload.total
-                state.tableData.totalPage = action.payload.totalPage //TAMBAHAN TOTAL PAGE
+                state.tableData.totalPage = action.payload.totalPage
                 state.loading = false
             })
             .addCase(getTenders.pending, (state) => {
