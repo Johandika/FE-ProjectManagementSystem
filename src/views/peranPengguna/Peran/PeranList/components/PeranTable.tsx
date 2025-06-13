@@ -16,6 +16,10 @@ const PeranTable = () => {
 
     const dispatch = useAppDispatch()
 
+    const { pageIndex, pageSize, sort, query, total } = useAppSelector(
+        (state) => state.peranList.data.tableData
+    )
+
     const loading = useAppSelector((state) => state.peranList.data.loading)
 
     const rolesData = useAppSelector((state) => state.peranList.data.peranList)
@@ -23,7 +27,7 @@ const PeranTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [pageIndex, pageSize, sort])
 
     const fetchData = () => {
         dispatch(getRoles())

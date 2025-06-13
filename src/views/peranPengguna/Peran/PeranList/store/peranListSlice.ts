@@ -14,6 +14,8 @@ type Satuans = Satuan[]
 
 type GetMasterSatuanResponse = {
     data: Satuans
+    totaldataClient: number
+    totalPage: number
 }
 
 export type MasterPeranListSlice = {
@@ -21,18 +23,39 @@ export type MasterPeranListSlice = {
     loadingSelectRoles: boolean
     deleteConfirmation: boolean
     selectedSatuan: string
-    tableData: TableQueries
+    tableData: TableQueries & { totalPage: number }
     peranList: Satuan[]
     selectRoles: any[]
 }
 
+type FilterQueries = {
+    name: string
+    category: string[]
+    status: number[]
+}
+
+type GetMasterSatuanData = TableQueries & { filterData?: FilterQueries }
+
 export const SLICE_NAME = 'peranList'
 
 // get all satuans
-export const getRoles = createAsyncThunk(SLICE_NAME + '/getRoles', async () => {
-    const response = await apiGetRoles()
-    return response.data
-})
+export const getRoles = createAsyncThunk(
+    SLICE_NAME + '/getRoles',
+    async (data) => {
+        console.log('data masuk', data)
+        const response = await apiGetRoles<
+            GetMasterSatuanResponse,
+            GetMasterSatuanData
+        >(data)
+
+        console.log('data keluar', response.data)
+        return {
+            data: response.data.data,
+            total: response.data.totaldataClient,
+            totalPage: response.data.totalPage,
+        }
+    }
+)
 
 // select roles
 export const selectRoles = createAsyncThunk(
@@ -89,6 +112,7 @@ const peranListSlice = createSlice({
             .addCase(getRoles.fulfilled, (state, action) => {
                 state.peranList = action.payload.data
                 state.tableData.total = action.payload.total
+                state.tableData.totalPage = action.payload.totalPage
                 state.loading = false
             })
             .addCase(getRoles.pending, (state) => {

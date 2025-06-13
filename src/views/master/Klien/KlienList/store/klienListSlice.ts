@@ -119,7 +119,7 @@ const klienListSlice = createSlice({
             .addCase(getKliens.fulfilled, (state, action) => {
                 state.productList = action.payload.data
                 state.tableData.total = action.payload.total
-                state.tableData.totalPage = action.payload.totalPage //TAMBAHAN TOTAL PAGE
+                state.tableData.totalPage = action.payload.totalPage
                 state.loading = false
             })
             .addCase(getKliens.pending, (state) => {

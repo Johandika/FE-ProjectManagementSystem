@@ -8,19 +8,14 @@ import {
     useAppSelector,
 } from '../store'
 import { FormItem, FormContainer } from '@/components/ui/Form'
-import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import Checkbox from '@/components/ui/Checkbox'
 import Radio from '@/components/ui/Radio'
 import Drawer from '@/components/ui/Drawer'
 import { Field, Form, Formik, FormikProps, FieldProps } from 'formik'
 import type { MouseEvent } from 'react'
 
 type FormModel = {
-    name: string
-    category: string[]
-    status: number[]
-    productStatus: number
+    status: string
 }
 
 type FilterFormProps = {
@@ -43,7 +38,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
         const handleSubmit = (values: FormModel) => {
             onSubmitComplete?.()
             dispatch(setFilterData(values))
-            dispatch(getTenders(initialTableData))
+            // dispatch(getTenders(initialTableData))
         }
 
         return (
@@ -59,135 +54,15 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                     <Form>
                         <FormContainer>
                             <FormItem
-                                invalid={errors.name && touched.name}
-                                errorMessage={errors.name}
-                            >
-                                <h6 className="mb-4">Included text</h6>
-                                <Field
-                                    type="text"
-                                    autoComplete="off"
-                                    name="name"
-                                    placeholder="Keyword"
-                                    component={Input}
-                                    prefix={
-                                        <HiOutlineSearch className="text-lg" />
-                                    }
-                                />
-                            </FormItem>
-                            <FormItem
-                                invalid={errors.category && touched.category}
-                                errorMessage={errors.category as string}
-                            >
-                                <h6 className="mb-4">Product Category</h6>
-                                <Field name="category">
-                                    {({ field, form }: FieldProps) => (
-                                        <>
-                                            <Checkbox.Group
-                                                vertical
-                                                value={values.category}
-                                                onChange={(options) =>
-                                                    form.setFieldValue(
-                                                        field.name,
-                                                        options
-                                                    )
-                                                }
-                                            >
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="bags"
-                                                >
-                                                    Bags{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="cloths"
-                                                >
-                                                    Cloths{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="devices"
-                                                >
-                                                    Devices{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value="shoes"
-                                                >
-                                                    Shoes{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    name={field.name}
-                                                    value="watches"
-                                                >
-                                                    Watches{' '}
-                                                </Checkbox>
-                                            </Checkbox.Group>
-                                        </>
-                                    )}
-                                </Field>
-                            </FormItem>
-                            <FormItem
                                 invalid={errors.status && touched.status}
-                                errorMessage={errors.status as string}
+                                errorMessage={errors.status}
                             >
-                                <h6 className="mb-4">Product Category</h6>
+                                <h6 className="mb-4">Tender Status</h6>
                                 <Field name="status">
-                                    {({ field, form }: FieldProps) => (
-                                        <>
-                                            <Checkbox.Group
-                                                vertical
-                                                value={values.status}
-                                                onChange={(options) =>
-                                                    form.setFieldValue(
-                                                        field.name,
-                                                        options
-                                                    )
-                                                }
-                                            >
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value={0}
-                                                >
-                                                    In Stock{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value={1}
-                                                >
-                                                    Limited{' '}
-                                                </Checkbox>
-                                                <Checkbox
-                                                    className="mb-3"
-                                                    name={field.name}
-                                                    value={2}
-                                                >
-                                                    Out Of Stock{' '}
-                                                </Checkbox>
-                                            </Checkbox.Group>
-                                        </>
-                                    )}
-                                </Field>
-                            </FormItem>
-                            <FormItem
-                                invalid={
-                                    errors.productStatus &&
-                                    touched.productStatus
-                                }
-                                errorMessage={errors.productStatus}
-                            >
-                                <h6 className="mb-4">Product Status</h6>
-                                <Field name="productStatus">
                                     {({ field, form }: FieldProps) => (
                                         <Radio.Group
                                             vertical
-                                            value={values.productStatus}
+                                            value={values.status}
                                             onChange={(val) =>
                                                 form.setFieldValue(
                                                     field.name,
@@ -195,9 +70,15 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                                 )
                                             }
                                         >
-                                            <Radio value={0}>Published</Radio>
-                                            <Radio value={1}>Disabled</Radio>
-                                            <Radio value={2}>Archive</Radio>
+                                            <Radio value={'Pengajuan'}>
+                                                Pengajuan
+                                            </Radio>
+                                            <Radio value={'Diterima'}>
+                                                Diterima
+                                            </Radio>
+                                            <Radio value={'Ditolak'}>
+                                                Ditolak
+                                            </Radio>
                                         </Radio.Group>
                                     )}
                                 </Field>

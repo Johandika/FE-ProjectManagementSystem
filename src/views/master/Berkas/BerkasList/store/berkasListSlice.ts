@@ -14,6 +14,8 @@ type Berkases = Berkas[]
 
 type GetMasterBerkasResponse = {
     data: Berkases
+    totaldataMasterBerkas: number
+    totalPage: number
     total: number
 }
 
@@ -39,12 +41,19 @@ export const SLICE_NAME = 'berkasList'
 
 export const getBerkases = createAsyncThunk(
     SLICE_NAME + '/getBerkases',
+
     async (data: GetMasterBerkasData) => {
         const response = await apiGetBerkases<
             GetMasterBerkasResponse,
             GetMasterBerkasData
         >(data)
-        return response.data
+
+        console.log('response.data', response.data)
+        return {
+            data: response.data.data,
+            total: response.data.totaldataMasterBerkas,
+            totalPage: response.data.totalPage,
+        }
     }
 )
 

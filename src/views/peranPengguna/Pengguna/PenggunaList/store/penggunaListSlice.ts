@@ -41,13 +41,14 @@ export const SLICE_NAME = 'penggunaList'
 
 // get all penggunas
 export const getPenggunas = createAsyncThunk(
-    SLICE_NAME + '/getPenggunas',
+    SLICE_NAME + '/apiGetUsers',
     async (data: GetMasterPenggunaData) => {
-        const response = await apiGetUsers<
-            GetMasterPenggunaResponse,
-            GetMasterPenggunaData
-        >(data)
-        return response.data
+        const response = await apiGetUsers(data)
+        return {
+            data: response.data.data,
+            total: response.data.totaldataUser,
+            totalPage: response.data.totalPage,
+        }
     }
 )
 

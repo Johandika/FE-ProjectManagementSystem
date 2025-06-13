@@ -13,6 +13,8 @@ type Satuans = Satuan[]
 
 type GetMasterSatuanResponse = {
     data: Satuans
+    totaldataSatuan: number
+    totalPage: number
     total: number
 }
 
@@ -44,7 +46,12 @@ export const getSatuans = createAsyncThunk(
             GetMasterSatuanResponse,
             GetMasterSatuanData
         >(data)
-        return response.data
+
+        return {
+            data: response.data.data,
+            total: response.data.totaldataSatuan,
+            totalPage: response.data.totalPage,
+        }
     }
 )
 

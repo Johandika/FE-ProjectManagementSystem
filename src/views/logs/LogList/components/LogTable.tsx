@@ -133,7 +133,11 @@ const LogTable = () => {
                 accessorKey: 'user',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.User.nama}</span>
+                    return (
+                        <span className="capitalize">
+                            {row.User.nama || '-'}
+                        </span>
+                    )
                 },
             },
         ],

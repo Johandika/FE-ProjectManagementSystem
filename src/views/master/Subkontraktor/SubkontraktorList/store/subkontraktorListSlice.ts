@@ -16,6 +16,8 @@ type Subkontraktors = Subkontraktor[]
 
 type GetMasterSubkontraktorResponse = {
     data: Subkontraktors
+    totaldataSubkon: number
+    totalPage: number
     total: number
 }
 
@@ -41,12 +43,18 @@ export const SLICE_NAME = 'subkontraktorList'
 
 export const getSubkontraktors = createAsyncThunk(
     SLICE_NAME + '/getSubkontraktors',
+
     async (data: GetMasterSubkontraktorData) => {
         const response = await apiGetSubkontraktors<
             GetMasterSubkontraktorResponse,
             GetMasterSubkontraktorData
         >(data)
-        return response.data
+
+        return {
+            data: response.data.data,
+            total: response.data.totaldataSubkon,
+            totalPage: response.data.totalPage,
+        }
     }
 )
 

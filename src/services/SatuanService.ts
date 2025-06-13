@@ -1,14 +1,20 @@
 import ApiService from './ApiService'
 
-// get all satuan
 export async function apiGetSatuans<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    const res = ApiService.fetchData<T>({
+    const res = await ApiService.fetchData<T>({
         url: '/satuan',
         method: 'get',
-        data,
+        params: data
+            ? {
+                  page: data.pageIndex,
+                  limit: data.pageSize,
+                  search: data.query,
+              }
+            : undefined,
     })
+
     return res
 }
 

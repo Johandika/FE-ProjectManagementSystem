@@ -93,7 +93,9 @@ export const getBerkases = createAsyncThunk(
 export const getSatuans = createAsyncThunk(
     SLICE_NAME + '/getSatuans',
     async () => {
+        console.log('test satu')
         const response = await apiGetSatuans<GetSatuansResponse>()
+        console.log('response getsatuans', response)
         return response.data
     }
 )

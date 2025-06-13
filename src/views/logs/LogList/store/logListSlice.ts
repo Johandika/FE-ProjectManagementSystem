@@ -86,8 +86,8 @@ export const getLogs = createAsyncThunk(
 // get all penggunas
 export const getPenggunas = createAsyncThunk(
     SLICE_NAME + '/getPenggunas',
-    async () => {
-        const response = await apiGetUsers()
+    async (data) => {
+        const response = await apiGetUsers(data)
 
         return response.data
     }

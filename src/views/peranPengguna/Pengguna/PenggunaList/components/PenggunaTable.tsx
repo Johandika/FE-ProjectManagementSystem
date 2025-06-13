@@ -56,7 +56,6 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
 
     const user = useAppSelector((state) => state.auth.user)
 
-    console.log('user', user)
     return (
         <div className="flex justify-end text-lg">
             {row.email === user.email && (
@@ -156,11 +155,19 @@ const PenggunaTable = () => {
                 },
             },
             {
+                header: 'Email',
+                accessorKey: 'email',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span>{row.email}</span>
+                },
+            },
+            {
                 header: 'Peran',
                 accessorKey: 'peran',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span className="capitalize">{row.Role.nama}</span>
+                    return <span>{row.Role.nama}</span>
                 },
             },
             {

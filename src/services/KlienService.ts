@@ -7,7 +7,13 @@ export async function apiGetKliens<T, U extends Record<string, unknown>>(
     const res = await ApiService.fetchData<T>({
         url: '/client',
         method: 'get',
-        params: data, //ubah
+        params: data
+            ? {
+                  page: data.pageIndex,
+                  limit: data.pageSize,
+                  search: data.query,
+              }
+            : undefined,
     })
 
     return res

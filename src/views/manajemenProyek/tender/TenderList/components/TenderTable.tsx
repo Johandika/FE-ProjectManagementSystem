@@ -112,7 +112,7 @@ const TenderTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
+    }, [pageIndex, pageSize, sort, filterData])
 
     useEffect(() => {
         if (tableRef) {

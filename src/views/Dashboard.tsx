@@ -12,11 +12,12 @@ const Dashboard = () => {
     const { dataDashboard, loadingDashboard } = useAppSelector(
         (state: any) => state.base.common
     )
+
     const [tanggalAwal, setTanggalAwal] = useState(
-        dayjs().startOf('month').format('YYYY-MM-DD')
+        dayjs().startOf('year').format('YYYY-MM-DD')
     )
     const [tanggalAkhir, setTanggalAkhir] = useState(
-        dayjs().endOf('month').format('YYYY-MM-DD')
+        dayjs().endOf('year').format('YYYY-MM-DD')
     )
 
     const dataAwal = dataDashboard?.data

@@ -103,15 +103,6 @@ const BerkasTable = () => {
                     return <span className="capitalize">{row.nama}</span>
                 },
             },
-
-            // {
-            //     header: 'Keterangan',
-            //     accessorKey: 'keterangan',
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return <span className="capitalize">{row.keterangan}</span>
-            //     },
-            // },
             {
                 header: '',
                 id: 'action',

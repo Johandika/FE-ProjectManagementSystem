@@ -105,7 +105,6 @@ export default function DialogConfirmResetPassword() {
         }
     }
 
-    console.log('penggunaDialogIsOpen', penggunaDialogIsOpen)
     return (
         <ConfirmDialog
             isOpen={penggunaDialogIsOpen}

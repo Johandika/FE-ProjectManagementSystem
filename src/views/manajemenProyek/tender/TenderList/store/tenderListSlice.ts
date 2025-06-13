@@ -21,10 +21,7 @@ type GetMasterTenderResponse = {
 }
 
 type FilterQueries = {
-    name: string
-    category: string[]
-    status: number[]
-    productStatus: number
+    status: string
 }
 
 export type MasterTenderListSlice = {
@@ -50,7 +47,7 @@ export const getTenders = createAsyncThunk(
             GetMasterTenderResponse,
             GetMasterTenderData
         >(data)
-        console.log('response getTenders', response.data)
+
         // return response.data
         return {
             data: response.data.data,
@@ -76,10 +73,7 @@ const initialState: MasterTenderListSlice = {
     productList: [],
     tableData: initialTableData,
     filterData: {
-        name: '',
-        category: [],
-        status: [0, 1, 2],
-        productStatus: 0,
+        status: '',
     },
 }
 

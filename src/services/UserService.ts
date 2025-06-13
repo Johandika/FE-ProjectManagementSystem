@@ -1,10 +1,17 @@
 import ApiService from './ApiService'
 
 // get all user
-export async function apiGetUsers() {
+export async function apiGetUsers(data: any) {
     const res = await ApiService.fetchData({
         url: '/user',
         method: 'get',
+        params: data
+            ? {
+                  page: data.pageIndex,
+                  limit: data.pageSize,
+                  search: data.query,
+              }
+            : undefined,
     })
 
     return res

@@ -285,7 +285,6 @@ export default function BerkasTagihan() {
             const path = location.pathname.substring(
                 location.pathname.lastIndexOf('/') + 1
             )
-
             // Create a new object with the form values and add the idProject
             const requestData = {
                 ...values,
@@ -301,7 +300,6 @@ export default function BerkasTagihan() {
 
             if (successCreateBerkasProyek) {
                 popNotification('added')
-                // Refresh data to show new BASTP
                 fetchData({ id: path })
             }
         } catch (error) {
@@ -533,7 +531,7 @@ export default function BerkasTagihan() {
                                             {({ field, form }: FieldProps) => {
                                                 // Ubah format data dari API menjadi format yang bisa digunakan oleh react-select
                                                 const options =
-                                                    selectBerkasData.data.map(
+                                                    selectBerkasData?.data?.map(
                                                         (item: any) => ({
                                                             value: item.id,
                                                             label: item.nama,
@@ -589,9 +587,6 @@ export default function BerkasTagihan() {
                                             loading={isSubmitting}
                                         >
                                             {'Simpan'}
-                                            {/* {isEditBerkasTagihanMode
-                                                ? 'Update'
-                                                : 'Simpan'} */}
                                         </Button>
                                     </div>
                                 </Form>
