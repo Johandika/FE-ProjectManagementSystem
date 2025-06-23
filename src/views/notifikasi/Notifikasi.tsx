@@ -66,54 +66,6 @@ export default function Notifikasi() {
         }
     }
 
-    // const handleDeleteAllNotification = async () => {
-    //     try {
-    //         const result = await apiDeleteAllReadNotification()
-
-    //         if (
-    //             result &&
-    //             result.data.statusCode >= 200 &&
-    //             result.data.statusCode < 300
-    //         ) {
-    //             toast.push(
-    //                 <Notification
-    //                     title="Berhasil Hapus Notifikasi"
-    //                     type="success"
-    //                     duration={2500}
-    //                 >
-    //                     Semua notifikasi yang sudah dibaca berhasil dihapus
-    //                 </Notification>,
-    //                 { placement: 'top-center' }
-    //             )
-    //             dispatch(getAllNotification())
-    //         } else {
-    //             toast.push(
-    //                 <Notification
-    //                     title="Gagal Hapus Notifikasi"
-    //                     type="danger"
-    //                     duration={2500}
-    //                 >
-    //                     {result.data.message ||
-    //                         'Terjadi kesalahan saat menghapus notifikasi'}
-    //                 </Notification>,
-    //                 { placement: 'top-center' }
-    //             )
-    //         }
-    //     } catch (error) {
-    //         console.error('Error deleting notification:', error)
-    //         toast.push(
-    //             <Notification
-    //                 title="Gagal Hapus Notifikasi"
-    //                 type="danger"
-    //                 duration={2500}
-    //             >
-    //                 Terjadi kesalahan saat menghapus notifikasi
-    //             </Notification>,
-    //             { placement: 'top-center' }
-    //         )
-    //     }
-    // }
-
     return (
         <Container>
             <AdaptableCard>

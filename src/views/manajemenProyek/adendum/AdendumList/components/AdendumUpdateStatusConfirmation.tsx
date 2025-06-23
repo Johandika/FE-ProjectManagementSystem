@@ -9,6 +9,10 @@ import {
     getAdendums,
 } from '../store'
 import { apiUpdateStatusAdendum } from '@/services/AdendumService'
+import {
+    refreshUnreadStatus,
+    setUnreadNotification,
+} from '@/views/notifikasi/store'
 
 const AdendumUpdateStatusConfirmation = () => {
     const dispatch = useAppDispatch()
@@ -54,6 +58,7 @@ const AdendumUpdateStatusConfirmation = () => {
             }
 
             if (success) {
+                dispatch(setUnreadNotification(true))
                 dispatch(getAdendums(tableData))
                 toast.push(
                     <Notification

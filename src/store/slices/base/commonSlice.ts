@@ -1,28 +1,65 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SLICE_BASE_NAME } from './constants'
 import { apiGetDashboard } from '@/services/DashboardService'
+import { apiSelectClient, apiSelectDivisi } from '@/services/SelectService'
 
 export type CommonState = {
     currentRouteKey: string
     dataDashboard: any
     loadingDashboard: boolean
+    loadingSelectClient: boolean
+    loadingSelectDivisi: boolean
+    selectClient: any
+    selectDivisi: any
     errorDashboard: string | null
 }
 
 export const initialState: CommonState = {
     currentRouteKey: '',
     dataDashboard: [],
+    selectClient: [],
+    selectDivisi: [],
     loadingDashboard: false,
+    loadingSelectClient: false,
+    loadingSelectDivisi: false,
     errorDashboard: null,
 }
 
-// Async thunk untuk fetch data
 export const getDashboard = createAsyncThunk(
     `${SLICE_BASE_NAME}/common/getDashboard`,
     async (data: any) => {
         try {
             const response = await apiGetDashboard<any, any>(data)
-            console.log('response.data', response.data)
+
+            return response.data
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(
+                error.message || 'Failed to fetch data'
+            )
+        }
+    }
+)
+
+export const getSelectClient = createAsyncThunk(
+    `${SLICE_BASE_NAME}/common/getSelectClients`,
+    async () => {
+        try {
+            const response = await apiSelectClient<any, any>()
+
+            return response.data
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(
+                error.message || 'Failed to fetch data'
+            )
+        }
+    }
+)
+
+export const getSelectDivisi = createAsyncThunk(
+    `${SLICE_BASE_NAME}/common/getSelectDivisis`,
+    async () => {
+        try {
+            const response = await apiSelectDivisi<any, any>()
 
             return response.data
         } catch (error: any) {
@@ -50,6 +87,20 @@ export const commonSlice = createSlice({
             .addCase(getDashboard.fulfilled, (state, action) => {
                 state.loadingDashboard = false
                 state.dataDashboard = action.payload
+            })
+            .addCase(getSelectClient.pending, (state) => {
+                state.loadingSelectClient = true
+            })
+            .addCase(getSelectClient.fulfilled, (state, action) => {
+                state.loadingSelectClient = false
+                state.selectClient = action.payload
+            })
+            .addCase(getSelectDivisi.pending, (state) => {
+                state.loadingSelectDivisi = true
+            })
+            .addCase(getSelectDivisi.fulfilled, (state, action) => {
+                state.loadingSelectDivisi = false
+                state.selectDivisi = action.payload
             })
             .addCase(getDashboard.rejected, (state, action) => {
                 state.loadingDashboard = false

@@ -37,3 +37,23 @@ export const formatWaktuNotifikasi = (createdAt) => {
         return `${dd}/${mm}/${yyyy}`
     }
 }
+
+export const formatDateWithTime = (isoString: string): string => {
+    const tanggal = new Date(isoString)
+
+    const jam = tanggal.getHours() // -> 18
+    const menit = tanggal.getMinutes() // -> 59
+    const hari = tanggal.getDate() // -> 21
+    const bulan = tanggal.getMonth() + 1 // -> 6
+    const tahun = tanggal.getFullYear() // -> 2025
+
+    const jamString = String(jam).padStart(2, '0')
+    const menitString = String(menit).padStart(2, '0')
+    const hariString = String(hari).padStart(2, '0')
+    const bulanString = String(bulan).padStart(2, '0')
+
+    const waktuFormatted = `${jamString}.${menitString} WIB`
+    const tanggalFormatted = `${hariString}-${bulanString}-${tahun}`
+
+    return `${waktuFormatted}, ${tanggalFormatted}`
+}

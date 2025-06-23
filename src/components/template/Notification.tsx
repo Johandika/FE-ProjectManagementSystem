@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom'
 import isLastChild from '@/utils/isLastChild'
 import useTwColorByName from '@/utils/hooks/useTwColorByName'
 import useThemeClass from '@/utils/hooks/useThemeClass'
-import { useAppSelector } from '@/store'
+import { injectReducer, useAppDispatch, useAppSelector } from '@/store'
 import useResponsive from '@/utils/hooks/useResponsive'
 import acronym from '@/utils/acronym'
 import {
@@ -29,6 +29,10 @@ import {
 } from '@/services/NotificationService'
 import { formatWaktuNotifikasi } from '@/utils/formatDate'
 import { toast, Notification as NotificationuUi } from '../ui'
+import reducer, {
+    getAllNotification,
+    setUnreadNotification,
+} from '@/views/notifikasi/store'
 
 type NotificationList = {
     id: string
@@ -41,6 +45,8 @@ type NotificationList = {
 
 const notificationHeight = 'h-72'
 const imagePath = '/img/avatars/'
+
+injectReducer('notification', reducer)
 
 const GeneratedAvatar = ({ target }: { target: string }) => {
     const color = useTwColorByName()
@@ -117,10 +123,17 @@ const NotificationToggle = ({
 }
 
 const _Notification = ({ className }: { className?: string }) => {
+    const dispatch = useAppDispatch()
+    const unreadNotification = useAppSelector(
+        (state) => state.notification.data.unreadNotification
+    )
+    const dataNotification = useAppSelector(
+        (state) => state.notification.data.dataNotification
+    )
+
     const [notificationList, setNotificationList] = useState<
         NotificationList[]
     >([])
-    const [unreadNotification, setUnreadNotification] = useState(false)
 
     const [noResult, setNoResult] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -137,14 +150,15 @@ const _Notification = ({ className }: { className?: string }) => {
 
         if (unreadMessageQty > 0) {
             setNoResult(false)
-            setUnreadNotification(true)
+            dispatch(setUnreadNotification(true))
         } else {
             setNoResult(true)
         }
-    }, [setUnreadNotification])
+    }, [unreadNotification, dispatch])
 
     useEffect(() => {
         getNotificationCount()
+        getAllNotification()
     }, [getNotificationCount])
 
     const onNotificationOpen = useCallback(async () => {
@@ -160,7 +174,7 @@ const _Notification = ({ className }: { className?: string }) => {
                 setLoading(false)
             }
         }
-    }, [notificationList])
+    }, [notificationList, unreadNotification])
 
     const deleteAllReadNotification = useCallback(async () => {
         setLoading(true)
@@ -212,14 +226,18 @@ const _Notification = ({ className }: { className?: string }) => {
                 return item
             })
             setNotificationList(list)
-            setUnreadNotification(list.some((item) => !item.status_baca))
+            dispatch(
+                setUnreadNotification(list.some((item) => !item.status_baca))
+            )
         },
         [notificationList]
     )
 
     useEffect(() => {
-        setUnreadNotification(notificationList.some((n) => !n.status_baca))
-    }, [notificationList])
+        dispatch(
+            setUnreadNotification(notificationList.some((n) => !n.status_baca))
+        )
+    }, [notificationList, dispatch])
 
     return (
         <Dropdown

@@ -3,18 +3,13 @@ import reducer, {
     getAllNotification,
     useAppSelector,
     useAppDispatch,
+    setUnreadNotification,
 } from '../store'
 
 import { injectReducer } from '@/store'
 import { useEffect, useState } from 'react'
-import {
-    Avatar,
-    AvatarProps,
-    Button,
-    Notification,
-    toast,
-} from '@/components/ui'
-import { HiOutlineBell, HiOutlineTrash, HiTag } from 'react-icons/hi'
+import { Avatar, Button, Notification, toast } from '@/components/ui'
+import { HiOutlineBell, HiOutlineTrash } from 'react-icons/hi'
 import { formatWaktuNotifikasi } from '@/utils/formatDate'
 import {
     apiDeleteOneNotification,
@@ -22,8 +17,6 @@ import {
 } from '@/services/NotificationService'
 
 injectReducer('notification', reducer)
-
-type TimelineAvatarProps = AvatarProps
 
 export default function AllNotification() {
     const dispatch = useAppDispatch()
@@ -34,11 +27,11 @@ export default function AllNotification() {
     )
 
     const loading = useAppSelector((state) => state.notification.data.loading)
+    console.log('data luar', dataNotification)
 
     const handleDeletNotification = async (data: { id: string }) => {
         try {
             const result = await apiDeleteOneNotification(data)
-
             if (
                 result &&
                 result.data.statusCode >= 200 &&
@@ -129,9 +122,13 @@ export default function AllNotification() {
 
     useEffect(() => {
         dispatch(getAllNotification())
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
+
+    useEffect(() => {
+        if (!dataNotification || dataNotification.length === 0) {
+            dispatch(setUnreadNotification(false))
+        }
+    }, [dataNotification, dispatch])
 
     return (
         <Loading loading={loading}>

@@ -182,6 +182,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             pekerjaan: stateFromTender?.pekerjaan || '',
             nilai_kontrak: stateFromTender?.nilai_kontrak || 0,
             idClient: stateFromTender?.idClient || '',
+            idTender: stateFromTender?.idTender || null,
             pic: '',
             nomor_kontrak: '',
             timeline_awal: '',

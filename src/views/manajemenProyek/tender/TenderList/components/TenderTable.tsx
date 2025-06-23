@@ -46,7 +46,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
     const onCreateProject = () => {
         navigate(`/manajemen-proyek-new`, {
             state: {
-                id: row.id,
+                idTender: row.id,
                 pekerjaan: row.pekerjaan,
                 nilai_kontrak: row.nilai_kontrak,
                 idClient: row.idClient,

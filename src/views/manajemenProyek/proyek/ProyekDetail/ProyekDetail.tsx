@@ -8,12 +8,8 @@ import Lokasi from './components/Lokasi'
 import Subkontraktor from './components/Subkontraktor'
 import BerkasTagihan from './components/BerkasTagihan'
 import Bastp from './components/Bastp'
-// import { injectReducer } from '@/store'
-// import reducer from '../ProyekEdit/store'
 
 const { TabNav, TabList, TabContent } = Tabs
-
-// injectReducer('proyekEdit', reducer)
 
 export default function ProyekDetail() {
     return (

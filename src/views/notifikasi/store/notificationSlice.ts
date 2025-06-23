@@ -1,6 +1,7 @@
 import {
     apiGetAllNotification,
     apiGetOneAndReadNotification,
+    apiGetUnreadNotification,
 } from '@/services/NotificationService'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
@@ -16,8 +17,11 @@ type GetAllNotifications = {
 
 export type NotificationState = {
     loading: boolean
+    unreadNotification: boolean
     loadingGetOne: boolean
     dataOneNotification: GetAllNotifications[]
+    dataUnreadsNotification: GetAllNotifications[]
+    loadingUnreadNotification: boolean
     dataNotification: GetAllNotifications[]
     error?: string | null
 }
@@ -29,6 +33,7 @@ export const getAllNotification = createAsyncThunk(
     async () => {
         const response = await apiGetAllNotification()
 
+        console.log('res', res)
         return response.data
     }
 )
@@ -42,18 +47,34 @@ export const getOneNotificationAndRead = createAsyncThunk(
     }
 )
 
+export const getUnreadNotifiaction = createAsyncThunk(
+    SLICE_NAME + '/getUnreadNotifiaction',
+    async (data: any) => {
+        const response: any = await apiGetUnreadNotification(data)
+
+        return response.data
+    }
+)
+
 const initialState: NotificationState = {
     loading: false,
     loadingGetOne: false,
     dataOneNotification: [],
     dataNotification: [],
+    unreadNotification: false,
     error: null,
+    dataUnreadsNotification: [],
+    loadingUnreadNotification: false,
 }
 
 const notificationSlice = createSlice({
     name: `${SLICE_NAME}/state`,
     initialState,
-    reducers: {},
+    reducers: {
+        setUnreadNotification: (state, action) => {
+            state.unreadNotification = action.payload
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getAllNotification.fulfilled, (state, action) => {
@@ -77,6 +98,14 @@ const notificationSlice = createSlice({
                 state.loadingGetOne = true
                 state.error = null
             })
+            .addCase(getUnreadNotifiaction.fulfilled, (state, action) => {
+                state.dataUnreadsNotification = action.payload
+                state.loadingGetOne = false
+            })
+            .addCase(getUnreadNotifiaction.pending, (state) => {
+                state.loadingUnreadNotification = true
+                state.error = null
+            })
             .addCase(getOneNotificationAndRead.rejected, (state, action) => {
                 state.loadingGetOne = false
                 state.error =
@@ -84,5 +113,7 @@ const notificationSlice = createSlice({
             })
     },
 })
+
+export const { setUnreadNotification } = notificationSlice.actions
 
 export default notificationSlice.reducer

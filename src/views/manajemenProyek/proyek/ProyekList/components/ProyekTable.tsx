@@ -26,12 +26,15 @@ import { IoLocationSharp } from 'react-icons/io5'
 import { AiFillCreditCard } from 'react-icons/ai'
 import { formatDate } from '@/utils/formatDate'
 import { Button } from '@/components/ui'
+import reducer, { getAllNotification } from '@/views/notifikasi/store'
+import { injectReducer } from '@/store'
 
 type Proyek = {
     id: string
     pekerjaan: string
     pic: string
     client: string
+    idTender: string
     nomor_kontrak: number
     tanggal_service_po: string
     tanggal_delivery: string
@@ -102,6 +105,7 @@ const ProyekTable = () => {
     const proyekData = useAppSelector(
         (state) => state.proyekList.data.proyekList
     )
+
     const kliensList = useAppSelector(
         (state) => state.proyekList.data.kliensList
     )
@@ -166,7 +170,6 @@ const ProyekTable = () => {
         row: any
     ) => {
         e.stopPropagation()
-        console.log('row', row)
         dispatch(toggleUpdateConfirmation(true))
         dispatch(setSelectedProyek(row.id))
         dispatch(setProjectStatus(row.status))
@@ -186,7 +189,12 @@ const ProyekTable = () => {
                             <div className="text-blue-600 text-xs font-semibold capitalize">
                                 {row.client}
                             </div>
-                            <div className="text-base font-medium text-neutral-800 ">
+                            <div className="text-base font-medium text-neutral-800">
+                                {row.idTender && (
+                                    <span className="bg-emerald-100 text-emerald-600 w-[20px] h-[20px] px-[6px] py-[2px]  mr-2 text-xs font-semibold rounded-md">
+                                        Tender
+                                    </span>
+                                )}
                                 {row.pekerjaan}
                             </div>
                             <div className="text-blue-600 text-xs font-semibold">
@@ -356,9 +364,25 @@ const ProyekTable = () => {
                     const row = props.row.original
                     return (
                         <div className="flex flex-col gap-1">
-                            <span className="capitalize" color="green">
-                                {row.status}
-                            </span>
+                            {row.status === 'Selesai Sudah tertagih 100%' ? (
+                                <span className="capitalize text-green-600">
+                                    {row.status}
+                                </span>
+                            ) : row.status === 'Selesai belum tertagih 100%' ? (
+                                <span className="capitalize text-yellow-600">
+                                    {row.status}
+                                </span>
+                            ) : row.status === 'Selesai' ? (
+                                <span className="capitalize text-emerald-600">
+                                    {row.status}
+                                </span>
+                            ) : row.status === 'Dalam Proses' ? (
+                                <span className="capitalize text-blue-600">
+                                    {row.status}
+                                </span>
+                            ) : (
+                                <span className="capitalize">{row.status}</span>
+                            )}
                             {(row.status === 'Belum Dimulai' ||
                                 row.status ===
                                     'Selesai Sudah tertagih 100%') && (
@@ -377,6 +401,21 @@ const ProyekTable = () => {
                                         : 'Proyek Selesai'}
                                 </Button>
                             )}
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'Keterangan',
+                accessorKey: 'keterangan',
+                minWidth: 260,
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <div className="flex flex-col gap-1">
+                            {row.KeteranganProjects[0]?.keterangan
+                                ? row.KeteranganProjects[0]?.keterangan
+                                : row.keterangan}
                         </div>
                     )
                 },

@@ -1,7 +1,6 @@
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { useState } from 'react'
 import {
     apiUpdateStatusDiprosesProyek,
     apiUpdateStatusSelesaiProyek,
@@ -12,6 +11,13 @@ import {
     useAppSelector,
     toggleUpdateConfirmation,
 } from '../store'
+import { injectReducer } from '@/store'
+import reducer, {
+    getAllNotification,
+    setUnreadNotification,
+} from '@/views/notifikasi/store'
+
+injectReducer('notification', reducer)
 
 const ProyekUpdateStatusConfirmation = () => {
     const dispatch = useAppDispatch()
@@ -52,6 +58,8 @@ const ProyekUpdateStatusConfirmation = () => {
             }
 
             if (success) {
+                dispatch(setUnreadNotification(true))
+                dispatch(getAllNotification())
                 dispatch(getProyeks(tableData))
                 toast.push(
                     <Notification

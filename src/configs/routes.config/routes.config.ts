@@ -87,6 +87,27 @@ export const protectedRoutes = [
             header: 'Tambah Tender',
         },
     },
+    // Tagihan Client
+    {
+        key: 'apps.tagihanKlien',
+        path: '/manajemen-proyek/tagihan-klien',
+        component: lazy(
+            () =>
+                import('@/views/manajemenProyek/tagihanKlien/TagihanKlienList')
+        ),
+        authority: [],
+    },
+    {
+        key: 'apps.tagihanProyek',
+        path: '/manajemen-proyek/tagihan-proyek',
+        component: lazy(
+            () =>
+                import(
+                    '@/views/manajemenProyek/tagihanProyek/TagihanProyekList'
+                )
+        ),
+        authority: [],
+    },
     // Adendum
     {
         key: 'apps.adendum',
@@ -126,6 +147,31 @@ export const protectedRoutes = [
         authority: [],
         meta: {
             header: 'Tambah Klien',
+        },
+    },
+    // Divisi
+    {
+        key: 'apps.divisi',
+        path: '/master/divisi',
+        component: lazy(() => import('@/views/master/Divisi/DivisiList')),
+        authority: [],
+    },
+    {
+        key: 'apps.divisi',
+        path: '/master/divisi-edit/:divisiId',
+        component: lazy(() => import('@/views/master/Divisi/DivisiEdit')),
+        authority: [],
+        meta: {
+            header: 'Ubah Divisi',
+        },
+    },
+    {
+        key: 'apps.divisi',
+        path: '/master/divisi-new',
+        component: lazy(() => import('@/views/master/Divisi/DivisiNew')),
+        authority: [],
+        meta: {
+            header: 'Tambah Divisi',
         },
     },
     // Satuan

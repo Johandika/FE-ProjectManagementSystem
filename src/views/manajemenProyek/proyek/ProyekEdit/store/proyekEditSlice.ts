@@ -24,6 +24,10 @@ import {
     apiDeletePurchaseOrders,
     apiGetPurchaseByProyek,
 } from '@/services/PurchaseOrderService'
+import {
+    apiGetKeterangan,
+    apiGetKeterangans,
+} from '@/services/KeteranganService'
 
 export const SLICE_NAME = 'proyekEdit'
 
@@ -85,15 +89,17 @@ interface ProyekData {
     BerkasProjects?: Berkas[]
     SubkonProjects?: Subkontraktor[]
     subkontraktor?: Subkontraktor[]
+    KeteranganProjects?: KeteranganData[]
 }
 
-// interface BerkasProyekData {
-//     id?: string
-//     nama?: string
-//     idProject?: string
-//     idBerkas?: string
-//     status?: boolean
-// }
+interface KeteranganData {
+    id: string
+    keterangan: string
+    tanggal: string
+    IdProject?: string
+    createdAt?: string
+    updatedAt?: string
+}
 
 type Klien = {
     id: string
@@ -143,13 +149,13 @@ interface PurchaseOrder {
 }
 
 type GetProyekResponse = ProyekData
+type GetKeteranganResponse = KeteranganData[]
 type Kliens = Klien[]
 type Berkases = Berkas[]
 type Subkontraktors = Subkontraktor[]
 type Termins = Termin[]
 type getAllBerkasByProyekDatas = getAllBerkasByProyekData[]
 type BerkasesByTerminId = BerkasByTerminId[]
-// type GetBerkasProyekResponse = BerkasProyekData[]
 
 type GetKliensResponse = {
     data: Kliens
@@ -192,14 +198,20 @@ export type MasterProyekEditState = {
     loadingTermins: boolean
     loadingFakturPajak: boolean
     loadingSelectBerkas: boolean
+    loadingKeterangans: boolean
+    loadingKeterangan: boolean
     loadingPurchaseOrders: boolean
     loadingFakturPajakByProyekData: boolean
     updateBerkasStatus: boolean
+    deleteConfirmationKeterangan: boolean
+    selectedKeterangan: string
     proyekData: ProyekData
     loadingUpdateBerkasStatus: boolean
     loadingGetAllBerkasesByTermin: boolean
     getAllBerkasesByTerminIdData?: GetAllBerkasesByTerminIdResponse
     kliensData?: GetKliensResponse
+    keterangansData?: GetKeteranganResponse
+    keteranganData?: GetKeteranganResponse
     berkasesData?: GetBerkasesResponse
     subkontraktorsData?: GetSubkontraktorsResponse
     terminsData?: Termins
@@ -218,6 +230,30 @@ export const getProyek = createAsyncThunk(
         const response = await apiGetProyek<GetProyekResponse, { id: string }>(
             data
         )
+        return response.data
+    }
+)
+
+// get all keterangans
+export const getKeteranganByProject = createAsyncThunk(
+    SLICE_NAME + '/getKeteranganByProject',
+    async (data: { id: string }) => {
+        const response = await apiGetKeterangans<
+            GetKeteranganResponse,
+            { id: string }
+        >(data)
+        return response.data
+    }
+)
+
+// get keterangan
+export const getKeterangan = createAsyncThunk(
+    SLICE_NAME + '/getKeterangan',
+    async (data: { id: string }) => {
+        const response = await apiGetKeterangan<
+            GetKeteranganResponse,
+            { id: string }
+        >(data)
         return response.data
     }
 )
@@ -430,16 +466,19 @@ const initialState: MasterProyekEditState = {
     loadingSelectBerkas: true,
     loadingFakturPajak: true,
     loadingPurchaseOrders: true,
+    loadingKeterangans: true,
+    loadingKeterangan: true,
     loadingFakturPajakByProyekData: true,
     loadingGetAllBerkasByProyek: true,
     loadingGetAllBerkasesByTermin: true,
+    deleteConfirmationKeterangan: false,
+    selectedKeterangan: '',
     terminsData: [],
+    keterangansData: [],
+    keteranganData: [],
     getAllBerkasByProyekData: [],
     selectBerkasData: [],
     getAllBerkasesByTerminIdData: [],
-
-    // loadingBerkasProyeks: true,
-    // berkasProyekData: [],
     proyekData: {},
     fakturPajakData: [],
     fakturPajakByProyekData: [],
@@ -449,7 +488,14 @@ const initialState: MasterProyekEditState = {
 const proyekEditSlice = createSlice({
     name: `${SLICE_NAME}/state`,
     initialState,
-    reducers: {},
+    reducers: {
+        toggleDeleteConfirmationKeterangan: (state, action) => {
+            state.deleteConfirmationKeterangan = action.payload
+        },
+        setSelectedKeterangan: (state, action) => {
+            state.selectedKeterangan = action.payload
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(setPekerjaanActive.fulfilled, (state, action) => {
@@ -461,6 +507,20 @@ const proyekEditSlice = createSlice({
             })
             .addCase(getProyek.pending, (state) => {
                 state.loading = true
+            })
+            .addCase(getKeteranganByProject.fulfilled, (state, action) => {
+                state.keterangansData = action.payload
+                state.loadingKeterangans = false
+            })
+            .addCase(getKeteranganByProject.pending, (state) => {
+                state.loadingKeterangans = true
+            })
+            .addCase(getKeterangan.fulfilled, (state, action) => {
+                state.keteranganData = action.payload
+                state.loadingKeterangan = false
+            })
+            .addCase(getKeterangan.pending, (state) => {
+                state.loadingKeterangan = true
             })
             .addCase(getTermins.fulfilled, (state, action) => {
                 state.terminsData = action.payload
@@ -546,5 +606,8 @@ const proyekEditSlice = createSlice({
             })
     },
 })
+
+export const { toggleDeleteConfirmationKeterangan, setSelectedKeterangan } =
+    proyekEditSlice.actions
 
 export default proyekEditSlice.reducer

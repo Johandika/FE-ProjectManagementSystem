@@ -7,6 +7,7 @@ import AdaptableCard from '@/components/shared/AdaptableCard'
 import type { FormikErrors, FormikTouched } from 'formik'
 import { NumericFormat } from 'react-number-format'
 import { Select } from '@/components/ui'
+import { extractNumberFromString } from '@/utils/extractNumberFromString'
 
 interface ItemDetail {
     uraian: string
@@ -39,17 +40,60 @@ const ItemFields = (props: ItemFieldsProps) => {
 
     const calculateJumlahHargaMaterial = (
         volume: number,
-        hargaSatuan: number
+        hargaSatuanMaterial: number
     ) => {
-        return volume * hargaSatuan
+        console.log(
+            `volume: ${extractNumberFromString(
+                volume
+            )} * H. sat. mat.: ${extractNumberFromString(
+                hargaSatuanMaterial
+            )} = ${
+                extractNumberFromString(volume) *
+                extractNumberFromString(hargaSatuanMaterial)
+            }`
+        )
+        return (
+            extractNumberFromString(volume) *
+            extractNumberFromString(hargaSatuanMaterial)
+        )
     }
 
-    const calculateJumlahHargaJasa = (volume: number, hargaSatuan: number) => {
-        return volume * hargaSatuan
+    const calculateJumlahHargaJasa = (
+        volume: number,
+        hargaSatuanJasa: number
+    ) => {
+        console.log(
+            `volume: ${extractNumberFromString(
+                volume
+            )} * H. sat. jasa: ${extractNumberFromString(hargaSatuanJasa)} = ${
+                volume * extractNumberFromString(hargaSatuanJasa)
+            }`
+        )
+        return (
+            extractNumberFromString(volume) *
+            extractNumberFromString(hargaSatuanJasa)
+        )
     }
 
-    const calculateJumlahTotal = (hargaMaterial: number, hargaJasa: number) => {
-        return hargaMaterial + hargaJasa
+    const calculateJumlahTotal = (
+        jumlahHargaMaterial: number,
+        jumlahHargaJasa: number
+    ) => {
+        console.log(
+            `jumlahHargaMaterial: ${extractNumberFromString(
+                jumlahHargaMaterial
+            )} + jumlahHargaJasa: ${extractNumberFromString(
+                jumlahHargaJasa
+            )} = ${
+                extractNumberFromString(jumlahHargaMaterial) +
+                extractNumberFromString(jumlahHargaJasa)
+            }`
+        )
+        console.log('')
+        return (
+            extractNumberFromString(jumlahHargaMaterial) +
+            extractNumberFromString(jumlahHargaJasa)
+        )
     }
 
     return (
@@ -339,6 +383,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                                             volume,
                                                                                                             hargaSatuanMaterial
                                                                                                         )
+
                                                                                                     const jumlahHargaJasa =
                                                                                                         form
                                                                                                             .values

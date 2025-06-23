@@ -4,12 +4,13 @@ import reducer, {
     useAppSelector,
     getTermins,
     setPekerjaanActive,
+    getKeteranganByProject,
 } from '../../ProyekEdit/store'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import DescriptionSection from './DesriptionSection'
 import { injectReducer } from '@/store'
-import { formatDate } from '@/utils/formatDate'
+import { formatDate, formatDateWithTime } from '@/utils/formatDate'
 import * as Yup from 'yup'
 import {
     Button,
@@ -30,6 +31,7 @@ import {
 } from '@/services/AdendumService'
 import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
+import KeteranganSection from './Keterangan'
 
 injectReducer('proyekEdit', reducer)
 
@@ -69,7 +71,6 @@ export default function Detail() {
     const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false)
     const [dialogAdendumNilaiKontrakOpen, setDialogAdendumNilaiKontrakOpen] =
         useState(false)
-
     const [dialogAdendumTimelineOpen, setDialogAdendumTimelineOpen] =
         useState(false)
     const [statusChangeItem, setStatusChangeItem] = useState(null)
@@ -102,6 +103,7 @@ export default function Detail() {
                 }
             })
         dispatch(getTermins(data))
+        // dispatch(getKeteranganByProject(data))
     }
 
     const handleOpenStatusChangeDialog = (typeDialog: string) => {
@@ -310,15 +312,13 @@ export default function Detail() {
         const rquestParam = { id: path }
         fetchData(rquestParam)
 
-        // dispatch(getKliens()) // kliens
-        // dispatch(getBerkases()) // kliens
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
     return (
         <section className=" ">
             <div>
                 {/* Informasi Dasar */}
-                <div className="flex flex-col gap-4 border-b border-gray-200 py-6">
+                <div className="flex flex-col gap-4  border-gray-200 py-6">
                     <DescriptionSection
                         title="Informasi Dasar"
                         desc="Informasi dasar proyek"
@@ -498,6 +498,7 @@ export default function Detail() {
                         </div>
                     </div>
                 </div>
+                <KeteranganSection proyekData={proyekData} />
             </div>
 
             {/* Dialog update status */}
