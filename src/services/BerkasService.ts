@@ -4,7 +4,6 @@ import ApiService from './ApiService'
 export async function apiGetBerkases<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('apiGetBerkases', data)
     return ApiService.fetchData<T>({
         url: '/berkas',
         method: 'get',

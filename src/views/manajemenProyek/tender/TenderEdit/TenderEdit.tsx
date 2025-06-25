@@ -9,7 +9,7 @@ import reducer, {
     useAppDispatch,
     getKliens,
 } from './store'
-import { injectReducer } from '@/store'
+import { getSelectDivisi, injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import TenderForm, {
@@ -24,9 +24,12 @@ injectReducer('tenderEdit', reducer)
 
 const TenderEdit = () => {
     const dispatch = useAppDispatch()
-
     const location = useLocation()
     const navigate = useNavigate()
+
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state) => state.base.common
+    )
 
     const tenderData = useAppSelector(
         (state) => state.tenderEdit.data.tenderData
@@ -41,6 +44,7 @@ const TenderEdit = () => {
     const fetchData = (data: { id: string }) => {
         dispatch(getTender(data))
         dispatch(getKliens())
+        dispatch(getSelectDivisi())
     }
 
     const popNotification = (keyword: string) => {
@@ -129,16 +133,17 @@ const TenderEdit = () => {
 
     return (
         <>
-            <Loading loading={loading}>
+            <Loading loading={loading || loadingSelectDivisi}>
                 {!isEmpty(tenderData) && (
                     <>
                         <TenderForm
                             type="edit"
                             initialData={tenderData}
-                            onFormSubmit={handleFormSubmit}
-                            onDiscard={handleDiscard}
-                            onDelete={handleDelete}
                             kliensData={kliensData}
+                            dataDivisi={selectDivisi.data}
+                            onFormSubmit={handleFormSubmit}
+                            onDelete={handleDelete}
+                            onDiscard={handleDiscard}
                         />
                     </>
                 )}

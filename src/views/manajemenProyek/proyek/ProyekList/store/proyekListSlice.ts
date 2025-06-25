@@ -55,6 +55,8 @@ type GetMasterKlienResponse = {
 type FilterQueries = {
     order: string | null
     progress: number | null
+    idClient?: string
+    idDivisi?: string
 }
 
 export type ProyekListSlice = {

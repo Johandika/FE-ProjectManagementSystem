@@ -5,16 +5,16 @@ import ApiService from './ApiService'
 export async function apiGetTenders<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('data apiGetTenders', data)
     const res = await ApiService.fetchData<T>({
         url: '/tender',
         method: 'get',
         params: {
             limit: data.limit,
             page: data.page,
-            status: data?.filterData?.status,
-            search: data.query,
-        }, //ubah
+            status: data?.filterData?.status || null,
+            idDivisi: data?.filterData?.idDivisi || null,
+            search: data.query || null,
+        },
     })
 
     return res

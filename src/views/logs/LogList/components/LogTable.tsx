@@ -49,7 +49,6 @@ const LogTable = () => {
         () => ({ pageIndex, pageSize, query, total }),
         [pageIndex, pageSize, query, total]
     )
-    // console.log('filterDataokkjmss', filterData)
     const fetchData = () => {
         dispatch(
             getLogs({

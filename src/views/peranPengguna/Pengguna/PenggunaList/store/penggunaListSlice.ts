@@ -17,10 +17,7 @@ type GetMasterPenggunaResponse = {
 }
 
 type FilterQueries = {
-    name: string
-    category: string[]
-    status: number[]
-    penggunaStatus: number
+    idDivisi: string
 }
 
 export type MasterPenggunaListSlice = {
@@ -73,10 +70,7 @@ const initialState: MasterPenggunaListSlice = {
     idUserActive: '',
     tableData: initialTableData,
     filterData: {
-        name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'c'],
-        status: [0, 1, 2],
-        penggunaStatus: 0,
+        idDivisi: '',
     },
 }
 

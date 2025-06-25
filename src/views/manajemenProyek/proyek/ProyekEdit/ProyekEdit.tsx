@@ -14,7 +14,7 @@ import reducer, {
     getSubkontraktors,
     getTermins,
 } from './store'
-import { injectReducer } from '@/store'
+import { getSelectDivisi, injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import ProyekForm, {
@@ -36,12 +36,10 @@ const ProyekEdit = () => {
         (state) => state.proyekEdit.data.proyekData
     )
 
-    // kliens data
     const kliensData = useAppSelector(
         (state) => state.proyekEdit.data.kliensData?.data || []
     )
 
-    // berkases data
     const berkasesData = useAppSelector(
         (state) => state.proyekEdit.data.berkasesData?.data || []
     )
@@ -52,9 +50,14 @@ const ProyekEdit = () => {
         (state) => state.proyekEdit.data.loadingKliens
     )
 
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state) => state.base.common
+    )
+
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
         dispatch(getTermins(data))
+        dispatch(getSelectDivisi())
     }
 
     const handleFormSubmit = async (
@@ -127,19 +130,21 @@ const ProyekEdit = () => {
               nilai_kontrak: proyekData.nilai_kontrak,
               timeline: proyekData.timeline,
               keterangan: proyekData.keterangan,
-              idClient: proyekData.Client.id,
+              idClient: proyekData.Client?.id,
+              idDivisi: proyekData.idDivisi,
           }
         : {}
 
     return (
         <>
-            <Loading loading={loading || loadingKliens}>
+            <Loading loading={loading || loadingKliens || loadingSelectDivisi}>
                 {!isEmpty(proyekData) && (
                     <>
                         <ProyekForm
                             type="edit"
                             initialDataEdit={proyekDataEdit}
                             kliensList={kliensData}
+                            dataDivisi={selectDivisi.data}
                             berkasesList={berkasesData}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}

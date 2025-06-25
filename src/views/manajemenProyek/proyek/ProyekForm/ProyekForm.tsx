@@ -90,6 +90,7 @@ type ProyekForm = {
     onDelete?: OnDelete
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
     kliensList?: { id: string; nama: string; keterangan: string }[]
+    dataDivisi: any[]
     berkasesList?: { id: string; nama: string }[]
     subkontraktorsList?: {
         nama: string
@@ -182,6 +183,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             pekerjaan: stateFromTender?.pekerjaan || '',
             nilai_kontrak: stateFromTender?.nilai_kontrak || 0,
             idClient: stateFromTender?.idClient || '',
+            idDivisi: stateFromTender?.idDivisi || '',
             idTender: stateFromTender?.idTender || null,
             pic: '',
             nomor_kontrak: '',
@@ -213,10 +215,12 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
             timeline: 0,
             keterangan: '',
             idClient: '',
+            idDivisi: '',
         },
         onFormSubmit,
         onDiscard,
         onDelete,
+        dataDivisi = [],
         kliensList = [],
         berkasesList = [],
         satuansList = [],
@@ -241,8 +245,6 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
 
-                    //COCOKKAN DATA PADA BERKAS DENGAN DATA PADA PROYEK.BERKAS
-
                     onFormSubmit?.(formData, setSubmitting)
                 }}
             >
@@ -258,6 +260,7 @@ const ProyekForm = forwardRef<FormikRef, ProyekForm>((props, ref) => {
                                             errors={errors}
                                             kliensList={kliensList}
                                             berkasesList={berkasesList}
+                                            dataDivisi={dataDivisi}
                                             initialData={initialData}
                                         />
 

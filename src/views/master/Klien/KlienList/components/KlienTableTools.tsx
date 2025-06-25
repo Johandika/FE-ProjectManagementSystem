@@ -8,7 +8,7 @@ const KlienTableTools = () => {
     return (
         <div className="flex flex-col lg:flex-row lg:items-center">
             <KlienTableSearch />
-            {/* <KlienFilter /> */}
+            <KlienFilter />
             {/* <Link
                 download
                 className="block lg:inline-block md:mx-2 md:mb-0 mb-4"

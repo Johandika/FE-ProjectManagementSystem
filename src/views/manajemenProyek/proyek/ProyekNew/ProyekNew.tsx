@@ -13,7 +13,12 @@ import reducer, {
     getSubkontraktors,
 } from './store'
 import { useEffect } from 'react'
-import { injectReducer, useAppDispatch, useAppSelector } from '@/store'
+import {
+    getSelectDivisi,
+    injectReducer,
+    useAppDispatch,
+    useAppSelector,
+} from '@/store'
 import isEmpty from 'lodash/isEmpty'
 import Loading from '@/components/shared/Loading'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
@@ -29,6 +34,9 @@ const ProyekNew = () => {
         (state: any) => state.proyekNew.data.kliensData?.data || []
     )
 
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state) => state.base.common
+    )
     // berkases data
     const berkasesData = useAppSelector(
         (state: any) => state.proyekNew.data.berkasesData?.data || []
@@ -152,13 +160,13 @@ const ProyekNew = () => {
     }
 
     useEffect(() => {
-        dispatch(getKliens()) // kliens
-        dispatch(getBerkases()) // kliens
-        dispatch(getSubkontraktors()) // kliens
+        dispatch(getKliens())
+        dispatch(getBerkases())
+        dispatch(getSubkontraktors())
         dispatch(getSatuans())
+        dispatch(getSelectDivisi())
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
-    // Di ProyekNew.tsx
 
     return (
         <>
@@ -167,13 +175,15 @@ const ProyekNew = () => {
                     loadingKliens ||
                     loadingBerkases ||
                     loadingSubkontraktors ||
-                    loadingSatuans
+                    loadingSatuans ||
+                    loadingSelectDivisi
                 }
             >
                 {!isEmpty(kliensData && berkasesData) && (
                     <>
                         <ProyekForm
                             type="new"
+                            dataDivisi={selectDivisi.data}
                             kliensList={kliensData}
                             berkasesList={berkasesData}
                             subkontraktorsList={subkontraktorsData}

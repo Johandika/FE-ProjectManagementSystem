@@ -72,7 +72,6 @@ export const getLogs = createAsyncThunk(
             GetMasterLogResponse,
             GetMasterLogData
         >(data)
-        console.log('data response log', response.data)
 
         // return response.data
         return {

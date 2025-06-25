@@ -8,6 +8,7 @@ export interface GetProyeksRequest {
         order: string
         progress: number
         idClient: string
+        idDivisi: string
     }
 }
 
@@ -18,6 +19,8 @@ export async function apiGetProyeks<T, U extends GetProyeksRequest>(data: U) {
     // Menangani pagination
     if (data.page) params.append('page', data.page.toString())
     if (data.limit) params.append('limit', data.limit.toString())
+    if (data.filterData?.idDivisi)
+        params.append('idDivisi', data.filterData?.idDivisi?.toString())
 
     // Menangani pencarian
     if (data.query && data.query.trim() !== '')

@@ -40,6 +40,7 @@ type FormFieldsName = {
     pekerjaan: string
     pic: string
     uang_muka: number
+    idDivisi: string
     nomor_kontrak: string
     tanggal_service_po: string
     tanggal_kontrak: string
@@ -67,10 +68,18 @@ type BasicInformationFields = {
     kliensList?: { id: string; nama: string; keterangan: string }[]
     berkasesList?: { id: string; nama: string }[]
     initialData?: any[]
+    dataDivisi?: any[]
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const { touched, errors, type, kliensList = [], initialData = {} } = props
+    const {
+        touched,
+        errors,
+        type,
+        kliensList = [],
+        initialData = {},
+        dataDivisi,
+    } = props
     const [checkRetensi, setCheckRetensi] = useState(false)
     const [disabledState, setDisabledState] = useState(false)
 
@@ -381,7 +390,49 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                 </Field>
                             </FormItem>
                         </div>
+                    </>
+                )}
 
+                <div className="col-span-2 md:col-span-1">
+                    {/* Pilih Divisi */}
+                    <FormItem
+                        label="Divisi"
+                        invalid={
+                            (errors.idDivisi && touched.idDivisi) as boolean
+                        }
+                        errorMessage={errors.idDivisi}
+                    >
+                        <Field name="idDivisi">
+                            {({ field, form }: FieldProps) => (
+                                <Select
+                                    placeholder="Pilih divisi"
+                                    isDisabled={disabledState}
+                                    options={dataDivisi?.map((role) => ({
+                                        label: role.name,
+                                        value: role.id,
+                                    }))}
+                                    value={dataDivisi
+                                        ?.map((role) => ({
+                                            label: role.name,
+                                            value: role.id,
+                                        }))
+                                        .find(
+                                            (opt) => opt.value === field.value
+                                        )}
+                                    onChange={(selected) => {
+                                        form.setFieldValue(
+                                            field.name,
+                                            selected?.value || ''
+                                        )
+                                    }}
+                                />
+                            )}
+                        </Field>
+                    </FormItem>
+                </div>
+
+                {type === 'new' && (
+                    <>
                         <div className="col-span-2 ">
                             <Field name="is_retensi">
                                 {({ form }: FieldProps) => (

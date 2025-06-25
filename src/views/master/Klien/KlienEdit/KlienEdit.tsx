@@ -10,7 +10,7 @@ import reducer, {
     useAppSelector,
     useAppDispatch,
 } from './store'
-import { injectReducer } from '@/store'
+import { getSelectDivisi, injectReducer, RootState } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import KlienForm, {
@@ -24,15 +24,19 @@ injectReducer('klienEdit', reducer)
 
 const KlienEdit = () => {
     const dispatch = useAppDispatch()
-
     const location = useLocation()
     const navigate = useNavigate()
+
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state: RootState) => state.base.common
+    )
 
     const klienData = useAppSelector((state) => state.klienEdit.data.klienData)
     const loading = useAppSelector((state) => state.klienEdit.data.loading)
 
     const fetchData = (data: { id: string }) => {
         dispatch(getKlien(data))
+        dispatch(getSelectDivisi())
     }
 
     const popNotification = (keyword: string) => {
@@ -119,12 +123,13 @@ const KlienEdit = () => {
 
     return (
         <>
-            <Loading loading={loading}>
+            <Loading loading={loading || loadingSelectDivisi}>
                 {!isEmpty(klienData) && (
                     <>
                         <KlienForm
                             type="edit"
                             initialData={klienData}
+                            dataDivisi={selectDivisi.data}
                             onFormSubmit={handleFormSubmit}
                             onDiscard={handleDiscard}
                             onDelete={handleDelete}

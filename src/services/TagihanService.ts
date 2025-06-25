@@ -4,8 +4,6 @@ import ApiService from './ApiService'
 export async function apiGetTagihanKliens<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('apiGetTagihanKlien', data)
-
     const res = await ApiService.fetchData<T>({
         url: '/dashboard/tagihanClient',
         method: 'get',

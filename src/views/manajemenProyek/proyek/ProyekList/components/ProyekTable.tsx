@@ -406,6 +406,19 @@ const ProyekTable = () => {
                 },
             },
             {
+                header: 'Divisi',
+                accessorKey: 'idDivisi',
+                minWidth: 260,
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <div className="flex flex-col gap-1">
+                            {row.Divisi?.nama}
+                        </div>
+                    )
+                },
+            },
+            {
                 header: 'Keterangan',
                 accessorKey: 'keterangan',
                 minWidth: 260,

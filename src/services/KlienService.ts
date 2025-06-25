@@ -11,7 +11,8 @@ export async function apiGetKliens<T, U extends Record<string, unknown>>(
             ? {
                   page: data.pageIndex,
                   limit: data.pageSize,
-                  search: data.query,
+                  search: data.query || null,
+                  idDivisi: data.filterData.idDivisi || null,
               }
             : undefined,
     })

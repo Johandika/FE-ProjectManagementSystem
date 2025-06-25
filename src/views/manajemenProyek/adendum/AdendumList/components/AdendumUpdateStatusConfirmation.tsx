@@ -9,10 +9,7 @@ import {
     getAdendums,
 } from '../store'
 import { apiUpdateStatusAdendum } from '@/services/AdendumService'
-import {
-    refreshUnreadStatus,
-    setUnreadNotification,
-} from '@/views/notifikasi/store'
+import { setUnreadNotification } from '@/views/notifikasi/store'
 
 const AdendumUpdateStatusConfirmation = () => {
     const dispatch = useAppDispatch()
@@ -45,7 +42,6 @@ const AdendumUpdateStatusConfirmation = () => {
             let success
 
             if (adendumStatus === 'Terima') {
-                console.log('adendumStatus', adendumStatus)
                 success = await apiUpdateStatusAdendum({
                     id: selectedProyek,
                     status: 'Sudah Disetujui',
@@ -91,12 +87,12 @@ const AdendumUpdateStatusConfirmation = () => {
     return (
         <ConfirmDialog
             isOpen={dialogOpen}
-            onClose={cancelStatusChange}
-            onRequestClose={cancelStatusChange}
-            onCancel={cancelStatusChange}
             type="warning"
             title="Ubah Status"
             onConfirm={confirmStatusChange}
+            onClose={cancelStatusChange}
+            onRequestClose={cancelStatusChange}
+            onCancel={cancelStatusChange}
         >
             <p>Apakah kamu yakin ingin mengupdate status proyek ?</p>
         </ConfirmDialog>

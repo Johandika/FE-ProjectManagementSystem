@@ -127,7 +127,7 @@ const PenggunaTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
+    }, [pageIndex, pageSize, sort, filterData])
 
     useEffect(() => {
         if (tableRef) {
@@ -168,6 +168,14 @@ const PenggunaTable = () => {
                 cell: (props) => {
                     const row = props.row.original
                     return <span>{row.Role.nama}</span>
+                },
+            },
+            {
+                header: 'Divisi',
+                accessorKey: 'divisi',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span>{row.Divisi?.name}</span>
                 },
             },
             {

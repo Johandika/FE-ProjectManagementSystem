@@ -76,6 +76,7 @@ interface ProyekData {
     progress?: number
     sisa_waktu?: number
     keterangan?: string
+    idDivisi?: string
     timeline_awal?: string
     timeline_akhir?: string
     timeline?: number

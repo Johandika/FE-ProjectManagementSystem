@@ -1,4 +1,4 @@
-import { useState, useRef, forwardRef, useEffect } from 'react'
+import { useState, useRef, forwardRef, useEffect, useMemo } from 'react'
 import { HiOutlineFilter } from 'react-icons/hi'
 import {
     setFilterData,
@@ -32,6 +32,22 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
     ({ onSubmitComplete }, ref) => {
         const dispatch = useAppDispatch()
 
+        const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+            (state) => state.base.common
+        )
+
+        const divisiOptions = useMemo(() => {
+            if (!selectDivisi?.data) {
+                return []
+            }
+            return selectDivisi.data.map(
+                (divisi: { id: string; name: string }) => ({
+                    value: divisi.id,
+                    label: divisi.name,
+                })
+            )
+        }, [selectDivisi])
+
         const kliensList = useAppSelector(
             (state) => state.proyekList.data.kliensList
         )
@@ -63,7 +79,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                 {({ values, touched, errors }) => (
                     <Form>
                         <FormContainer>
-                            {/* Select client */}
+                            {/* Pilih klien */}
                             <FormItem
                                 label="Klien"
                                 invalid={errors.idClient && touched.idClient}
@@ -113,6 +129,46 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                 </Field>
                             </FormItem>
 
+                            {/* Pilih divisi */}
+                            <FormItem
+                                label="Klien"
+                                invalid={errors.idDivisi && touched.idDivisi}
+                                errorMessage={errors.idDivisi}
+                            >
+                                <Field name="idDivisi">
+                                    {({ field, form }: FieldProps) => {
+                                        const selectedDivisi = field.value
+                                            ? divisiOptions.find(
+                                                  (divisi: any) =>
+                                                      divisi.value ===
+                                                      field.value
+                                              )
+                                            : null
+
+                                        return (
+                                            <Select
+                                                field={field}
+                                                form={form}
+                                                options={divisiOptions}
+                                                isLoading={loadingSelectDivisi}
+                                                value={
+                                                    selectedDivisi
+                                                        ? selectedDivisi
+                                                        : null
+                                                }
+                                                placeholder="Pilih divisi"
+                                                onChange={(option) => {
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        option?.value
+                                                    )
+                                                }}
+                                            />
+                                        )
+                                    }}
+                                </Field>
+                            </FormItem>
+
                             {/* Progress */}
                             <FormItem
                                 invalid={errors.progress && touched.progress}
@@ -130,6 +186,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                                     val
                                                 )
                                             }}
+                                            className="inline space-x-4 sm:space-x-6"
                                         >
                                             <Radio value={30}>30</Radio>
                                             <Radio value={50}>50</Radio>

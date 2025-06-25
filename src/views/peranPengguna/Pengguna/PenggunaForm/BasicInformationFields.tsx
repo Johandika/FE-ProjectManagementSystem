@@ -12,6 +12,7 @@ type FormFieldsName = {
     nomor_telepon: string
     password: string
     idRole: string
+    idDivisi: string
 }
 
 type BasicInformationFields = {
@@ -19,10 +20,11 @@ type BasicInformationFields = {
     errors: FormikErrors<FormFieldsName>
     type: 'new' | 'edit'
     roleData: any[]
+    divisiData: any[]
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const { touched, errors, type, roleData } = props
+    const { touched, errors, type, roleData, divisiData } = props
 
     const [pwInputType, setPwInputType] = useState('password')
 
@@ -122,6 +124,39 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                     value={roleData
                                         ?.map((role) => ({
                                             label: role.nama,
+                                            value: role.id,
+                                        }))
+                                        .find(
+                                            (opt) => opt.value === field.value
+                                        )}
+                                    onChange={(selected) => {
+                                        form.setFieldValue(
+                                            field.name,
+                                            selected?.value || ''
+                                        )
+                                    }}
+                                />
+                            )}
+                        </Field>
+                    </FormItem>
+                    <FormItem
+                        label="Divisi"
+                        invalid={
+                            (errors.idDivisi && touched.idDivisi) as boolean
+                        }
+                        errorMessage={errors.idDivisi}
+                    >
+                        <Field name="idDivisi">
+                            {({ field, form }: FieldProps) => (
+                                <Select
+                                    placeholder="Pilih divisi"
+                                    options={divisiData?.map((role) => ({
+                                        label: role.name,
+                                        value: role.id,
+                                    }))}
+                                    value={divisiData
+                                        ?.map((role) => ({
+                                            label: role.name,
                                             value: role.id,
                                         }))
                                         .find(

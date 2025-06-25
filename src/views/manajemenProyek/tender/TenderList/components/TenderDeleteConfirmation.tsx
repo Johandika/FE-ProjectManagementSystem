@@ -14,8 +14,8 @@ const TenderDeleteConfirmation = () => {
     const dialogOpen = useAppSelector(
         (state) => state.tenderList.data.deleteConfirmation
     )
-    const selectedProduct = useAppSelector(
-        (state) => state.tenderList.data.selectedProduct
+    const selectedTender = useAppSelector(
+        (state) => state.tenderList.data.selectedTender
     )
     const tableData = useAppSelector((state) => state.tenderList.data.tableData)
 
@@ -25,7 +25,7 @@ const TenderDeleteConfirmation = () => {
 
     const onDelete = async () => {
         dispatch(toggleDeleteConfirmation(false))
-        const success = await apiDeleteTender({ id: selectedProduct })
+        const success = await apiDeleteTender({ id: selectedTender })
 
         if (success) {
             dispatch(getTenders(tableData))

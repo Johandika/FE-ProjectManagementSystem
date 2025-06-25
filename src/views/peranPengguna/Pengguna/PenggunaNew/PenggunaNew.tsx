@@ -7,9 +7,8 @@ import Notification from '@/components/ui/Notification'
 import { useNavigate } from 'react-router-dom'
 import { apiRegister } from '@/services/AuthService'
 import { Loading } from '@/components/shared'
-import { injectReducer } from '@/store'
+import { getSelectDivisi, injectReducer, RootState } from '@/store'
 import reducer, {
-    getRoles,
     selectRoles,
     useAppDispatch,
     useAppSelector,
@@ -22,12 +21,15 @@ const PenggunaNew = () => {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
-    // const loading = useAppSelector((state) => state.data.loading)
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state: RootState) => state.base.common
+    )
 
     const peranList = useAppSelector(
         (state) => state.peranList.data.selectRoles
     )
-    const laoding = useAppSelector(
+
+    const loading = useAppSelector(
         (state) => state.peranList.data.loadingSelectRoles
     )
 
@@ -116,15 +118,17 @@ const PenggunaNew = () => {
 
     useEffect(() => {
         dispatch(selectRoles())
+        dispatch(getSelectDivisi())
     }, [])
 
     return (
-        <Loading loading={laoding}>
+        <Loading loading={loading || loadingSelectDivisi}>
             <PenggunaForm
                 type="new"
+                roleData={peranList}
+                divisiData={selectDivisi.data}
                 onFormSubmit={handleFormSubmit}
                 onDiscard={handleDiscard}
-                roleData={peranList}
             />
         </Loading>
     )

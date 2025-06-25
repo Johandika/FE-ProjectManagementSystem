@@ -4,8 +4,6 @@ import ApiService from './ApiService'
 export async function apiGetDashboard<T, U extends GetDashboardRequest>(
     data: U
 ) {
-    console.log('data', data)
-
     const params = new URLSearchParams()
 
     if (data.tanggal_awal)

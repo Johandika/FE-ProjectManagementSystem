@@ -23,6 +23,7 @@ type Product = {
     id: string
     nama: string
     keterangan: string
+    Divisi: any
 }
 
 const ActionColumn = ({ row }: { row: Product }) => {
@@ -77,7 +78,7 @@ const KlienTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
+    }, [pageIndex, pageSize, sort, filterData])
 
     useEffect(() => {
         if (tableRef) {
@@ -91,7 +92,7 @@ const KlienTable = () => {
     )
 
     const fetchData = () => {
-        dispatch(getKliens({ pageIndex, pageSize, sort, query, filterData }))
+        dispatch(getKliens({ pageIndex, pageSize, query, filterData }))
     }
 
     const columns: ColumnDef<Product>[] = useMemo(
@@ -105,6 +106,14 @@ const KlienTable = () => {
                 },
             },
 
+            {
+                header: 'Divisi',
+                accessorKey: 'Divisi',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span>{row?.Divisi?.name || ''}</span>
+                },
+            },
             {
                 header: 'Keterangan',
                 accessorKey: 'keterangan',

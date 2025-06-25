@@ -6,9 +6,22 @@ import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import { useNavigate } from 'react-router-dom'
 import { apiCreateKlien } from '@/services/KlienService'
+import {
+    getSelectDivisi,
+    RootState,
+    useAppDispatch,
+    useAppSelector,
+} from '@/store'
+import { useEffect } from 'react'
+import { Loading } from '@/components/shared'
 
 const KlienNew = () => {
     const navigate = useNavigate()
+    const dispatch = useAppDispatch()
+
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state: RootState) => state.base.common
+    )
 
     const addKlien = async (data: FormModel) => {
         try {
@@ -95,14 +108,19 @@ const KlienNew = () => {
         navigate('/master/klien')
     }
 
+    useEffect(() => {
+        dispatch(getSelectDivisi())
+    }, [])
+
     return (
-        <>
+        <Loading loading={loadingSelectDivisi}>
             <KlienForm
                 type="new"
+                dataDivisi={selectDivisi.data}
                 onFormSubmit={handleFormSubmit}
                 onDiscard={handleDiscard}
             />
-        </>
+        </Loading>
     )
 }
 

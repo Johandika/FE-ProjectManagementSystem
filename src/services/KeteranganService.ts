@@ -4,8 +4,6 @@ import ApiService from './ApiService'
 export async function apiGetKeterangans<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('data', data)
-
     const res = await ApiService.fetchData<T>({
         url: `/keteranganProject/project/${data.id}`,
         method: 'get',

@@ -35,6 +35,7 @@ type Product = {
     tanggal_pengajuan: string
     client: string
     idClient?: string
+    idDivisi?: string
     status: string
 }
 
@@ -50,6 +51,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
                 pekerjaan: row.pekerjaan,
                 nilai_kontrak: row.nilai_kontrak,
                 idClient: row.idClient,
+                idDivisi: row.idDivisi,
             },
         })
     }
@@ -60,7 +62,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
 
     const onDelete = () => {
         dispatch(toggleDeleteConfirmation(true))
-        dispatch(setSelectedProduct(row.id))
+        dispatch(setSelectedTender(row.id))
     }
 
     return (
@@ -175,6 +177,16 @@ const TenderTable = () => {
                     const row = props.row.original
 
                     return <span className="capitalize">{row.client}</span>
+                },
+            },
+            {
+                header: 'Divisi',
+                accessorKey: 'idDivisi',
+                minWidth: 150,
+                cell: (props) => {
+                    const row = props.row.original
+
+                    return <span>{row.Divisi?.name}</span>
                 },
             },
             {

@@ -4,17 +4,27 @@ import TenderForm, {
     SetSubmitting,
 } from '@/views/manajemenProyek/tender/TenderForm'
 import Notification from '@/components/ui/Notification'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { apiCreateTender } from '@/services/TenderService'
-import { injectReducer, useAppDispatch, useAppSelector } from '@/store'
+import {
+    getSelectDivisi,
+    injectReducer,
+    useAppDispatch,
+    useAppSelector,
+} from '@/store'
 import reducer, { getKliens } from './store'
 import { useEffect } from 'react'
+import { Loading } from '@/components/shared'
 
 injectReducer('proyekNew', reducer)
 
 const TenderNew = () => {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state) => state.base.common
+    )
 
     const kliensData = useAppSelector(
         (state: any) => state.proyekNew.data.kliensData?.data || []
@@ -107,20 +117,22 @@ const TenderNew = () => {
     }
 
     useEffect(() => {
-        dispatch(getKliens()) // kliens
+        dispatch(getKliens())
+        dispatch(getSelectDivisi())
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
     return (
-        <>
+        <Loading loading={loadingSelectDivisi}>
             <TenderForm
                 type="new"
+                dataDivisi={selectDivisi.data}
+                kliensData={kliensData}
                 onFormSubmit={handleFormSubmit}
                 onDiscard={handleDiscard}
-                kliensData={kliensData}
             />
-        </>
+        </Loading>
     )
 }
 

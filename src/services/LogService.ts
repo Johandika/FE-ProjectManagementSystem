@@ -4,8 +4,6 @@ import ApiService from './ApiService'
 export async function apiGetLogs<T, U extends Record<string, unknown>>(
     data: U
 ) {
-    console.log('data query log', data)
-
     const params = new URLSearchParams()
 
     if (data.tanggal) params.append('tanggal', data.tanggal.toString())

@@ -19,6 +19,9 @@ type InitialData = {
     email: string
     nomor_telepon: string
     status_aktif: boolean
+    password: string
+    idRole: string
+    idDivisi: string
 }
 
 export type FormModel = InitialData
@@ -32,6 +35,7 @@ type OnDelete = (callback: OnDeleteCallback) => void
 type PenggunaForm = {
     initialData?: InitialData
     roleData?: any[]
+    divisiData?: any[]
     type: 'edit' | 'new'
     onDiscard?: () => void
     onDelete?: OnDelete
@@ -92,30 +96,30 @@ const DeletePenggunaButton = ({ onDelete }: { onDelete: OnDelete }) => {
 const PenggunaForm = forwardRef<FormikRef, PenggunaForm>((props, ref) => {
     const {
         type,
-        initialData = {
-            id: '',
-            nama: '',
-            email: '',
-            nomor_telepon: '',
-            idRole: '',
-        },
+        initialData,
         onFormSubmit,
         onDiscard,
         onDelete,
         roleData,
+        divisiData,
     } = props
+
+    const formInitialValues = {
+        id: '',
+        nama: '',
+        email: '',
+        nomor_telepon: '',
+        idRole: '',
+        idDivisi: '',
+        password: '',
+        ...initialData,
+    }
 
     return (
         <>
             <Formik
                 innerRef={ref}
-                initialValues={{
-                    id: initialData.id || '',
-                    nama: initialData.nama || '',
-                    email: initialData.email || '',
-                    nomor_telepon: initialData.nomor_telepon || '',
-                    idRole: initialData.idRole || '',
-                }}
+                initialValues={formInitialValues}
                 validationSchema={validationSchema}
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
@@ -133,6 +137,7 @@ const PenggunaForm = forwardRef<FormikRef, PenggunaForm>((props, ref) => {
                                         errors={errors}
                                         type={type}
                                         roleData={roleData}
+                                        divisiData={divisiData}
                                     />
                                 </div>
                             </div>

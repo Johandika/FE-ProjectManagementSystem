@@ -36,10 +36,12 @@ type KlienForm = {
     onDiscard?: () => void
     onDelete?: OnDelete
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
+    dataDivisi?: any[]
 }
 
 const validationSchema = Yup.object().shape({
     nama: Yup.string().required('Nama wajib diisi'),
+    idDivisi: Yup.string().required('Divisi wajib dipilih'),
 })
 
 const DeleteKlienButton = ({ onDelete }: { onDelete: OnDelete }) => {
@@ -91,7 +93,9 @@ const KlienForm = forwardRef<FormikRef, KlienForm>((props, ref) => {
         initialData = {
             nama: '',
             keterangan: '',
+            idDivisi: '',
         },
+        dataDivisi,
         onFormSubmit,
         onDiscard,
         onDelete,
@@ -131,6 +135,7 @@ const KlienForm = forwardRef<FormikRef, KlienForm>((props, ref) => {
                                     <BasicInformationFields
                                         touched={touched}
                                         errors={errors}
+                                        divisiData={dataDivisi}
                                     />
                                 </div>
                             </div>

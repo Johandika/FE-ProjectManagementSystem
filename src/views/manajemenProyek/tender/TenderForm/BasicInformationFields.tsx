@@ -11,16 +11,18 @@ type FormFieldsName = {
     tanggal_pengajuan: string
     nilai_kontrak: number
     idClient: string
+    idDivisi: string
 }
 
 type BasicInformationFields = {
     touched: FormikTouched<FormFieldsName>
     errors: FormikErrors<FormFieldsName>
     kliensData: any[]
+    dataDivisi: any[]
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const { touched, errors, kliensData } = props
+    const { touched, errors, kliensData, dataDivisi } = props
 
     return (
         <AdaptableCard divider className="mb-4">
@@ -136,6 +138,37 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                             />
                         )
                     }}
+                </Field>
+            </FormItem>
+
+            {/* Pilih Divisi */}
+            <FormItem
+                label="Divisi"
+                invalid={(errors.idDivisi && touched.idDivisi) as boolean}
+                errorMessage={errors.idDivisi}
+            >
+                <Field name="idDivisi">
+                    {({ field, form }: FieldProps) => (
+                        <Select
+                            placeholder="Pilih divisi"
+                            options={dataDivisi?.map((role) => ({
+                                label: role.name,
+                                value: role.id,
+                            }))}
+                            value={dataDivisi
+                                ?.map((role) => ({
+                                    label: role.name,
+                                    value: role.id,
+                                }))
+                                .find((opt) => opt.value === field.value)}
+                            onChange={(selected) => {
+                                form.setFieldValue(
+                                    field.name,
+                                    selected?.value || ''
+                                )
+                            }}
+                        />
+                    )}
                 </Field>
             </FormItem>
         </AdaptableCard>

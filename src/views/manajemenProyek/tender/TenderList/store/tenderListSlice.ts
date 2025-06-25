@@ -22,6 +22,7 @@ type GetMasterTenderResponse = {
 
 type FilterQueries = {
     status: string
+    idDivisi?: string
 }
 
 export type MasterTenderListSlice = {

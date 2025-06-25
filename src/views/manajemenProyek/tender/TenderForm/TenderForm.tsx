@@ -36,6 +36,7 @@ type TenderForm = {
     onDiscard?: () => void
     onDelete?: OnDelete
     kliensData: any[]
+    dataDivisi: any[]
     onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
 }
 
@@ -96,36 +97,24 @@ const TenderForm = forwardRef<FormikRef, TenderForm>((props, ref) => {
             pekerjaan: '',
             tanggal_pengajuan: '',
             nilai_kontrak: 0,
+            idDivisi: '',
         },
+        dataDivisi,
         kliensData,
         onFormSubmit,
         onDiscard,
         onDelete,
     } = props
-
     return (
         <>
             <Formik
                 innerRef={ref}
                 initialValues={{
                     ...initialData,
-                    // tags: initialData?.tags
-                    //     ? initialData.tags.map((value) => ({
-                    //           label: value,
-                    //           value,
-                    //       }))
-                    //     : [],
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values: FormModel, { setSubmitting }) => {
                     const formData = cloneDeep(values)
-                    // formData.tags = formData.tags.map((tag) => {
-                    //     if (typeof tag !== 'string') {
-                    //         return tag.value
-                    //     }
-                    //     return tag
-                    // })
-
                     onFormSubmit?.(formData, setSubmitting)
                 }}
             >
@@ -138,6 +127,7 @@ const TenderForm = forwardRef<FormikRef, TenderForm>((props, ref) => {
                                         touched={touched}
                                         errors={errors}
                                         kliensData={kliensData}
+                                        dataDivisi={dataDivisi}
                                     />
                                 </div>
                             </div>

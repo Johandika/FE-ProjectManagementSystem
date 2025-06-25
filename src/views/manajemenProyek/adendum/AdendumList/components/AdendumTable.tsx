@@ -47,7 +47,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
         dispatch(setSelectedAdendum(row.id))
         dispatch(setAdendumStatus('Tolak'))
     }
-    console.log(' row', row)
+
     return (
         <div className="flex justify-end gap-2">
             {row.status === 'Belum Disetujui' && (
@@ -203,11 +203,6 @@ const AdendumTable = () => {
         dispatch(setTableData(newTableData))
     }
 
-    console.log({
-        total: tableData.total as number,
-        pageIndex: tableData.pageIndex as number,
-        pageSize: tableData.pageSize as number,
-    })
     return (
         <>
             <DataTableDropdown
