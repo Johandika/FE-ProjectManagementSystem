@@ -46,6 +46,11 @@ const TenderUpdateStatusConfirmation = () => {
                     id: selectedProyek,
                     status: tenderStatus,
                 })
+            } else if (tenderStatus === 'Batal') {
+                success = await apiUpdateStatusTender({
+                    id: selectedProyek,
+                    status: tenderStatus,
+                })
             }
 
             if (success) {

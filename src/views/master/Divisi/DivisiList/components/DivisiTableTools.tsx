@@ -1,10 +1,12 @@
 import Button from '@/components/ui/Button'
-import { HiDownload, HiPlusCircle } from 'react-icons/hi'
+import { HiPlusCircle } from 'react-icons/hi'
 import DivisiTableSearch from './DivisiTableSearch'
-import DivisiFilter from './DivisiFilter'
 import { Link } from 'react-router-dom'
+import { useAppSelector } from '@/store'
 
 const DivisiTableTools = () => {
+    const user = useAppSelector((state) => state.auth.user)
+
     return (
         <div className="flex flex-col lg:flex-row lg:items-center">
             <DivisiTableSearch />
@@ -19,14 +21,21 @@ const DivisiTableTools = () => {
                     Export
                 </Button>
             </Link> */}
-            <Link
-                className="block lg:inline-block md:mb-0 mb-4 md:ml-2 "
-                to="/master/divisi-new"
-            >
-                <Button block variant="solid" size="sm" icon={<HiPlusCircle />}>
-                    Tambah Divisi
-                </Button>
-            </Link>
+            {user.authority !== 'Admin' && user.authority !== 'Owner' && (
+                <Link
+                    className="block lg:inline-block md:mb-0 mb-4 md:ml-2 "
+                    to="/master/divisi-new"
+                >
+                    <Button
+                        block
+                        variant="solid"
+                        size="sm"
+                        icon={<HiPlusCircle />}
+                    >
+                        Tambah Divisi
+                    </Button>
+                </Link>
+            )}
         </div>
     )
 }

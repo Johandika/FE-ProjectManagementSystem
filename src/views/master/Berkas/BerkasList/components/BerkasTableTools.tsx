@@ -3,8 +3,11 @@ import { HiDownload, HiPlusCircle } from 'react-icons/hi'
 import BerkasTableSearch from './BerkasTableSearch'
 import BerkasFilter from './BerkasFilter'
 import { Link } from 'react-router-dom'
+import { useAppSelector } from '@/store'
 
 const BerkasTableTools = () => {
+    const user = useAppSelector((state) => state.auth.user)
+
     return (
         <div className="flex flex-col lg:flex-row lg:items-center">
             <BerkasTableSearch />
@@ -19,14 +22,21 @@ const BerkasTableTools = () => {
                     Export
                 </Button>
             </Link> */}
-            <Link
-                className="block lg:inline-block md:mb-0 mb-4 md:ml-2 "
-                to="/master/berkas-new"
-            >
-                <Button block variant="solid" size="sm" icon={<HiPlusCircle />}>
-                    Tambah Berkas
-                </Button>
-            </Link>
+            {user.authority !== 'Admin' && user.authority !== 'Owner' && (
+                <Link
+                    className="block lg:inline-block md:mb-0 mb-4 md:ml-2 "
+                    to="/master/berkas-new"
+                >
+                    <Button
+                        block
+                        variant="solid"
+                        size="sm"
+                        icon={<HiPlusCircle />}
+                    >
+                        Tambah Berkas
+                    </Button>
+                </Link>
+            )}
         </div>
     )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import DataTable from '@/components/shared/DataTable'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
 import {
@@ -92,6 +92,8 @@ const ProyekTable = () => {
 
     const dispatch = useAppDispatch()
 
+    const user = useAppSelector((state) => state.auth.user)
+
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
         (state) => state.proyekList.data.tableData
     )
@@ -165,18 +167,18 @@ const ProyekTable = () => {
         )
     }
 
-    const onUpdate = (
-        e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-        row: any
-    ) => {
-        e.stopPropagation()
-        dispatch(toggleUpdateConfirmation(true))
-        dispatch(setSelectedProyek(row.id))
-        dispatch(setProjectStatus(row.status))
-    }
+    const onUpdate = useCallback(
+        (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, row: any) => {
+            e.stopPropagation()
+            dispatch(toggleUpdateConfirmation(true))
+            dispatch(setSelectedProyek(row.id))
+            dispatch(setProjectStatus(row.status))
+        },
+        [dispatch]
+    )
 
-    const columns: ColumnDef<Proyek>[] = useMemo(
-        () => [
+    const columns: ColumnDef<Proyek>[] = useMemo(() => {
+        const baseColumns: ColumnDef<Proyek>[] = [
             {
                 header: 'Pekerjaan',
                 accessorKey: 'pekerjaan',
@@ -305,7 +307,6 @@ const ProyekTable = () => {
                     )
                 },
             },
-
             {
                 header: 'Progress',
                 accessorKey: 'progress',
@@ -408,12 +409,27 @@ const ProyekTable = () => {
             {
                 header: 'Divisi',
                 accessorKey: 'idDivisi',
-                minWidth: 260,
+                minWidth: 180,
                 cell: (props) => {
                     const row = props.row.original
+                    console.log('row', row)
                     return (
                         <div className="flex flex-col gap-1">
-                            {row.Divisi?.nama}
+                            {row.Divisi?.name}
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'Dibuat Oleh',
+                accessorKey: 'dibuatOleh',
+                minWidth: 180,
+                cell: (props) => {
+                    const row = props.row.original
+                    console.log('row', row)
+                    return (
+                        <div className="flex flex-col gap-1">
+                            {row.User?.nama}
                         </div>
                     )
                 },
@@ -433,14 +449,18 @@ const ProyekTable = () => {
                     )
                 },
             },
-            {
+        ]
+
+        if (user?.authority !== 'Owner') {
+            baseColumns.push({
                 header: '',
                 id: 'action',
                 cell: (props) => <ActionColumn row={props.row.original} />,
-            },
-        ],
-        []
-    )
+            })
+        }
+
+        return baseColumns
+    }, [user, onUpdate])
 
     const onPaginationChange = (page: number) => {
         const newTableData = cloneDeep(tableData)

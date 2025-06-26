@@ -99,6 +99,8 @@ const TenderTable = () => {
 
     const dispatch = useAppDispatch()
 
+    const user = useAppSelector((state) => state.auth.user)
+
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
         (state) => state.tenderList.data.tableData
     )
@@ -145,8 +147,8 @@ const TenderTable = () => {
         dispatch(setTenderStatus(status))
     }
 
-    const columns: ColumnDef<Product>[] = useMemo(
-        () => [
+    const columns: ColumnDef<Product>[] = useMemo(() => {
+        const baseColumns: ColumnDef<Product>[] = [
             {
                 header: 'Pekerjaan',
                 accessorKey: 'pekerjaan',
@@ -208,6 +210,7 @@ const TenderTable = () => {
                 minWidth: 150,
                 cell: (props) => {
                     const row = props.row.original
+                    console.log('row', row)
                     return (
                         <span className="capitalize">
                             {row.status === 'Pengajuan' ? (
@@ -215,6 +218,7 @@ const TenderTable = () => {
                                     <Button
                                         size="xs"
                                         variant="solid"
+                                        disabled={user?.authority === 'Owner'}
                                         onClick={(e) => {
                                             handleUpdateStatus(
                                                 'Diterima',
@@ -228,6 +232,7 @@ const TenderTable = () => {
                                     <Button
                                         size="xs"
                                         variant="solid"
+                                        disabled={user?.authority === 'Owner'}
                                         color="rose"
                                         onClick={(e) => {
                                             handleUpdateStatus(
@@ -239,13 +244,27 @@ const TenderTable = () => {
                                     >
                                         Ditolak
                                     </Button>
+                                    <Button
+                                        size="xs"
+                                        variant="solid"
+                                        disabled={user?.authority === 'Owner'}
+                                        color="gray-500"
+                                        onClick={(e) => {
+                                            handleUpdateStatus('Batal', row.id)
+                                            e.stopPropagation()
+                                        }}
+                                    >
+                                        Batal
+                                    </Button>
                                 </div>
                             ) : row.status === 'Diterima' ? (
                                 <span className="text-green-500">
                                     {row.status}
                                 </span>
+                            ) : row.status === 'Ditolak' ? (
+                                <span className="text-rose-500">Kalah</span>
                             ) : (
-                                <span className="text-rose-500">
+                                <span className="text-gray-500">
                                     {row.status}
                                 </span>
                             )}
@@ -253,14 +272,18 @@ const TenderTable = () => {
                     )
                 },
             },
-            {
+        ]
+
+        if (user?.authority !== 'Owner') {
+            baseColumns.push({
                 header: '',
                 id: 'action',
                 cell: (props) => <ActionColumn row={props.row.original} />,
-            },
-        ],
-        []
-    )
+            })
+        }
+
+        return baseColumns
+    }, [user])
 
     const onPaginationChange = (page: number) => {
         const newTableData = cloneDeep(tableData)

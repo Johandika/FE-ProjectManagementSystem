@@ -3,8 +3,11 @@ import { HiDownload, HiPlusCircle } from 'react-icons/hi'
 import KlienTableSearch from './KlienTableSearch'
 import KlienFilter from './KlienFilter'
 import { Link } from 'react-router-dom'
+import { useAppSelector } from '@/store'
 
 const KlienTableTools = () => {
+    const user = useAppSelector((state) => state.auth.user)
+
     return (
         <div className="flex flex-col lg:flex-row lg:items-center">
             <KlienTableSearch />
@@ -19,14 +22,21 @@ const KlienTableTools = () => {
                     Export
                 </Button>
             </Link> */}
-            <Link
-                className="block lg:inline-block md:mb-0 mb-4 md:ml-2 "
-                to="/master/klien-new"
-            >
-                <Button block variant="solid" size="sm" icon={<HiPlusCircle />}>
-                    Tambah Klien
-                </Button>
-            </Link>
+            {user.authority !== 'Admin' && user.authority !== 'Owner' && (
+                <Link
+                    className="block lg:inline-block md:mb-0 mb-4 md:ml-2 "
+                    to="/master/klien-new"
+                >
+                    <Button
+                        block
+                        variant="solid"
+                        size="sm"
+                        icon={<HiPlusCircle />}
+                    >
+                        Tambah Klien
+                    </Button>
+                </Link>
+            )}
         </div>
     )
 }

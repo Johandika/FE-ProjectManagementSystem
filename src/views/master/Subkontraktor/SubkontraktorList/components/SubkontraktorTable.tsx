@@ -61,6 +61,8 @@ const SubkontraktorTable = () => {
 
     const dispatch = useAppDispatch()
 
+    const user = useAppSelector((state) => state.auth.user)
+
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
         (state) => state.subkontraktorList.data.tableData
     )
@@ -99,8 +101,8 @@ const SubkontraktorTable = () => {
         )
     }
 
-    const columns: ColumnDef<Subkontraktor>[] = useMemo(
-        () => [
+    const columns: ColumnDef<Subkontraktor>[] = useMemo(() => {
+        const baseColumns: ColumnDef<Subkontraktor>[] = [
             {
                 header: 'Nama',
                 accessorKey: 'nama',
@@ -109,23 +111,18 @@ const SubkontraktorTable = () => {
                     return <span className="capitalize">{row.nama}</span>
                 },
             },
+        ]
 
-            // {
-            //     header: 'Keterangan',
-            //     accessorKey: 'keterangan',
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return <span className="capitalize">{row.keterangan}</span>
-            //     },
-            // },
-            {
+        if (user?.authority !== 'Admin' && user?.authority !== 'Owner') {
+            baseColumns.push({
                 header: '',
                 id: 'action',
                 cell: (props) => <ActionColumn row={props.row.original} />,
-            },
-        ],
-        []
-    )
+            })
+        }
+
+        return baseColumns
+    }, [user])
 
     const onPaginationChange = (page: number) => {
         const newTableData = cloneDeep(tableData)

@@ -65,6 +65,8 @@ const SatuanTable = () => {
         (state) => state.satuanList.data.tableData
     )
 
+    const user = useAppSelector((state) => state.auth.user)
+
     const filterData = useAppSelector(
         (state) => state.satuanList.data.filterData
     )
@@ -93,8 +95,8 @@ const SatuanTable = () => {
         dispatch(getSatuans({ pageIndex, pageSize, sort, query, filterData }))
     }
 
-    const columns: ColumnDef<Satuan>[] = useMemo(
-        () => [
+    const columns: ColumnDef<Satuan>[] = useMemo(() => {
+        const baseColumns: ColumnDef<Satuan>[] = [
             {
                 header: 'Satuan',
                 accessorKey: 'satuan',
@@ -103,15 +105,18 @@ const SatuanTable = () => {
                     return <span className="capitalize">{row.satuan}</span>
                 },
             },
+        ]
 
-            {
+        if (user?.authority !== 'Admin' && user?.authority !== 'Owner') {
+            baseColumns.push({
                 header: '',
                 id: 'action',
                 cell: (props) => <ActionColumn row={props.row.original} />,
-            },
-        ],
-        []
-    )
+            })
+        }
+
+        return baseColumns
+    }, [user])
 
     const onPaginationChange = (page: number) => {
         const newTableData = cloneDeep(tableData)

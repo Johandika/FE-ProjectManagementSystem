@@ -27,7 +27,6 @@ export default function AllNotification() {
     )
 
     const loading = useAppSelector((state) => state.notification.data.loading)
-    console.log('data luar', dataNotification)
 
     const handleDeletNotification = async (data: { id: string }) => {
         try {

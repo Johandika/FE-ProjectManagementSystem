@@ -62,6 +62,8 @@ const DivisiTable = () => {
 
     const dispatch = useAppDispatch()
 
+    const user = useAppSelector((state) => state.auth.user)
+
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
         (state) => state.divisiList.data.tableData
     )
@@ -73,8 +75,6 @@ const DivisiTable = () => {
     const loading = useAppSelector((state) => state.divisiList.data.loading)
 
     const data = useAppSelector((state) => state.divisiList.data.divisiList)
-
-    console.log('data Mantap', data)
 
     useEffect(() => {
         fetchData()
@@ -96,8 +96,8 @@ const DivisiTable = () => {
         dispatch(getDivisies({ pageIndex, pageSize, sort, query, filterData }))
     }
 
-    const columns: ColumnDef<Divisi>[] = useMemo(
-        () => [
+    const columns: ColumnDef<Divisi>[] = useMemo(() => {
+        const baseColumns: ColumnDef<Divisi>[] = [
             {
                 header: 'Nama',
                 accessorKey: 'name',
@@ -114,14 +114,18 @@ const DivisiTable = () => {
                     return <span className="capitalize">{row.keterangan}</span>
                 },
             },
-            {
+        ]
+
+        if (user?.authority !== 'Admin' && user?.authority !== 'Owner') {
+            baseColumns.push({
                 header: '',
                 id: 'action',
                 cell: (props) => <ActionColumn row={props.row.original} />,
-            },
-        ],
-        []
-    )
+            })
+        }
+
+        return baseColumns
+    }, [user])
 
     const onPaginationChange = (page: number) => {
         const newTableData = cloneDeep(tableData)

@@ -61,6 +61,8 @@ const BerkasTable = () => {
 
     const dispatch = useAppDispatch()
 
+    const user = useAppSelector((state) => state.auth.user)
+
     const { pageIndex, pageSize, sort, query, total } = useAppSelector(
         (state) => state.berkasList.data.tableData
     )
@@ -93,8 +95,8 @@ const BerkasTable = () => {
         dispatch(getBerkases({ pageIndex, pageSize, sort, query, filterData }))
     }
 
-    const columns: ColumnDef<Berkas>[] = useMemo(
-        () => [
+    const columns: ColumnDef<Berkas>[] = useMemo(() => {
+        const baseColumns: ColumnDef<Berkas>[] = [
             {
                 header: 'Nama',
                 accessorKey: 'nama',
@@ -103,14 +105,18 @@ const BerkasTable = () => {
                     return <span className="capitalize">{row.nama}</span>
                 },
             },
-            {
+        ]
+
+        if (user?.authority !== 'Admin' && user?.authority !== 'Owner') {
+            baseColumns.push({
                 header: '',
                 id: 'action',
                 cell: (props) => <ActionColumn row={props.row.original} />,
-            },
-        ],
-        []
-    )
+            })
+        }
+
+        return baseColumns
+    }, [user])
 
     const onPaginationChange = (page: number) => {
         const newTableData = cloneDeep(tableData)

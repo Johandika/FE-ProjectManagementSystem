@@ -33,7 +33,6 @@ export const getAllNotification = createAsyncThunk(
     async () => {
         const response = await apiGetAllNotification()
 
-        console.log('res', res)
         return response.data
     }
 )

@@ -4,7 +4,7 @@ import {
     NAV_ITEM_TYPE_ITEM,
 } from '@/constants/navigation.constant'
 import type { NavigationTree } from '@/@types/navigation'
-import { DEVELOPER, SUPER_ADMIN } from '@/constants/roles.constant'
+import { DEVELOPER, OWNER, SUPER_ADMIN } from '@/constants/roles.constant'
 
 const appsNavigationConfig: NavigationTree[] = [
     {
@@ -54,7 +54,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item2',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [SUPER_ADMIN],
+                        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
                         subMenu: [],
                     },
                     {
@@ -64,7 +64,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item3',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [SUPER_ADMIN],
+                        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
                         subMenu: [],
                     },
                     {
@@ -74,7 +74,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item4',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [SUPER_ADMIN],
+                        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
                         subMenu: [],
                     },
                     {
@@ -84,7 +84,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item5',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [SUPER_ADMIN],
+                        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
                         subMenu: [],
                     },
                     {
@@ -94,7 +94,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item6',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [SUPER_ADMIN],
+                        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
                         subMenu: [],
                     },
                 ],
