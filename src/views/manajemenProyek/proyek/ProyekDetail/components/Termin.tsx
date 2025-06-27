@@ -40,6 +40,7 @@ import DescriptionSection from './DesriptionSection'
 import { formatDate } from '@/utils/formatDate'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
 import { IoIosAdd, IoIosCheckmark } from 'react-icons/io'
+import { setUnreadNotification } from '@/views/notifikasi/store'
 
 // Define missing interfaces
 export interface SetSubmitting {
@@ -254,6 +255,7 @@ export default function Termin() {
                     processedData
                 )
                 if (success) {
+                    dispatch(setUnreadNotification(true))
                     popNotification('added')
                 }
             }

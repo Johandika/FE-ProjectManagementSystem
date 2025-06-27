@@ -48,8 +48,8 @@ export const getOneNotificationAndRead = createAsyncThunk(
 
 export const getUnreadNotifiaction = createAsyncThunk(
     SLICE_NAME + '/getUnreadNotifiaction',
-    async (data: any) => {
-        const response: any = await apiGetUnreadNotification(data)
+    async () => {
+        const response: any = await apiGetUnreadNotification()
 
         return response.data
     }
@@ -99,7 +99,7 @@ const notificationSlice = createSlice({
             })
             .addCase(getUnreadNotifiaction.fulfilled, (state, action) => {
                 state.dataUnreadsNotification = action.payload
-                state.loadingGetOne = false
+                state.loadingUnreadNotification = false
             })
             .addCase(getUnreadNotifiaction.pending, (state) => {
                 state.loadingUnreadNotification = true

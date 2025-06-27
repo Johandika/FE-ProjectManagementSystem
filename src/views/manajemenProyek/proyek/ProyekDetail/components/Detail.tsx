@@ -32,6 +32,7 @@ import {
 import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 import KeteranganSection from './Keterangan'
+import { setUnreadNotification } from '@/views/notifikasi/store'
 
 injectReducer('proyekEdit', reducer)
 
@@ -214,6 +215,7 @@ export default function Detail() {
             let result = await apiCreateAdendumTimeline(processedData)
 
             if (result && result.data?.statusCode === 201) {
+                dispatch(setUnreadNotification(true))
                 popNotification('berhasil ditambahkan')
 
                 setAdendumTimelineFormInitialValues({
@@ -264,6 +266,8 @@ export default function Detail() {
             let result = await apiCreateAdendumNilaiKontrak(processedData)
 
             if (result && result.data?.statusCode === 201) {
+                dispatch(setUnreadNotification(true))
+
                 popNotification('berhasil ditambahkan')
 
                 setAdendumNilaiKontrakFormInitialValues({

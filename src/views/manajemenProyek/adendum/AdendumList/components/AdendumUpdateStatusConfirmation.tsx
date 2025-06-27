@@ -54,7 +54,6 @@ const AdendumUpdateStatusConfirmation = () => {
             }
 
             if (success) {
-                dispatch(setUnreadNotification(true))
                 dispatch(getAdendums(tableData))
                 toast.push(
                     <Notification

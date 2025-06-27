@@ -24,6 +24,7 @@ import {
     apiEditLokasi,
 } from '@/services/LokasiService'
 import { apiCreateAdendumLokasi } from '@/services/AdendumService'
+import { setUnreadNotification } from '@/views/notifikasi/store'
 
 export interface SetSubmitting {
     (isSubmitting: boolean): void
@@ -168,6 +169,7 @@ export default function Lokasi() {
             let result = await apiCreateAdendumLokasi(processedData)
 
             if (result && result.data?.statusCode === 201) {
+                dispatch(setUnreadNotification(true))
                 popNotification('berhasil ditambahkan', 'Adendum')
 
                 setAdendumLokasiFormInitialValues({

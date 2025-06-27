@@ -210,59 +210,110 @@ const TenderTable = () => {
                 minWidth: 150,
                 cell: (props) => {
                     const row = props.row.original
-                    console.log('row', row)
                     return (
                         <span className="capitalize">
                             {row.status === 'Pengajuan' ? (
-                                <div className="gap-2 flex flex-row">
-                                    <Button
-                                        size="xs"
-                                        variant="solid"
-                                        disabled={user?.authority === 'Owner'}
-                                        onClick={(e) => {
-                                            handleUpdateStatus(
-                                                'Diterima',
-                                                row.id
-                                            )
-                                            e.stopPropagation()
-                                        }}
-                                    >
-                                        Diterima
-                                    </Button>
-                                    <Button
-                                        size="xs"
-                                        variant="solid"
-                                        disabled={user?.authority === 'Owner'}
-                                        color="rose"
-                                        onClick={(e) => {
-                                            handleUpdateStatus(
-                                                'Ditolak',
-                                                row.id
-                                            )
-                                            e.stopPropagation()
-                                        }}
-                                    >
-                                        Ditolak
-                                    </Button>
-                                    <Button
-                                        size="xs"
-                                        variant="solid"
-                                        disabled={user?.authority === 'Owner'}
-                                        color="gray-500"
-                                        onClick={(e) => {
-                                            handleUpdateStatus('Batal', row.id)
-                                            e.stopPropagation()
-                                        }}
-                                    >
-                                        Batal
-                                    </Button>
+                                <div className="gap-2 flex flex-col">
+                                    Pengajuan
+                                    <div className="flex flex-row gap-2">
+                                        <Button
+                                            size="xs"
+                                            variant="solid"
+                                            disabled={
+                                                user?.authority === 'Owner'
+                                            }
+                                            onClick={(e) => {
+                                                handleUpdateStatus(
+                                                    'Diproses',
+                                                    row.id
+                                                )
+                                                e.stopPropagation()
+                                            }}
+                                        >
+                                            Diproses
+                                        </Button>
+                                        <Button
+                                            size="xs"
+                                            variant="solid"
+                                            disabled={
+                                                user?.authority === 'Owner'
+                                            }
+                                            color="gray-500"
+                                            onClick={(e) => {
+                                                handleUpdateStatus(
+                                                    'Batal',
+                                                    row.id
+                                                )
+                                                e.stopPropagation()
+                                            }}
+                                        >
+                                            Batal
+                                        </Button>
+                                    </div>
                                 </div>
                             ) : row.status === 'Diterima' ? (
-                                <span className="text-green-500">
-                                    {row.status}
-                                </span>
+                                <span className="text-green-500">Menang</span>
                             ) : row.status === 'Ditolak' ? (
                                 <span className="text-rose-500">Kalah</span>
+                            ) : row.status === 'Diproses' ? (
+                                <div className="gap-2 flex flex-col">
+                                    <span className="text-indigo-500">
+                                        Diproses
+                                    </span>{' '}
+                                    <div className="flex flex-row gap-2">
+                                        <Button
+                                            size="xs"
+                                            variant="solid"
+                                            color="green"
+                                            disabled={
+                                                user?.authority === 'Owner'
+                                            }
+                                            onClick={(e) => {
+                                                handleUpdateStatus(
+                                                    'Diterima',
+                                                    row.id
+                                                )
+                                                e.stopPropagation()
+                                            }}
+                                        >
+                                            Diterima
+                                        </Button>
+                                        <Button
+                                            size="xs"
+                                            variant="solid"
+                                            disabled={
+                                                user?.authority === 'Owner'
+                                            }
+                                            color="rose"
+                                            onClick={(e) => {
+                                                handleUpdateStatus(
+                                                    'Ditolak',
+                                                    row.id
+                                                )
+                                                e.stopPropagation()
+                                            }}
+                                        >
+                                            Ditolak
+                                        </Button>
+                                        <Button
+                                            size="xs"
+                                            variant="solid"
+                                            disabled={
+                                                user?.authority === 'Owner'
+                                            }
+                                            color="gray-500"
+                                            onClick={(e) => {
+                                                handleUpdateStatus(
+                                                    'Batal',
+                                                    row.id
+                                                )
+                                                e.stopPropagation()
+                                            }}
+                                        >
+                                            Batal
+                                        </Button>
+                                    </div>
+                                </div>
                             ) : (
                                 <span className="text-gray-500">
                                     {row.status}

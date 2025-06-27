@@ -412,7 +412,6 @@ const ProyekTable = () => {
                 minWidth: 180,
                 cell: (props) => {
                     const row = props.row.original
-                    console.log('row', row)
                     return (
                         <div className="flex flex-col gap-1">
                             {row.Divisi?.name}
@@ -426,7 +425,6 @@ const ProyekTable = () => {
                 minWidth: 180,
                 cell: (props) => {
                     const row = props.row.original
-                    console.log('row', row)
                     return (
                         <div className="flex flex-col gap-1">
                             {row.User?.nama}
