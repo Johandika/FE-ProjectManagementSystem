@@ -12,6 +12,7 @@ type FormFieldsName = {
     nilai_kontrak: number
     idClient: string
     idDivisi: string
+    prioritas: string
 }
 
 type BasicInformationFields = {
@@ -19,11 +20,16 @@ type BasicInformationFields = {
     errors: FormikErrors<FormFieldsName>
     kliensData: any[]
     dataDivisi: any[]
+    type: 'edit' | 'new'
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const { touched, errors, kliensData, dataDivisi } = props
-
+    const { touched, errors, kliensData, dataDivisi, type } = props
+    const prioritasOptions = [
+        { value: 'Rendah', label: 'Rendah' },
+        { value: 'Sedang', label: 'Sedang' },
+        { value: 'Tinggi', label: 'Tinggi' },
+    ]
     return (
         <AdaptableCard divider className="mb-4">
             <h5>Informasi Dasar</h5>
@@ -166,6 +172,28 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                     field.name,
                                     selected?.value || ''
                                 )
+                            }}
+                        />
+                    )}
+                </Field>
+            </FormItem>
+            {/* Prioritas */}
+            <FormItem
+                label="Prioritas"
+                invalid={(errors.prioritas && touched.prioritas) as boolean}
+                errorMessage={errors.prioritas}
+            >
+                <Field name="prioritas">
+                    {({ field, form }: FieldProps) => (
+                        <Select
+                            placeholder="Pilih Prioritas"
+                            isDisabled={type === 'edit'}
+                            options={prioritasOptions}
+                            value={prioritasOptions.find(
+                                (option) => option.value === field.value
+                            )}
+                            onChange={(option) => {
+                                form.setFieldValue(field.name, option?.value)
                             }}
                         />
                     )}

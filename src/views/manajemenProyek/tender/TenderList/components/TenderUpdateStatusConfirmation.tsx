@@ -21,7 +21,7 @@ const TenderUpdateStatusConfirmation = () => {
     )
 
     const tenderStatus = useAppSelector(
-        (state) => state.tenderList.data.tenderStatus
+        (state) => state.tenderList.data.progress
     )
 
     const tableData = useAppSelector((state) => state.tenderList.data.tableData)

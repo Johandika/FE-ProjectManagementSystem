@@ -13,7 +13,6 @@ const DivisiNew = () => {
     const addDivisi = async (data: FormModel) => {
         try {
             const response = await apiCreateDivisi<boolean, FormModel>(data)
-            console.log('DivisiNew response:', response)
             return { success: true, data: response.data }
         } catch (error: any) {
             // Ekstrak pesan error dari respons

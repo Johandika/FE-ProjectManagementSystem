@@ -54,7 +54,6 @@ const TagihanKlienTable = () => {
         (state) => state.tagihanKlienList.data.tagihanData
     )
 
-    console.log('tagihanData', tagihanData)
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps

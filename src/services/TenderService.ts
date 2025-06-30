@@ -73,6 +73,18 @@ export async function apiUpdateStatusTender<
     })
 }
 
+// update status tender
+export async function apiUpdateProgressTender<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/tender/progress/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
 // create
 export async function apiCreateTender<T, U extends Record<string, unknown>>(
     data: U

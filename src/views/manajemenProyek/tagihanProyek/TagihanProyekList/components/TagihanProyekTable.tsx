@@ -53,11 +53,6 @@ const TagihanProyekTable = () => {
         (state) => state.tagihanProyekList.data.tagihanData
     )
 
-    console.log(
-        'data',
-        useAppSelector((state) => state.tagihanProyekList.data.proyeksList)
-    )
-
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps

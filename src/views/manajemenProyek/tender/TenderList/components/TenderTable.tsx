@@ -5,6 +5,7 @@ import {
     HiOutlinePencil,
     HiOutlineTrash,
 } from 'react-icons/hi'
+import { GiProgression } from 'react-icons/gi'
 import {
     getTenders,
     setTableData,
@@ -14,6 +15,8 @@ import {
     setUpdateConfirmation,
     setSelectedTender,
     setTenderStatus,
+    setProgressConfirmation,
+    setProgress,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import TenderDeleteConfirmation from './TenderDeleteConfirmation'
@@ -25,8 +28,9 @@ import type {
     ColumnDef,
 } from '@/components/shared/DataTable'
 import { formatDate } from '@/utils/formatDate'
-import { Button } from '@/components/ui'
+import { Button, Tooltip } from '@/components/ui'
 import TenderUpdateStatusConfirmation from './TenderUpdateStatusConfirmation'
+import TenderUpdateProgress from './TenderUpdateProgress'
 
 type Product = {
     id: string
@@ -37,12 +41,19 @@ type Product = {
     idClient?: string
     idDivisi?: string
     status: string
+    progress: number
 }
 
 const ActionColumn = ({ row }: { row: Product }) => {
     const dispatch = useAppDispatch()
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
+
+    const onProgressUpdate = () => {
+        dispatch(setProgressConfirmation(true))
+        dispatch(setSelectedTender(row.id))
+        dispatch(setProgress(row.progress))
+    }
 
     const onCreateProject = () => {
         navigate(`/manajemen-proyek-new`, {
@@ -83,12 +94,24 @@ const ActionColumn = ({ row }: { row: Product }) => {
                     </span>
                 </>
             ) : row.status === 'Diterima' ? (
-                <span
-                    className={`cursor-pointer p-2 hover:${textTheme}`}
-                    onClick={onCreateProject}
-                >
-                    <HiOutlineDocumentAdd />
-                </span>
+                <>
+                    <Tooltip title="Progress">
+                        <span
+                            className={`cursor-pointer p-2 hover:${textTheme}`}
+                            onClick={onProgressUpdate}
+                        >
+                            <GiProgression />
+                        </span>
+                    </Tooltip>
+                    <Tooltip title="Tambah Proyek">
+                        <span
+                            className={`cursor-pointer p-2 hover:${textTheme}`}
+                            onClick={onCreateProject}
+                        >
+                            <HiOutlineDocumentAdd />
+                        </span>
+                    </Tooltip>
+                </>
             ) : null}
         </div>
     )
@@ -323,6 +346,39 @@ const TenderTable = () => {
                     )
                 },
             },
+            {
+                header: 'Progress',
+                accessorKey: 'progress',
+                minWidth: 150,
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span>
+                            {row.status === 'Diterima'
+                                ? `${row.progress}%`
+                                : '-'}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Prioritas',
+                accessorKey: 'prioritas',
+                minWidth: 150,
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span>{row.prioritas || '-'}</span>
+                },
+            },
+            {
+                header: 'Dibuat Oleh',
+                accessorKey: 'User.nama',
+                minWidth: 150,
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span>{row.User?.nama}</span>
+                },
+            },
         ]
 
         if (user?.authority !== 'Owner') {
@@ -376,6 +432,7 @@ const TenderTable = () => {
             />
             <TenderDeleteConfirmation />
             <TenderUpdateStatusConfirmation />
+            <TenderUpdateProgress />
         </>
     )
 }

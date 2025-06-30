@@ -42,13 +42,11 @@ export const SLICE_NAME = 'peranList'
 export const getRoles = createAsyncThunk(
     SLICE_NAME + '/getRoles',
     async (data) => {
-        console.log('data masuk', data)
         const response = await apiGetRoles<
             GetMasterSatuanResponse,
             GetMasterSatuanData
         >(data)
 
-        console.log('data keluar', response.data)
         return {
             data: response.data.data,
             total: response.data.totaldataClient,

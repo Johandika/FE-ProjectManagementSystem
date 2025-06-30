@@ -25,8 +25,6 @@ const AdendumUpdateStatusConfirmation = () => {
         (state) => state.adendumList.data.adendumStatus
     )
 
-    console.log('adendumStatus', adendumStatus)
-
     const tableData = useAppSelector(
         (state) => state.adendumList.data.tableData
     )

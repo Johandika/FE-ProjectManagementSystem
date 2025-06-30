@@ -44,13 +44,11 @@ const ProyekUpdateStatusConfirmation = () => {
             let success
 
             if (projectStatus === 'Selesai Sudah tertagih 100%') {
-                console.log('projectStatus berhasil', projectStatus)
                 success = await apiUpdateStatusSelesaiProyek({
                     id: selectedProyek,
                     status: true,
                 })
             } else if (projectStatus === 'Belum Dimulai') {
-                console.log('projectStatus berhasil', projectStatus)
                 success = await apiUpdateStatusDiprosesProyek({
                     id: selectedProyek,
                     status: true,

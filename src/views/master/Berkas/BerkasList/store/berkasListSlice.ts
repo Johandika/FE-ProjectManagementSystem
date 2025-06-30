@@ -48,7 +48,6 @@ export const getBerkases = createAsyncThunk(
             GetMasterBerkasData
         >(data)
 
-        console.log('response.data', response.data)
         return {
             data: response.data.data,
             total: response.data.totaldataMasterBerkas,

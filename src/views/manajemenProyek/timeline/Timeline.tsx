@@ -72,9 +72,6 @@ const Timeline = () => {
         const formattedStart = dayjs(start).format('YYYY-MM-DD')
         const formattedEnd = dayjs(end).format('YYYY-MM-DD')
 
-        console.log('Tanggal awal yang dipilih:', formattedStart)
-        console.log('Tanggal akhir yang dipilih:', formattedEnd)
-
         setDateRange({ awal: formattedStart, akhir: formattedEnd })
     }
 

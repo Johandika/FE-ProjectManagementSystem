@@ -30,7 +30,9 @@ export type MasterTenderListSlice = {
     deleteConfirmation: boolean
     selectedTender: string
     tenderStatus: string
+    progress: number
     updateConfirmation: boolean
+    progressConfirmation: boolean
     tableData: TableQueries & { totalPage?: number }
     filterData: FilterQueries
     productList: Tender[]
@@ -71,6 +73,7 @@ const initialState: MasterTenderListSlice = {
     selectedTender: '',
     updateConfirmation: false,
     tenderStatus: '',
+    progress: 0,
     productList: [],
     tableData: initialTableData,
     filterData: {
@@ -97,8 +100,14 @@ const tenderListSlice = createSlice({
         setUpdateConfirmation: (state, action) => {
             state.updateConfirmation = action.payload
         },
+        setProgressConfirmation: (state, action) => {
+            state.progressConfirmation = action.payload
+        },
         setTenderStatus: (state, action) => {
             state.tenderStatus = action.payload
+        },
+        setProgress: (state, action) => {
+            state.progress = action.payload
         },
     },
     extraReducers: (builder) => {
@@ -121,7 +130,9 @@ export const {
     toggleDeleteConfirmation,
     setSelectedTender,
     setUpdateConfirmation,
+    setProgressConfirmation,
     setTenderStatus,
+    setProgress,
 } = tenderListSlice.actions
 
 export default tenderListSlice.reducer

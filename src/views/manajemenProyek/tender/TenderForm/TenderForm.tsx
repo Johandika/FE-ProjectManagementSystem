@@ -128,6 +128,7 @@ const TenderForm = forwardRef<FormikRef, TenderForm>((props, ref) => {
                                         errors={errors}
                                         kliensData={kliensData}
                                         dataDivisi={dataDivisi}
+                                        type={type}
                                     />
                                 </div>
                             </div>

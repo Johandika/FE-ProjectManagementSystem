@@ -74,7 +74,6 @@ export const getAdendumsByProyek = createAsyncThunk(
             GetMasterAdendumData
         >(data)
 
-        console.log('response.data.data', response.data)
         // return response.data
         return {
             data: response.data,

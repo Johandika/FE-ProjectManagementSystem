@@ -60,7 +60,6 @@ const TenderNew = () => {
     ) => {
         try {
             setSubmitting(true)
-            console.log('values', values)
             const result = await addTender(values)
 
             setSubmitting(false)

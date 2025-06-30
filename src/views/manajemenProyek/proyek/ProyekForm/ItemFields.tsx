@@ -42,16 +42,6 @@ const ItemFields = (props: ItemFieldsProps) => {
         volume: number,
         hargaSatuanMaterial: number
     ) => {
-        console.log(
-            `volume: ${extractNumberFromString(
-                volume
-            )} * H. sat. mat.: ${extractNumberFromString(
-                hargaSatuanMaterial
-            )} = ${
-                extractNumberFromString(volume) *
-                extractNumberFromString(hargaSatuanMaterial)
-            }`
-        )
         return (
             extractNumberFromString(volume) *
             extractNumberFromString(hargaSatuanMaterial)
@@ -62,13 +52,6 @@ const ItemFields = (props: ItemFieldsProps) => {
         volume: number,
         hargaSatuanJasa: number
     ) => {
-        console.log(
-            `volume: ${extractNumberFromString(
-                volume
-            )} * H. sat. jasa: ${extractNumberFromString(hargaSatuanJasa)} = ${
-                volume * extractNumberFromString(hargaSatuanJasa)
-            }`
-        )
         return (
             extractNumberFromString(volume) *
             extractNumberFromString(hargaSatuanJasa)
@@ -79,17 +62,6 @@ const ItemFields = (props: ItemFieldsProps) => {
         jumlahHargaMaterial: number,
         jumlahHargaJasa: number
     ) => {
-        console.log(
-            `jumlahHargaMaterial: ${extractNumberFromString(
-                jumlahHargaMaterial
-            )} + jumlahHargaJasa: ${extractNumberFromString(
-                jumlahHargaJasa
-            )} = ${
-                extractNumberFromString(jumlahHargaMaterial) +
-                extractNumberFromString(jumlahHargaJasa)
-            }`
-        )
-        console.log('')
         return (
             extractNumberFromString(jumlahHargaMaterial) +
             extractNumberFromString(jumlahHargaJasa)
