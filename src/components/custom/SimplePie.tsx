@@ -21,8 +21,10 @@ const SimplePie = ({ dataAwal }: any) => {
                 options={{
                     colors: [
                         twColor.amber['500'],
+                        twColor.blue['500'],
                         twColor.emerald['500'],
                         twColor.rose['500'],
+                        twColor.gray['500'],
                     ],
                     labels: category?.map((label) => `${label}`), // Format angka untuk label
                     plotOptions: {

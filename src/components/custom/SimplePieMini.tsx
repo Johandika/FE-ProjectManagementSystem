@@ -1,10 +1,7 @@
 import Chart from 'react-apexcharts'
-import { theme } from 'twin.macro'
 
-const twColor: Record<string, string> = theme`colors`
-
-const SimplePieMini = ({ dataAwal }: any) => {
-    const dataGrafikPie = dataAwal?.grafik_pie_pembayaran
+const SimplePieMini = ({ dataAwal, title, colors }: any) => {
+    const dataGrafikPie = dataAwal
     const data = dataGrafikPie?.data
     const category = dataGrafikPie?.key
 
@@ -15,15 +12,11 @@ const SimplePieMini = ({ dataAwal }: any) => {
     return (
         <div className="flex flex-col w-full ">
             <div className="mb-4 lg:mb-0">
-                <p className="text-sm">Statistik Total Nilai Kontrak</p>
+                <p className="text-sm">{title}</p>
             </div>
             <Chart
                 options={{
-                    colors: [
-                        twColor.emerald['500'],
-                        twColor.amber['500'],
-                        twColor.rose['500'],
-                    ],
+                    colors: colors,
                     labels: category?.map((label) => `${label}`), // Format angka untuk label
                     plotOptions: {
                         pie: {
