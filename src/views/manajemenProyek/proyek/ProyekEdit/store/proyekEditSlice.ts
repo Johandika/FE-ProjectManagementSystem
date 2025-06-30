@@ -147,6 +147,13 @@ interface PurchaseOrder {
     idProject: string
     createdAt: string
     updatedAt: string
+    // tmbh
+    tanggal_uang_muka: string
+    uang_muka: number
+    keterangan_barang: string
+    status_lunas: boolean
+    status_dikirim: boolean
+    status_sampai: boolean
 }
 
 type GetProyekResponse = ProyekData

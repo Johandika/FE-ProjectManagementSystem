@@ -21,7 +21,13 @@ import {
     useAppSelector,
 } from '../../ProyekEdit/store'
 import { formatDate } from '@/utils/formatDate'
-import { DatePicker, Notification, toast } from '@/components/ui'
+import {
+    DatePicker,
+    Notification,
+    Select,
+    Switcher,
+    toast,
+} from '@/components/ui'
 import dayjs from 'dayjs'
 import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
@@ -48,6 +54,13 @@ type PurchaseOrder = {
     createdAt: string
     updatedAt: string
     DetailPurchases: DetailPurchase[]
+    // tambah
+    tanggal_uang_muka: string
+    uang_muka: string
+    status_lunas: boolean
+    status_dikirim: boolean
+    status_sampai: boolean
+    keterangan_barang: string
 }
 
 // Type for detail item in the form
@@ -67,6 +80,13 @@ type FormValues = {
     tempStatus: string
     tempNomorPo: string
     tempDetails: DetailItem[]
+    //tmbh
+    tempTanggalUangMuka: string
+    tempUangMuka: number
+    tempStatusLunas: boolean
+    tempStatusDikirim: boolean
+    tempStatusSampai: boolean
+    tempKeteranganBarang: string
 }
 
 // Validation schema for the form fields
@@ -332,6 +352,19 @@ const PurchaseOrder = () => {
                                             pabrik: values.tempPabrik,
                                             tanggal_po: values.tempTanggalPo,
                                             detail: detailItems,
+                                            tanggal_uang_muka:
+                                                values.tempTanggalUangMuka,
+                                            uang_muka: extractNumberFromString(
+                                                values.tempUangMuka
+                                            ),
+                                            status_lunas:
+                                                values.tempStatusLunas,
+                                            status_dikirim:
+                                                values.tempStatusDikirim,
+                                            status_sampai:
+                                                values.tempStatusSampai,
+                                            keterangan_barang:
+                                                values.tempKeteranganBarang,
                                         }
 
                                         result = await apiCreatePurchaseOrder(
@@ -412,6 +445,14 @@ const PurchaseOrder = () => {
                         setFieldValue('tempPabrik', '')
                         setFieldValue('tempNomorPo', '')
                         setFieldValue('tempTanggalPo', '')
+
+                        setFieldValue('tempTanggalUangMuka', '')
+                        setFieldValue('tempUangMuka', 0)
+                        setFieldValue('tempStatusLunas', false)
+                        setFieldValue('tempStatusDikirim', false)
+                        setFieldValue('tempStatusSammpai', false)
+                        setFieldValue('tempKeteranganBarang', '')
+
                         setFieldValue('tempDetails', [
                             {
                                 nama_barang: '',
@@ -436,6 +477,27 @@ const PurchaseOrder = () => {
                             setFieldValue('tempNomorPo', purchase.nomor_po)
                             setFieldValue('tempTanggalPo', purchase.tanggal_po)
                             setFieldValue('tempIdProject', purchase.idProject)
+                            setFieldValue(
+                                'tempTanggalUangMuka',
+                                purchase.tanggal_uang_muka
+                            )
+                            setFieldValue('tempUangMuka', purchase.uang_muka)
+                            setFieldValue(
+                                'tempKeteranganBarang',
+                                purchase.keterangan_barang
+                            )
+                            setFieldValue(
+                                'tempStatusDikirim',
+                                purchase.status_dikirim
+                            )
+                            setFieldValue(
+                                'tempStatusLunas',
+                                purchase.status_lunas
+                            )
+                            setFieldValue(
+                                'tempStatusSampai',
+                                purchase.status_sampai
+                            )
 
                             // Map the detail purchases to form format
                             const details =
@@ -628,6 +690,95 @@ const PurchaseOrder = () => {
                                                 </Field>
                                             </FormItem>
 
+                                            {/* Harga */}
+                                            <FormItem
+                                                label="Uang Muka"
+                                                errorMessage={
+                                                    errors.tempUangMuka &&
+                                                    touched.tempUangMuka
+                                                        ? errors.tempUangMuka
+                                                        : ''
+                                                }
+                                                invalid={
+                                                    !!(
+                                                        errors.tempUangMuka &&
+                                                        touched.tempUangMuka
+                                                    )
+                                                }
+                                            >
+                                                <Field name={`tempUangMuka`}>
+                                                    {({
+                                                        field,
+                                                        form,
+                                                    }: FieldProps) => (
+                                                        <NumericFormat
+                                                            {...field}
+                                                            customInput={Input}
+                                                            placeholder="Harga"
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            onValueChange={(
+                                                                values
+                                                            ) => {
+                                                                form.setFieldValue(
+                                                                    field.name,
+                                                                    values.value
+                                                                )
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Field>
+                                            </FormItem>
+
+                                            {/* Edit Tanggal Uang Muka*/}
+                                            <FormItem
+                                                label="Tanggal Uang Muka"
+                                                invalid={
+                                                    !!(
+                                                        errors.tempTanggalUangMuka &&
+                                                        touched.tempTanggalUangMuka
+                                                    )
+                                                }
+                                                errorMessage={
+                                                    errors.tempTanggalUangMuka as string
+                                                }
+                                            >
+                                                <Field name="tempTanggalUangMuka">
+                                                    {({
+                                                        field,
+                                                        form,
+                                                    }: FieldProps) => (
+                                                        <DatePicker
+                                                            placeholder="Pilih Tanggal"
+                                                            value={
+                                                                field.value
+                                                                    ? new Date(
+                                                                          field.value
+                                                                      )
+                                                                    : null
+                                                            }
+                                                            inputFormat="DD-MM-YYYY"
+                                                            onChange={(
+                                                                date
+                                                            ) => {
+                                                                const formattedDate =
+                                                                    date
+                                                                        ? dayjs(
+                                                                              date
+                                                                          ).format(
+                                                                              'YYYY-MM-DD'
+                                                                          )
+                                                                        : ''
+                                                                form.setFieldValue(
+                                                                    field.name,
+                                                                    formattedDate
+                                                                )
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Field>
+                                            </FormItem>
+
                                             {/* Edit Pabrik*/}
                                             <FormItem
                                                 label="Pabrik"
@@ -649,6 +800,108 @@ const PurchaseOrder = () => {
                                                     autoComplete="off"
                                                     name="tempPabrik"
                                                     placeholder="Nama pabrik"
+                                                    component={Input}
+                                                />
+                                            </FormItem>
+
+                                            {/* Status Lunas */}
+                                            <FormItem
+                                                label="Status Lunas"
+                                                invalid={
+                                                    errors.tempStatusLunas &&
+                                                    touched.tempStatusLunas
+                                                }
+                                                errorMessage={
+                                                    errors.tempStatusLunas
+                                                }
+                                            >
+                                                <div className="flex flex-row items-center gap-3">
+                                                    <Field
+                                                        name={`tempStatusLunas`}
+                                                        component={Switcher}
+                                                    />
+                                                    <span>
+                                                        {values.tempStatusLunas ===
+                                                        true
+                                                            ? 'Sudah Lunas'
+                                                            : 'Belum Lunas'}
+                                                    </span>
+                                                </div>
+                                            </FormItem>
+
+                                            {/* Status Sampai */}
+                                            <FormItem
+                                                label="Status Sampai"
+                                                invalid={
+                                                    errors.tempStatusSampai &&
+                                                    touched.tempStatusSampai
+                                                }
+                                                errorMessage={
+                                                    errors.tempStatusSampai
+                                                }
+                                            >
+                                                <div className="flex flex-row items-center gap-3">
+                                                    <Field
+                                                        name={`tempStatusSampai`}
+                                                        component={Switcher}
+                                                    />
+                                                    <span>
+                                                        {values.tempStatusSampai ===
+                                                        true
+                                                            ? 'Sudah Sampai'
+                                                            : 'Belum Sampai'}
+                                                    </span>
+                                                </div>
+                                            </FormItem>
+
+                                            {/* Status Dikirim */}
+                                            <FormItem
+                                                label="Status Dikirim"
+                                                invalid={
+                                                    errors.tempStatusDikirim &&
+                                                    touched.tempStatusDikirim
+                                                }
+                                                errorMessage={
+                                                    errors.tempStatusDikirim
+                                                }
+                                            >
+                                                <div>
+                                                    <div className="flex flex-row items-center gap-3">
+                                                        <Field
+                                                            name={`tempStatusDikirim`}
+                                                            component={Switcher}
+                                                        />
+                                                        <span>
+                                                            {values.tempStatusDikirim ===
+                                                            true
+                                                                ? 'Sudah Dikirim'
+                                                                : 'Belum Dikirim'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </FormItem>
+
+                                            {/* Keterangan Barang*/}
+                                            <FormItem
+                                                label="Keterangan Barang"
+                                                errorMessage={
+                                                    errors.tempKeteranganBarang &&
+                                                    touched.tempKeteranganBarang
+                                                        ? errors.tempKeteranganBarang
+                                                        : ''
+                                                }
+                                                invalid={
+                                                    !!(
+                                                        errors.tempKeteranganBarang &&
+                                                        touched.tempKeteranganBarang
+                                                    )
+                                                }
+                                            >
+                                                <Field
+                                                    textArea
+                                                    autoComplete="off"
+                                                    name="tempKeteranganBarang"
+                                                    placeholder="Keterangan Barang"
                                                     component={Input}
                                                 />
                                             </FormItem>
@@ -928,7 +1181,7 @@ const PurchaseOrder = () => {
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                                        <div className="grid grid-cols-3 gap-4 mb-4">
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Nomor PO:
@@ -948,6 +1201,75 @@ const PurchaseOrder = () => {
                                                                     {formatDate(
                                                                         purchase.tanggal_po
                                                                     )}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Uang Muka:
+                                                                </span>
+                                                                <p>
+                                                                    Rp{' '}
+                                                                    {purchase.uang_muka?.toLocaleString(
+                                                                        'id-ID'
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Tanggal Uang
+                                                                    Muka:
+                                                                </span>
+                                                                <p>
+                                                                    {formatDate(
+                                                                        purchase.tanggal_uang_muka
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Status Lunas
+                                                                    :
+                                                                </span>
+                                                                <p>
+                                                                    {purchase.status_lunas ===
+                                                                    true
+                                                                        ? 'Sudah Lunas'
+                                                                        : 'Belum Lunas'}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Status
+                                                                    Dikirim:
+                                                                </span>
+                                                                <p>
+                                                                    {purchase.status_dikirim ===
+                                                                    true
+                                                                        ? 'Sudah Dikirim'
+                                                                        : 'Belum Dikirim'}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Status
+                                                                    Sampai:
+                                                                </span>
+                                                                <p>
+                                                                    {purchase.status_dikirim ===
+                                                                    true
+                                                                        ? 'Sudah Sampai'
+                                                                        : 'Belum Sampai'}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Keterangan
+                                                                    Barang:
+                                                                </span>
+                                                                <p>
+                                                                    {
+                                                                        purchase.keterangan_barang
+                                                                    }
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -1035,7 +1357,6 @@ const PurchaseOrder = () => {
                                                                                                     <HiOutlineTrash />
                                                                                                 }
                                                                                                 onClick={() => {
-                                                                                                   
                                                                                                     handleRemoveDetail(
                                                                                                         detail?.id
                                                                                                     )
