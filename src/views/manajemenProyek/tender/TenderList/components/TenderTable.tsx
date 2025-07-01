@@ -153,10 +153,11 @@ const TenderTable = () => {
 
     const data = useAppSelector((state) => state.tenderList.data.productList)
 
-    // Handler for row click to navigate to detail page
+    // Setelah diubah
     const handleRowClick = (row: any) => {
-        // e.stopPropagation()
-        navigate(`/manajemen-tender-detail/${row.id}`)
+        if (row.status === 'Diterima') {
+            navigate(`/manajemen-tender-detail/${row.id}`)
+        }
     }
 
     useEffect(() => {
@@ -188,8 +189,6 @@ const TenderTable = () => {
     }
 
     const handleUpdateStatus = async (status: string, id: string) => {
-        console.log(id)
-        console.log(status)
         dispatch(setUpdateConfirmation(true))
         dispatch(setSelectedTender(id))
         dispatch(setTenderStatus(status))
@@ -402,6 +401,15 @@ const TenderTable = () => {
                 cell: (props) => {
                     const row = props.row.original
                     return <span>{row.User?.nama}</span>
+                },
+            },
+            {
+                header: 'Keterangan',
+                accessorKey: 'KeteranganTenders[0].keterangan',
+                minWidth: 260,
+                cell: (props) => {
+                    const row = props.row.original
+                    return <span>{row.KeteranganTenders[0]?.keterangan}</span>
                 },
             },
         ]

@@ -26,7 +26,7 @@ const SimplePie = ({ dataAwal }: any) => {
                         twColor.rose['500'],
                         twColor.gray['500'],
                     ],
-                    labels: category?.map((label) => `${label}`), // Format angka untuk label
+                    labels: category?.map((label: string) => `${label}`), // Format angka untuk label
                     plotOptions: {
                         pie: {
                             donut: {

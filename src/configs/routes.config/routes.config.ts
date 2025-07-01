@@ -68,7 +68,7 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/manajemenProyek/tender/TenderList')
         ),
-        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
+        authority: [],
     },
     {
         key: 'apps.tender',
@@ -76,7 +76,7 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/manajemenProyek/tender/TenderEdit')
         ),
-        authority: [SUPER_ADMIN, DEVELOPER],
+        authority: [SUPER_ADMIN, DEVELOPER, ADMIN],
         meta: {
             header: 'Ubah Tender',
         },
@@ -87,7 +87,7 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/manajemenProyek/tender/TenderNew')
         ),
-        authority: [SUPER_ADMIN, DEVELOPER],
+        authority: [SUPER_ADMIN, DEVELOPER, ADMIN],
         meta: {
             header: 'Tambah Tender',
         },
@@ -139,7 +139,7 @@ export const protectedRoutes = [
         key: 'apps.timeline',
         path: '/manajemen-proyek/timeline',
         component: lazy(() => import('@/views/manajemenProyek/timeline')),
-        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
+        authority: [],
     },
     // Klien
     {
@@ -277,7 +277,7 @@ export const protectedRoutes = [
         key: 'apps.peran',
         path: '/peran-dan-pengguna/peran',
         component: lazy(() => import('@/views/peranPengguna/Peran/PeranList')),
-        authority: [],
+        authority: [SUPER_ADMIN, DEVELOPER, OWNER],
     },
     {
         key: 'apps.pengguna',
@@ -285,7 +285,7 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/peranPengguna/Pengguna/PenggunaList')
         ),
-        authority: [],
+        authority: [SUPER_ADMIN, DEVELOPER, OWNER],
     },
     {
         key: 'apps.peranDanPengguna',
@@ -293,7 +293,7 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/peranPengguna/Pengguna/PenggunaEdit')
         ),
-        authority: [],
+        authority: [SUPER_ADMIN, DEVELOPER, OWNER],
         meta: {
             header: 'Ubah Pengguna',
         },
@@ -304,7 +304,7 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/peranPengguna/Pengguna/PenggunaNew')
         ),
-        authority: [SUPER_ADMIN, DEVELOPER],
+        authority: [SUPER_ADMIN, DEVELOPER, OWNER],
         meta: {
             header: 'Tambah Pengguna',
         },

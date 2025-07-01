@@ -83,8 +83,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
     )
 
     const onCheck = (value: boolean, form: any) => {
-        console.log(setCheckRetensi(value))
-
         form.setFieldValue('is_retensi', value)
 
         // Reset field retensi jika unchecked
@@ -93,7 +91,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             form.setFieldValue('jatuh_tempo_retensi', null)
         }
     }
-    console.log(useAppSelector((state) => state.base.common))
 
     useEffect(() => {
         if (initialData?.idClient?.length > 5) {

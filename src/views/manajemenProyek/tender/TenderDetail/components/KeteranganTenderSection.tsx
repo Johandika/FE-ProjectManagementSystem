@@ -78,8 +78,6 @@ export default function KeteranganTenderSection({ keterangansData }: any) {
     )
     const rquestParam = { id: path }
 
-    console.log('keterangansData', keterangansData)
-
     const onDelete = (id: any) => {
         dispatch(toggleDeleteConfirmationKeterangan(true))
         dispatch(setSelectedKeterangan(id))
@@ -160,7 +158,6 @@ export default function KeteranganTenderSection({ keterangansData }: any) {
 
     // --- Handle Klik Tombol Edit ---
     const handleEditKeterangan = (id: string) => {
-        console.log(id)
         setIdKeterangan(id)
         setTypeDialog('edit')
         dispatch(getKeteranganTender({ id })) // Ambil data spesifik

@@ -3,6 +3,7 @@ import { COLORS } from '@/constants/chart.constant'
 
 const BasicBarVertical = ({ dataAwal }: any) => {
     const dataGrafikSatu = dataAwal?.grafik_satu
+
     const category = dataGrafikSatu?.key
 
     const data = [
@@ -36,11 +37,6 @@ const BasicBarVertical = ({ dataAwal }: any) => {
                     },
                     xaxis: {
                         categories: category,
-                        labels: {
-                            formatter: function (val: any) {
-                                return formatNumber(val)
-                            },
-                        },
                     },
                 }}
                 series={data}

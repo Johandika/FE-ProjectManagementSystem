@@ -200,7 +200,6 @@ const PurchaseOrder = () => {
                 result = await apiUpdateStatusLunasPurchase(data)
             }
 
-            console.log(result)
             // Show success notification if update was successful
             if (result.data.statusCode === 200) {
                 popNotification('updated')
@@ -401,14 +400,7 @@ const PurchaseOrder = () => {
                                         // Handle edit with API call
                                         const purchaseId =
                                             purchaseOrdersData[editIndex].id
-                                        console.log(
-                                            'tanggalPO',
-                                            values.tempTanggalPo
-                                        )
-                                        console.log(
-                                            'tempTanggalUangMuka',
-                                            values.tempTanggalUangMuka
-                                        )
+
                                         // Update main purchase order
                                         result = await apiPutPurchaseOrder({
                                             id: purchaseId,
@@ -484,7 +476,6 @@ const PurchaseOrder = () => {
                                                 values.tempKeteranganBarang,
                                         }
 
-                                        console.log('requestData', requestData)
                                         result = await apiCreatePurchaseOrder(
                                             requestData
                                         )
@@ -590,10 +581,6 @@ const PurchaseOrder = () => {
                         if (purchaseOrdersData) {
                             const purchase = purchaseOrdersData[index]
 
-                            console.log(
-                                'tempTanggalUangMuka',
-                                purchase.tanggal_uang_muka
-                            )
                             // Set temporary values for editing
                             setFieldValue('tempPabrik', purchase.pabrik)
                             setFieldValue('tempNomorPo', purchase.nomor_po)

@@ -54,7 +54,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item2',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
+                        authority: [],
                         subMenu: [],
                     },
                     {
@@ -64,7 +64,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.apps.manajemenProyek.item3',
                         icon: '',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
+                        authority: [],
                         subMenu: [],
                     },
                     {
@@ -170,7 +170,7 @@ const appsNavigationConfig: NavigationTree[] = [
                 translateKey: 'nav.apps.peranDanPengguna.collapse',
                 icon: 'peranDanPengguna',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [],
+                authority: [SUPER_ADMIN, DEVELOPER, OWNER],
                 subMenu: [
                     {
                         key: 'apps.peran',

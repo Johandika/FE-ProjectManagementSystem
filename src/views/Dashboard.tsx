@@ -229,7 +229,7 @@ const Dashboard = () => {
                                             isLoading={loadingSelectClient}
                                             value={
                                                 clientOptions.find(
-                                                    (opt) =>
+                                                    (opt: any) =>
                                                         opt.value ===
                                                         field.value
                                                 ) || null
@@ -265,7 +265,7 @@ const Dashboard = () => {
                                             isLoading={loadingSelectDivisi}
                                             value={
                                                 divisiOptions.find(
-                                                    (opt) =>
+                                                    (opt: any) =>
                                                         opt.value ===
                                                         field.value
                                                 ) || null
