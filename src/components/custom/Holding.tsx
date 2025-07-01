@@ -132,7 +132,7 @@ export default function Holding({ dataAwal }: any) {
                     <SimplePieMini
                         dataAwal={dataAwal?.grafik_pie_progress}
                         title={'Statistik Progress'}
-                        colors={[twColor.emerald['500'], twColor.rose['500']]}
+                        colors={[twColor.blue['500'], twColor.rose['500']]}
                     />
                 </div>
             </div>

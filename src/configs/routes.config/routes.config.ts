@@ -92,6 +92,18 @@ export const protectedRoutes = [
             header: 'Tambah Tender',
         },
     },
+    {
+        added: 'detailTender',
+        key: 'apps.tender',
+        path: '/manajemen-tender-detail/:tenderId',
+        component: lazy(
+            () => import('@/views/manajemenProyek/tender/TenderDetail')
+        ),
+        authority: [SUPER_ADMIN, DEVELOPER],
+        meta: {
+            header: 'Detail Tender',
+        },
+    },
     // Tagihan Client
     {
         key: 'apps.tagihanKlien',

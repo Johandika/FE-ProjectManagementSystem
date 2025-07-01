@@ -38,12 +38,18 @@ const AllRoutes = (props: AllRoutesProps) => {
                 {protectedRoutes.map((route, index) => {
                     const routeMeta = { ...route.meta }
 
-                    const custRouteMeta = route.added
-                        ? {
-                              ...route.meta,
-                              header: `Detail Proyek ${pekerjaanActive}`,
-                          }
-                        : routeMeta
+                    const custRouteMeta =
+                        route.added === 'detailTender'
+                            ? {
+                                  ...route.meta,
+                                  header: `Detail Tender`,
+                              }
+                            : route.added === 'detailProyek'
+                            ? {
+                                  ...route.meta,
+                                  header: `Detail Proyek ${pekerjaanActive}`,
+                              }
+                            : routeMeta
 
                     return (
                         <Route

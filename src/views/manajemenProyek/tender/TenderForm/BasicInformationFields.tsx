@@ -5,6 +5,8 @@ import { Field, FieldProps, FormikErrors, FormikTouched } from 'formik'
 import { NumericFormat } from 'react-number-format'
 import { DatePicker, Select } from '@/components/ui'
 import dayjs from 'dayjs'
+import { getSelectClient, useAppDispatch, useAppSelector } from '@/store'
+import { useEffect } from 'react'
 
 type FormFieldsName = {
     pekerjaan: string
@@ -24,12 +26,23 @@ type BasicInformationFields = {
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
+    const dispatch = useAppDispatch()
+
+    const { selectClient, loadingSelectClient } = useAppSelector(
+        (state) => state.base.common
+    )
+
     const { touched, errors, kliensData, dataDivisi, type } = props
     const prioritasOptions = [
         { value: 'Rendah', label: 'Rendah' },
         { value: 'Sedang', label: 'Sedang' },
         { value: 'Tinggi', label: 'Tinggi' },
     ]
+
+    useEffect(() => {
+        dispatch(getSelectClient())
+    }, [])
+
     return (
         <AdaptableCard divider className="mb-4">
             <h5>Informasi Dasar</h5>
@@ -106,34 +119,27 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             >
                 <Field name="idClient">
                     {({ field, form }: FieldProps) => {
-                        // Find the selected client based on current idClient value
-                        const selectedClient = field.value
-                            ? kliensData?.find(
-                                  (client: any) => client.id === field.value
-                              )
-                            : null
+                        // Gunakan `selectClient` bukan `kliensList`
+                        const clientOptions = selectClient.data?.map(
+                            (client) => ({
+                                value: client.id,
+                                label: client.nama,
+                            })
+                        )
 
-                        // Map clients to options format required by Select component
-                        const clientOptions = Array.isArray(kliensData)
-                            ? kliensData.map((client: any) => ({
-                                  value: client.id,
-                                  label: client.nama,
-                              }))
-                            : []
+                        // Logika untuk menemukan nilai yang sedang aktif tetap sama,
+                        // tapi gunakan `selectClient`
+                        const selectedValue = clientOptions?.find(
+                            (option) => option.value === field.value
+                        )
 
                         return (
                             <Select
                                 field={field}
                                 form={form}
+                                isLoading={loadingSelectClient}
                                 options={clientOptions}
-                                value={
-                                    selectedClient
-                                        ? {
-                                              value: selectedClient.nama,
-                                              label: `${selectedClient.nama}`,
-                                          }
-                                        : null
-                                }
+                                value={selectedValue}
                                 placeholder="Pilih klien"
                                 onChange={(option) => {
                                     form.setFieldValue(

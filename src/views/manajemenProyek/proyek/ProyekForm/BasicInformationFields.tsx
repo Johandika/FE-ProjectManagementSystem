@@ -7,6 +7,7 @@ import { Checkbox, DatePicker, Select } from '@/components/ui'
 import dayjs from 'dayjs'
 import reducer from '@/views/master/Satuan/SatuanList/store'
 import { useEffect, useState } from 'react'
+import { getSelectClient, useAppDispatch, useAppSelector } from '@/store'
 
 interface Termin {
     keterangan: string
@@ -72,16 +73,14 @@ type BasicInformationFields = {
 }
 
 const BasicInformationFields = (props: BasicInformationFields) => {
-    const {
-        touched,
-        errors,
-        type,
-        kliensList = [],
-        initialData = {},
-        dataDivisi,
-    } = props
+    const { touched, errors, type, initialData = {}, dataDivisi } = props
+    const dispatch = useAppDispatch()
     const [checkRetensi, setCheckRetensi] = useState(false)
     const [disabledState, setDisabledState] = useState(false)
+
+    const { selectClient, loadingSelectClient } = useAppSelector(
+        (state) => state.base.common
+    )
 
     const onCheck = (value: boolean, form: any) => {
         console.log(setCheckRetensi(value))
@@ -94,12 +93,17 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             form.setFieldValue('jatuh_tempo_retensi', null)
         }
     }
+    console.log(useAppSelector((state) => state.base.common))
 
     useEffect(() => {
         if (initialData?.idClient?.length > 5) {
             setDisabledState(true)
         }
     }, [initialData])
+
+    useEffect(() => {
+        dispatch(getSelectClient())
+    }, [])
 
     return (
         <AdaptableCard divider className="mb-4">
@@ -124,6 +128,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 {/* Client Select Field */}
+                {/* anchor */}
                 <div className="col-span-1">
                     <FormItem
                         label="Klien"
@@ -134,19 +139,16 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     >
                         <Field name="idClient">
                             {({ field, form }: FieldProps) => {
-                                // Find the selected client based on current idClient value
-                                const selectedClient = field.value
-                                    ? kliensList.find(
-                                          (client) => client.id === field.value
-                                      )
-                                    : null
-
-                                // Map clients to options format required by Select component
-                                const clientOptions = kliensList.map(
+                                // Gunakan `selectClient` bukan `kliensList`
+                                const clientOptions = selectClient.data?.map(
                                     (client) => ({
                                         value: client.id,
-                                        label: `${client.nama}`,
+                                        label: client.nama,
                                     })
+                                )
+
+                                const selectedValue = clientOptions?.find(
+                                    (option) => option.value === field.value
                                 )
 
                                 return (
@@ -154,15 +156,10 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                         field={field}
                                         form={form}
                                         isDisabled={disabledState}
+                                        // Tambahkan isLoading untuk UX yang lebih baik
+                                        isLoading={loadingSelectClient}
                                         options={clientOptions}
-                                        value={
-                                            selectedClient
-                                                ? {
-                                                      value: selectedClient.nama,
-                                                      label: `${selectedClient.nama}`,
-                                                  }
-                                                : null
-                                        }
+                                        value={selectedValue}
                                         placeholder="Pilih klien"
                                         onChange={(option) => {
                                             form.setFieldValue(

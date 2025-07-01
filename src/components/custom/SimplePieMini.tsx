@@ -27,7 +27,11 @@ const SimplePieMini = ({ dataAwal, title, colors }: any) => {
                     },
                     tooltip: {
                         y: {
-                            formatter: (value) => formatNumber(value), // Format angka pada tooltip
+                            formatter: (value) => {
+                                return `${formatNumber(value)}${
+                                    title === 'Statistik Progress' ? '%' : ''
+                                }`
+                            },
                         },
                     },
                     legend: {

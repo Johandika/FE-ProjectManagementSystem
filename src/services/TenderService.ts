@@ -104,3 +104,69 @@ export async function apiCreateTender<T, U extends Record<string, unknown>>(
 
     return res
 }
+
+// =================== KETERANGAN TENDER =======================
+
+// GetAll
+export async function apiGetAllKeteranganTender<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = await ApiService.fetchData<T>({
+        url: `/keteranganTender/tender/${data.id}`,
+        method: 'get',
+        data,
+    })
+
+    return res
+}
+
+// Get By Id
+export async function apiGetOneKeteranganTender<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = await ApiService.fetchData<T>({
+        url: `/keteranganTender/${data.id}`,
+        method: 'get',
+        data,
+    })
+    return res.data
+}
+
+// CREATE
+export async function apiCreateKeteranganTender<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    const res = ApiService.fetchData<T>({
+        url: '/keteranganTender',
+        method: 'post',
+        data: data,
+    })
+
+    return res
+}
+
+// UPDATE
+export async function apiUpdateKeteranganTender<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/keteranganTender/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// DELETE
+export async function apiDeleteKeteranganTender<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/keteranganTender/${data.id}`,
+        method: 'delete',
+    })
+}

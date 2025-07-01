@@ -154,6 +154,7 @@ interface PurchaseOrder {
     status_lunas: boolean
     status_dikirim: boolean
     status_sampai: boolean
+    DetailPurchases: any[]
 }
 
 type GetProyekResponse = ProyekData
@@ -213,6 +214,7 @@ export type MasterProyekEditState = {
     updateBerkasStatus: boolean
     deleteConfirmationKeterangan: boolean
     selectedKeterangan: string
+    purchaseStatusChecked: boolean
     proyekData: ProyekData
     loadingUpdateBerkasStatus: boolean
     loadingGetAllBerkasesByTermin: boolean
@@ -481,6 +483,7 @@ const initialState: MasterProyekEditState = {
     loadingGetAllBerkasesByTermin: true,
     deleteConfirmationKeterangan: false,
     selectedKeterangan: '',
+    purchaseStatusChecked: false,
     terminsData: [],
     keterangansData: [],
     keteranganData: [],
@@ -502,6 +505,9 @@ const proyekEditSlice = createSlice({
         },
         setSelectedKeterangan: (state, action) => {
             state.selectedKeterangan = action.payload
+        },
+        setStatusChecked: (state, action) => {
+            state.purchaseStatusChecked = action.payload
         },
     },
     extraReducers: (builder) => {
@@ -615,7 +621,10 @@ const proyekEditSlice = createSlice({
     },
 })
 
-export const { toggleDeleteConfirmationKeterangan, setSelectedKeterangan } =
-    proyekEditSlice.actions
+export const {
+    toggleDeleteConfirmationKeterangan,
+    setSelectedKeterangan,
+    setStatusChecked,
+} = proyekEditSlice.actions
 
 export default proyekEditSlice.reducer

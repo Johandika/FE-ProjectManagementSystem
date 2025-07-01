@@ -13,6 +13,9 @@ import {
     apiCreateDetailPurchase,
     apiUpdateDetailPurchase,
     apiDeleteDetailPurchaseOrder,
+    apiUpdateStatusKirimPurchase,
+    apiUpdateStatusLunasPurchase,
+    apiUpdateStatusSampaiPurchase,
 } from '@/services/PurchaseOrderService'
 import {
     deletePurchase,
@@ -32,6 +35,8 @@ import dayjs from 'dayjs'
 import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 import DescriptionSection from './DesriptionSection'
+
+// Added a comment to force refresh
 
 // Define types for your PO data structure according to the new API response
 type DetailPurchase = {
@@ -124,10 +129,16 @@ const PurchaseOrder = () => {
     const [deleteDetailId, setDeleteDetailId] = useState<
         string | number | null
     >(null)
-    const [deleteDetailInfo, setDeleteDetailInfo] = useState<{
-        purchaseIndex: number
-        detailIndex: number
+    // ... state lainnya
+    const [statusChangeInfo, setStatusChangeInfo] = useState<{
+        purchaseId: string
+        statusKey: 'status_lunas' | 'status_dikirim' | 'status_sampai'
+        newStatus: boolean
+        label: string // Untuk menampilkan di dialog
     } | null>(null)
+
+    const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] =
+        useState(false)
 
     const popNotification = (keyword: string) => {
         toast.push(
@@ -150,6 +161,83 @@ const PurchaseOrder = () => {
             dispatch(getPurchaseByProyek({ id: projectId }))
         }
     }, [dispatch, projectId])
+
+    // const handleStatusChange = (
+    //     purchase: PurchaseOrder,
+    //     statusKey: 'status_sampai' | 'status_lunas' | 'status_dikirim'
+    // ) => {
+    //     console.log(!purchase[statusKey])
+    //     // Abaikan nilai dari Switcher, kita hitung sendiri nilai barunya
+    //     const newStatus = !purchase[statusKey]
+
+    //     // Membuat teks yang lebih deskriptif untuk dialog
+    //     let statusLabel = ''
+    //     if (statusKey === 'status_lunas') statusLabel = 'Lunas'
+    //     if (statusKey === 'status_dikirim') statusLabel = 'Dikirim'
+    //     if (statusKey === 'status_sampai') statusLabel = 'Sampai'
+
+    //     // console.log('puurchase', {
+    //     //     purchaseId: purchase.id,
+    //     //     statusKey: statusKey,
+    //     //     newStatus: newStatus,
+    //     //     label: `status ${statusLabel} untuk PO "${purchase.nomor_po}"`,
+    //     // })
+
+    //     // Simpan semua info yang dibutuhkan untuk konfirmasi
+    //     setStatusChangeInfo({
+    //         purchaseId: purchase.id,
+    //         statusKey: statusKey,
+    //         newStatus: newStatus,
+    //         label: `status ${statusLabel} untuk PO "${purchase.nomor_po}"`,
+    //     })
+    //     setIsStatusChangeDialogOpen(true)
+    // }
+
+    // Fungsi ini akan dipanggil saat pengguna klik "Confirm"
+    // const confirmStatusChange = async () => {
+    //     if (!statusChangeInfo) return
+
+    //     const { purchaseId, statusKey, newStatus } = statusChangeInfo
+    //     let apiCall
+    //     // Tentukan API mana yang akan dipanggil berdasarkan statusKey
+    //     switch (statusKey) {
+    //         case 'status_lunas':
+    //             apiCall = apiUpdateStatusLunasPurchase
+    //             break
+    //         case 'status_dikirim':
+    //             apiCall = apiUpdateStatusKirimPurchase
+    //             break
+    //         case 'status_sampai':
+    //             apiCall = apiUpdateStatusSampaiPurchase
+    //             break
+    //         default:
+    //             return
+    //     }
+
+    //     setIsSubmitting(true)
+    //     try {
+    //         await apiCall({ id: purchaseId, [statusKey]: newStatus })
+    //         popNotification(`Status berhasil diubah`)
+    //         dispatch(getPurchaseByProyek({ id: projectId }))
+    //     } catch (error) {
+    //         console.error(`Error updating ${statusKey}:`, error)
+    //         toast.push(
+    //             <Notification title="Error" type="danger">
+    //                 Gagal memperbarui status.
+    //             </Notification>
+    //         )
+    //     } finally {
+    //         setIsSubmitting(false)
+    //         setIsStatusChangeDialogOpen(false)
+    //         setStatusChangeInfo(null)
+    //     }
+    // }
+
+    // Fungsi untuk menutup dialog jika dibatalkan
+    const cancelStatusChange = () => {
+        setIsStatusChangeDialogOpen(false)
+        setStatusChangeInfo(null)
+    }
 
     // Initialize form values with empty details array
     const initialValues: FormValues = {
@@ -189,6 +277,12 @@ const PurchaseOrder = () => {
                         setFieldValue('tempPabrik', '')
                         setFieldValue('tempNomorPo', '')
                         setFieldValue('tempTanggalPo', '')
+                        setFieldValue('tempUangMuka', '')
+                        setFieldValue('tempTanggalUangMuka', '')
+                        setFieldValue('tempStatusLunas', false)
+                        setFieldValue('tempStatusDikirim', false)
+                        setFieldValue('tempStatusSampai', false)
+                        setFieldValue('tempKeteranganBarang', '')
                         setFieldValue('tempDetails', [
                             {
                                 nama_barang: '',
@@ -299,13 +393,27 @@ const PurchaseOrder = () => {
                                         // Handle edit with API call
                                         const purchaseId =
                                             purchaseOrdersData[editIndex].id
-
+                                        console.log(
+                                            'tanggalPO',
+                                            values.tempTanggalPo
+                                        )
+                                        console.log(
+                                            'tempTanggalUangMuka',
+                                            values.tempTanggalUangMuka
+                                        )
                                         // Update main purchase order
                                         result = await apiPutPurchaseOrder({
                                             id: purchaseId,
                                             nomor_po: values.tempNomorPo,
                                             tanggal_po: values.tempTanggalPo,
+                                            uang_muka: extractNumberFromString(
+                                                values.tempUangMuka
+                                            ),
+                                            tanggal_uang_muka:
+                                                values.tempTanggalUangMuka,
                                             pabrik: values.tempPabrik,
+                                            keterangan_barang:
+                                                values.tempKeteranganBarang,
                                             status: purchaseOrdersData[
                                                 editIndex
                                             ].status, // keep existing status
@@ -346,6 +454,7 @@ const PurchaseOrder = () => {
                                         }
                                     } else {
                                         // Handle create with API call
+
                                         const requestData = {
                                             idProject: values.tempIdProject,
                                             nomor_po: values.tempNomorPo,
@@ -367,6 +476,7 @@ const PurchaseOrder = () => {
                                                 values.tempKeteranganBarang,
                                         }
 
+                                        console.log('requestData', requestData)
                                         result = await apiCreatePurchaseOrder(
                                             requestData
                                         )
@@ -450,7 +560,7 @@ const PurchaseOrder = () => {
                         setFieldValue('tempUangMuka', 0)
                         setFieldValue('tempStatusLunas', false)
                         setFieldValue('tempStatusDikirim', false)
-                        setFieldValue('tempStatusSammpai', false)
+                        setFieldValue('tempStatusSampai', false)
                         setFieldValue('tempKeteranganBarang', '')
 
                         setFieldValue('tempDetails', [
@@ -472,31 +582,23 @@ const PurchaseOrder = () => {
                         if (purchaseOrdersData) {
                             const purchase = purchaseOrdersData[index]
 
+                            console.log(
+                                'tempTanggalUangMuka',
+                                purchase.tanggal_uang_muka
+                            )
                             // Set temporary values for editing
                             setFieldValue('tempPabrik', purchase.pabrik)
                             setFieldValue('tempNomorPo', purchase.nomor_po)
                             setFieldValue('tempTanggalPo', purchase.tanggal_po)
                             setFieldValue('tempIdProject', purchase.idProject)
+                            setFieldValue('tempUangMuka', purchase.uang_muka)
                             setFieldValue(
                                 'tempTanggalUangMuka',
                                 purchase.tanggal_uang_muka
                             )
-                            setFieldValue('tempUangMuka', purchase.uang_muka)
                             setFieldValue(
                                 'tempKeteranganBarang',
                                 purchase.keterangan_barang
-                            )
-                            setFieldValue(
-                                'tempStatusDikirim',
-                                purchase.status_dikirim
-                            )
-                            setFieldValue(
-                                'tempStatusLunas',
-                                purchase.status_lunas
-                            )
-                            setFieldValue(
-                                'tempStatusSampai',
-                                purchase.status_sampai
                             )
 
                             // Map the detail purchases to form format
@@ -805,81 +907,89 @@ const PurchaseOrder = () => {
                                             </FormItem>
 
                                             {/* Status Lunas */}
-                                            <FormItem
-                                                label="Status Lunas"
-                                                invalid={
-                                                    errors.tempStatusLunas &&
-                                                    touched.tempStatusLunas
-                                                }
-                                                errorMessage={
-                                                    errors.tempStatusLunas
-                                                }
-                                            >
-                                                <div className="flex flex-row items-center gap-3">
-                                                    <Field
-                                                        name={`tempStatusLunas`}
-                                                        component={Switcher}
-                                                    />
-                                                    <span>
-                                                        {values.tempStatusLunas ===
-                                                        true
-                                                            ? 'Sudah Lunas'
-                                                            : 'Belum Lunas'}
-                                                    </span>
-                                                </div>
-                                            </FormItem>
-
-                                            {/* Status Sampai */}
-                                            <FormItem
-                                                label="Status Sampai"
-                                                invalid={
-                                                    errors.tempStatusSampai &&
-                                                    touched.tempStatusSampai
-                                                }
-                                                errorMessage={
-                                                    errors.tempStatusSampai
-                                                }
-                                            >
-                                                <div className="flex flex-row items-center gap-3">
-                                                    <Field
-                                                        name={`tempStatusSampai`}
-                                                        component={Switcher}
-                                                    />
-                                                    <span>
-                                                        {values.tempStatusSampai ===
-                                                        true
-                                                            ? 'Sudah Sampai'
-                                                            : 'Belum Sampai'}
-                                                    </span>
-                                                </div>
-                                            </FormItem>
-
-                                            {/* Status Dikirim */}
-                                            <FormItem
-                                                label="Status Dikirim"
-                                                invalid={
-                                                    errors.tempStatusDikirim &&
-                                                    touched.tempStatusDikirim
-                                                }
-                                                errorMessage={
-                                                    errors.tempStatusDikirim
-                                                }
-                                            >
-                                                <div>
+                                            {editIndex === null && (
+                                                <FormItem
+                                                    label="Status Lunas"
+                                                    invalid={
+                                                        errors.tempStatusLunas &&
+                                                        touched.tempStatusLunas
+                                                    }
+                                                    errorMessage={
+                                                        errors.tempStatusLunas
+                                                    }
+                                                >
                                                     <div className="flex flex-row items-center gap-3">
                                                         <Field
-                                                            name={`tempStatusDikirim`}
+                                                            name={`tempStatusLunas`}
                                                             component={Switcher}
                                                         />
                                                         <span>
-                                                            {values.tempStatusDikirim ===
+                                                            {values.tempStatusLunas ===
                                                             true
-                                                                ? 'Sudah Dikirim'
-                                                                : 'Belum Dikirim'}
+                                                                ? 'Sudah Lunas'
+                                                                : 'Belum Lunas'}
                                                         </span>
                                                     </div>
-                                                </div>
-                                            </FormItem>
+                                                </FormItem>
+                                            )}
+
+                                            {/* Status Sampai */}
+                                            {editIndex === null && (
+                                                <FormItem
+                                                    label="Status Sampai"
+                                                    invalid={
+                                                        errors.tempStatusSampai &&
+                                                        touched.tempStatusSampai
+                                                    }
+                                                    errorMessage={
+                                                        errors.tempStatusSampai
+                                                    }
+                                                >
+                                                    <div className="flex flex-row items-center gap-3">
+                                                        <Field
+                                                            name={`tempStatusSampai`}
+                                                            component={Switcher}
+                                                        />
+                                                        <span>
+                                                            {values.tempStatusSampai ===
+                                                            true
+                                                                ? 'Sudah Sampai'
+                                                                : 'Belum Sampai'}
+                                                        </span>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+
+                                            {/* Status Dikirim */}
+                                            {editIndex === null && (
+                                                <FormItem
+                                                    label="Status Dikirim"
+                                                    invalid={
+                                                        errors.tempStatusDikirim &&
+                                                        touched.tempStatusDikirim
+                                                    }
+                                                    errorMessage={
+                                                        errors.tempStatusDikirim
+                                                    }
+                                                >
+                                                    <div>
+                                                        <div className="flex flex-row items-center gap-3">
+                                                            <Field
+                                                                name={`tempStatusDikirim`}
+                                                                component={
+                                                                    Switcher
+                                                                }
+                                                            />
+                                                            <span>
+                                                                {values.tempStatusDikirim ===
+                                                                true
+                                                                    ? 'Sudah Dikirim'
+                                                                    : 'Belum Dikirim'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </FormItem>
+                                            )}
 
                                             {/* Keterangan Barang*/}
                                             <FormItem
@@ -1192,7 +1302,6 @@ const PurchaseOrder = () => {
                                                                     }
                                                                 </p>
                                                             </div>
-
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Tanggal PO:
@@ -1225,42 +1334,104 @@ const PurchaseOrder = () => {
                                                                     )}
                                                                 </p>
                                                             </div>
-                                                            <div>
+
+                                                            {/* <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Status Lunas
-                                                                    :
                                                                 </span>
-                                                                <p>
-                                                                    {purchase.status_lunas ===
-                                                                    true
-                                                                        ? 'Sudah Lunas'
-                                                                        : 'Belum Lunas'}
-                                                                </p>
-                                                            </div>
-                                                            <div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Switcher
+                                                                        checked={
+                                                                            purchase.status_lunas
+                                                                        }
+                                                                        // Panggil handler tanpa menangkap nilai dari event
+                                                                        onChange={() =>
+                                                                            handleStatusChange(
+                                                                                purchase,
+                                                                                'status_lunas'
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <p>
+                                                                        {purchase.status_lunas
+                                                                            ? 'Lunas'
+                                                                            : 'Belum Lunas'}
+                                                                    </p>
+                                                                </div>
+                                                            </div> */}
+                                                            {/* <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Status
-                                                                    Dikirim:
+                                                                    Dikirim
                                                                 </span>
-                                                                <p>
-                                                                    {purchase.status_dikirim ===
-                                                                    true
-                                                                        ? 'Sudah Dikirim'
-                                                                        : 'Belum Dikirim'}
-                                                                </p>
-                                                            </div>
-                                                            <div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Switcher
+                                                                        checked={
+                                                                            purchase.status_dikirim
+                                                                        }
+                                                                        onChange={() =>
+                                                                            handleStatusChange(
+                                                                                purchase,
+                                                                                'status_dikirim'
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <p>
+                                                                        {purchase.status_dikirim
+                                                                            ? 'Dikirim'
+                                                                            : 'Belum Dikirim'}
+                                                                    </p>
+                                                                </div>
+                                                            </div> */}
+                                                            {/* Status Sampai */}
+                                                            {/* <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Status
-                                                                    Sampai:
+                                                                    Sampai
                                                                 </span>
-                                                                <p>
-                                                                    {purchase.status_dikirim ===
-                                                                    true
-                                                                        ? 'Sudah Sampai'
-                                                                        : 'Belum Sampai'}
-                                                                </p>
-                                                            </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Switcher
+                                                                        checked={
+                                                                            purchase.status_sampai
+                                                                        }
+                                                                        onChange={() =>
+                                                                            handleStatusChange(
+                                                                                purchase,
+                                                                                'status_sampai'
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <p>
+                                                                        {purchase.status_sampai
+                                                                            ? 'true'
+                                                                            : 'false'}
+                                                                    </p>
+                                                                </div>
+                                                            </div> */}
+                                                            {/* Status Lunas */}
+                                                            {/* <div>
+                                                                <span className="text-xs font-bold text-gray-500">
+                                                                    Status Lunas
+                                                                </span>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Switcher
+                                                                        checked={
+                                                                            purchase.status_lunas
+                                                                        }
+                                                                        onChange={() =>
+                                                                            handleStatusChange(
+                                                                                purchase,
+                                                                                'status_lunas'
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <p>
+                                                                        {purchase.status_lunas
+                                                                            ? 'true'
+                                                                            : 'galse'}
+                                                                    </p>
+                                                                </div>
+                                                            </div> */}
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Keterangan
@@ -1388,6 +1559,31 @@ const PurchaseOrder = () => {
                                         </div>
                                     )}
                             </AdaptableCard>
+
+                            {/* <ConfirmDialog
+                                isOpen={isStatusChangeDialogOpen}
+                                type="warning"
+                                title="Konfirmasi Perubahan Status"
+                                confirmButtonColor="amber-600"
+                                onClose={cancelStatusChange}
+                                onCancel={cancelStatusChange}
+                                onRequestClose={cancelStatusChange}
+                                onConfirm={confirmStatusChange}
+                            >
+                                <p>
+                                    Apakah Anda yakin ingin mengubah{' '}
+                                    <span className="font-semibold">
+                                        {statusChangeInfo?.label}
+                                    </span>{' '}
+                                    menjadi{' '}
+                                    <strong>
+                                        {statusChangeInfo?.newStatus
+                                            ? 'IYA'
+                                            : 'TIDAK'}
+                                    </strong>
+                                    ?
+                                </p>
+                            </ConfirmDialog> */}
 
                             {/* Confirmation dialog for deleting purchase order */}
                             <ConfirmDialog

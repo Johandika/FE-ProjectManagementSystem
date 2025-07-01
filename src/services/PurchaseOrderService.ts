@@ -72,6 +72,45 @@ export async function apiPutPurchaseOrder<T, U extends Record<string, unknown>>(
     })
 }
 
+// update status lunas
+export async function apiUpdateStatusKirimPurchase<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    console.log('data lunas', data)
+    return ApiService.fetchData<T>({
+        url: `/purchase/status-lunas/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// update status kirim
+export async function apiUpdateStatusLunasPurchase<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    console.log('data kirim', data)
+    return ApiService.fetchData<T>({
+        url: `/purchase/status-kirim/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// update status sampai
+export async function apiUpdateStatusSampaiPurchase<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    console.log('data sampai', data)
+    return ApiService.fetchData<T>({
+        url: `/purchase/status-sampai/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
 // create
 export async function apiCreatePurchaseOrder<
     T,

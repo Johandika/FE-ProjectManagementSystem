@@ -82,13 +82,21 @@ const ActionColumn = ({ row }: { row: Product }) => {
                 <>
                     <span
                         className={`cursor-pointer p-2 hover:${textTheme}`}
-                        onClick={onEdit}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onEdit()
+                        }}
                     >
                         <HiOutlinePencil />
                     </span>
                     <span
                         className="cursor-pointer p-2 hover:text-red-500"
-                        onClick={onDelete}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onDelete()
+                        }}
                     >
                         <HiOutlineTrash />
                     </span>
@@ -98,7 +106,11 @@ const ActionColumn = ({ row }: { row: Product }) => {
                     <Tooltip title="Progress">
                         <span
                             className={`cursor-pointer p-2 hover:${textTheme}`}
-                            onClick={onProgressUpdate}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                onProgressUpdate()
+                            }}
                         >
                             <GiProgression />
                         </span>
@@ -106,7 +118,11 @@ const ActionColumn = ({ row }: { row: Product }) => {
                     <Tooltip title="Tambah Proyek">
                         <span
                             className={`cursor-pointer p-2 hover:${textTheme}`}
-                            onClick={onCreateProject}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                onCreateProject()
+                            }}
                         >
                             <HiOutlineDocumentAdd />
                         </span>
@@ -118,6 +134,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
 }
 
 const TenderTable = () => {
+    const navigate = useNavigate()
     const tableRef = useRef<DataTableResetHandle>(null)
 
     const dispatch = useAppDispatch()
@@ -135,6 +152,12 @@ const TenderTable = () => {
     const loading = useAppSelector((state) => state.tenderList.data.loading)
 
     const data = useAppSelector((state) => state.tenderList.data.productList)
+
+    // Handler for row click to navigate to detail page
+    const handleRowClick = (row: any) => {
+        // e.stopPropagation()
+        navigate(`/manajemen-tender-detail/${row.id}`)
+    }
 
     useEffect(() => {
         fetchData()
@@ -165,6 +188,8 @@ const TenderTable = () => {
     }
 
     const handleUpdateStatus = async (status: string, id: string) => {
+        console.log(id)
+        console.log(status)
         dispatch(setUpdateConfirmation(true))
         dispatch(setSelectedTender(id))
         dispatch(setTenderStatus(status))
@@ -429,6 +454,7 @@ const TenderTable = () => {
                 onPaginationChange={onPaginationChange}
                 onSelectChange={onSelectChange}
                 onSort={onSort}
+                onRowClick={handleRowClick}
             />
             <TenderDeleteConfirmation />
             <TenderUpdateStatusConfirmation />

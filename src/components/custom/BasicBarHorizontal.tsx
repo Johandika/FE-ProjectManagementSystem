@@ -30,6 +30,11 @@ const BasicBarHorizontal = ({ dataAwal }: any) => {
                         return formatNumber(val)
                     },
                 },
+                tooltip: {
+                    y: {
+                        formatter: (val: number) => formatNumber(val),
+                    },
+                },
                 xaxis: {
                     categories: category,
                     labels: {
