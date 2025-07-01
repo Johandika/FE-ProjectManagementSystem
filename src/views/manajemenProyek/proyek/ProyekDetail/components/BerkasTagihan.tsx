@@ -364,13 +364,13 @@ export default function BerkasTagihan() {
                                     return (
                                         <div
                                             key={item.id}
-                                            className={`flex flex-row justify-between items-center  p-4
+                                            className={`flex flex-row justify-between bg-indigo-50 items-center  p-4
                                         ${
                                             index === terminsData?.length - 1
-                                                ? 'rounded-b-md border'
+                                                ? 'rounded-b-md border border-indigo-400'
                                                 : index === 0
-                                                ? 'rounded-t-md border-t border-x'
-                                                : 'border-t border-x'
+                                                ? 'rounded-t-md border-t border-x border-indigo-400'
+                                                : 'border-t border-x border-indigo-400'
                                         }
                                             `}
                                         >
@@ -437,7 +437,7 @@ export default function BerkasTagihan() {
                                                 <Button
                                                     type="button"
                                                     shape="circle"
-                                                    variant="twoTone"
+                                                    variant="solid"
                                                     size="sm"
                                                     className="w-fit text-xs text-indigo-500"
                                                     icon={<IoIosAdd />}

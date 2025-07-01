@@ -441,7 +441,7 @@ export default function Subkontraktor() {
 
                                 {/* Form untuk input subkontraktor */}
                                 {showForm && (
-                                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
+                                    <div className="mb-4 border  bg-indigo-50 rounded-md p-4">
                                         <h6 className="mb-3">
                                             {editIndex !== null
                                                 ? 'Edit Subkontraktor'
@@ -673,7 +673,7 @@ export default function Subkontraktor() {
                                 {/* Daftar subkontraktor */}
                                 {subkontraktorByProyekData &&
                                 subkontraktorByProyekData.length > 0 ? (
-                                    <div className="rounded-lg border border-gray-200 dark:border-gray-600">
+                                    <div className="rounded-lg bg-indigo-50  border-gray-200 border border-indigo-400 dark:border-gray-600">
                                         {subkontraktorByProyekData.map(
                                             (
                                                 data: Subkontraktor,
@@ -688,12 +688,12 @@ export default function Subkontraktor() {
                                                     <div
                                                         key={data.id}
                                                         className={classNames(
-                                                            'flex items-center justify-between px-4 py-6',
+                                                            'flex items-center justify-between px-4 py-6 ',
                                                             !isLastChild(
                                                                 subkontraktorByProyekData,
                                                                 index
                                                             ) &&
-                                                                'border-b border-gray-200 dark:border-gray-600'
+                                                                'border-b border-indigo-400 dark:border-gray-600'
                                                         )}
                                                     >
                                                         <div className="flex items-center flex-grow">

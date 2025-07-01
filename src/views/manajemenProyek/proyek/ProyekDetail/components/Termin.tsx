@@ -568,7 +568,7 @@ export default function Termin() {
                         </Button>
                     </div>
                     {terminsData?.length === 0 && (
-                        <div className="text-center py-8 bg-slate-50 rounded-md">
+                        <div className="text-center py-8 bg-indigo-50 rounded-md">
                             Belum ada termin yang ditambahkan
                         </div>
                     )}
@@ -586,13 +586,13 @@ export default function Termin() {
                                 return (
                                     <div
                                         key={index}
-                                        className={` flex flex-row 
+                                        className={` flex flex-row bg-indigo-50
                                     ${
                                         index === 0
-                                            ? 'rounded-t-md border'
+                                            ? 'rounded-t-md border border-indigo-400'
                                             : index === terminsData.length - 1
-                                            ? 'rounded-b-md border-b border-x'
-                                            : 'border-b border-x'
+                                            ? 'rounded-b-md border-b border-x border-indigo-400'
+                                            : 'border-b border-x border-indigo-400'
                                     }
                                          sm:flex-row justify-center sm:justify-between`}
                                     >
@@ -617,7 +617,7 @@ export default function Termin() {
                                                         <Button
                                                             type="button"
                                                             shape="circle"
-                                                            variant="twoTone"
+                                                            variant="solid"
                                                             size="sm"
                                                             icon={<IoIosAdd />}
                                                             className="text-indigo-500"
@@ -674,7 +674,7 @@ export default function Termin() {
                                         {termin.FakturPajak?.id && (
                                             <>
                                                 {fakturByTermin && (
-                                                    <div className="bg-white flex-1 p-6 w-full flex flex-col sm:flex-row gap-4 rounded-lg justify-between">
+                                                    <div className="bg-indigo-50 flex-1 p-6 w-full flex flex-col sm:flex-row gap-4 rounded-lg justify-between">
                                                         <div className="flex flex-col items-center sm:items-start ">
                                                             <div>
                                                                 <span>
@@ -717,20 +717,16 @@ export default function Termin() {
                                                             <Button
                                                                 type="button"
                                                                 shape="circle"
-                                                                variant="twoTone"
+                                                                variant="solid"
                                                                 size="sm"
                                                                 icon={
                                                                     <IoIosCheckmark />
                                                                 }
                                                                 className="text-indigo-500"
-                                                                onClick={
-                                                                    () =>
-                                                                        handleOpenStatusChangeDialog(
-                                                                            fakturByTermin
-                                                                        )
-                                                                    // handleUpdateStatusFaktur(
-                                                                    //     fakturByTermin
-                                                                    // )
+                                                                onClick={() =>
+                                                                    handleOpenStatusChangeDialog(
+                                                                        fakturByTermin
+                                                                    )
                                                                 }
                                                                 disabled={
                                                                     fakturByTermin.status ===

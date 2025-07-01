@@ -477,7 +477,7 @@ export default function Bastp() {
 
                                 {/* Daftar BASTP */}
                                 {terminsData && terminsData.length > 0 ? (
-                                    <div className="rounded-lg border border-gray-200 dark:border-gray-600">
+                                    <div className="rounded-lg border border-indigo-400 overflow-hidden dark:border-gray-600">
                                         {terminsData.map(
                                             (data: any, index: number) => {
                                                 // If currently editing this item, don't show it in the list
@@ -489,12 +489,12 @@ export default function Bastp() {
                                                     <div
                                                         key={data.id}
                                                         className={classNames(
-                                                            'flex items-center justify-between px-4 py-6',
+                                                            'flex items-center bg-indigo-50 justify-between px-4 py-6',
                                                             !isLastChild(
                                                                 terminsData,
                                                                 index
                                                             ) &&
-                                                                'border-b border-gray-200 dark:border-gray-600'
+                                                                'border-b border-indigo-400 dark:border-gray-600'
                                                         )}
                                                     >
                                                         <div className="flex items-center flex-grow">
@@ -523,7 +523,7 @@ export default function Bastp() {
                                                                     !showForm && (
                                                                         <Button
                                                                             size="sm"
-                                                                            variant="twoTone"
+                                                                            variant="solid"
                                                                             shape="circle"
                                                                             className="w-fit text-xs"
                                                                             type="button"

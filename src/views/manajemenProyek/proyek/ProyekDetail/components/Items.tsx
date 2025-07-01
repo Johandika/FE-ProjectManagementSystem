@@ -478,7 +478,7 @@ export default function Items() {
                                 </div>
                                 {/* Form untuk input item */}
                                 {showItemForm && (
-                                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
+                                    <div className="mb-4 border  border-indigo-400 bg-indigo-50 rounded-md p-4">
                                         <h6 className="mb-3">
                                             {editItemIndex !== null
                                                 ? 'Edit Item'
@@ -995,7 +995,7 @@ export default function Items() {
                                             <>
                                                 {/* Form untuk input detail item */}
                                                 {showDetailForm && (
-                                                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
+                                                    <div className="mb-4 border bg-indigo-50 rounded-md p-4">
                                                         <h6 className="mb-3">
                                                             {editDetailIndex !==
                                                             null
@@ -1365,7 +1365,7 @@ export default function Items() {
                                                     <div className="overflow-auto sm:overflow-auto">
                                                         <div className="mb-4 bg-red min-w-[1000px] sm:w-full">
                                                             {/* Header */}
-                                                            <div className="grid grid-cols-5  px-4 gap-4 font-semibold bg-gray-100 py-5 rounded-t-md">
+                                                            <div className="grid grid-cols-5  px-4 gap-4 font-semibold bg-indigo-100 border border-indigo-400 py-5 rounded-t-md">
                                                                 <div className="col-span-1">
                                                                     Item
                                                                 </div>
@@ -1400,9 +1400,9 @@ export default function Items() {
                                                                                 item.id
                                                                             }
                                                                             className={classNames(
-                                                                                'border-b',
+                                                                                'border-b border-indigo-400',
                                                                                 {
-                                                                                    'border-b-0':
+                                                                                    'border-b-0 ':
                                                                                         isLastChild(
                                                                                             itemsByProyekData,
                                                                                             index
@@ -1412,13 +1412,13 @@ export default function Items() {
                                                                         >
                                                                             {/* Item Row */}
                                                                             <div
-                                                                                className={`grid grid-cols-5 gap-4 px-4 py-4
+                                                                                className={`grid grid-cols-5 border-x border-t border-indigo-400 gap-4 px-4 py-4 hover:bg-indigo-50 
                                                                             ${
                                                                                 expandedItems[
                                                                                     index
                                                                                 ]
-                                                                                    ? 'bg-gray-50'
-                                                                                    : 'bg-white'
+                                                                                    ? 'bg-indigo-50'
+                                                                                    : 'bg-indigo-50'
                                                                             } hover:bg-gray-50`}
                                                                             >
                                                                                 <div className="col-span-1 flex items-center">
@@ -1483,7 +1483,7 @@ export default function Items() {
                                                                                 <div className="col-span-1 flex justify-end space-x-2">
                                                                                     <Button
                                                                                         size="xs"
-                                                                                        variant="twoTone"
+                                                                                        variant="solid"
                                                                                         onClick={() =>
                                                                                             handleAddDetail(
                                                                                                 index
@@ -1531,9 +1531,9 @@ export default function Items() {
                                                                                     .DetailItemProjects
                                                                                     .length >
                                                                                     0 && (
-                                                                                    <div className="bg-gray-50 p-2">
+                                                                                    <div className="bg-indigo-50 border-l border-r border-indigo-400 p-2">
                                                                                         {/* Detail Header */}
-                                                                                        <div className="grid grid-cols-10 gap-4  px-4 font-semibold items-center text-sm py-2 bg-gray-100 rounded-md">
+                                                                                        <div className="grid grid-cols-10 gap-4 text-white px-4 font-semibold items-center text-sm py-2 bg-indigo-500 rounded-md">
                                                                                             <div className="col-span-2">
                                                                                                 Uraian
                                                                                             </div>
@@ -1579,7 +1579,7 @@ export default function Items() {
                                                                                                             detail.id
                                                                                                         }
                                                                                                         className={classNames(
-                                                                                                            'grid grid-cols-10 gap-4 px-4 py-4 text-sm bg-white border-b',
+                                                                                                            'grid grid-cols-10 gap-4 px-4 py-4 text-sm bg-white border-indigo-400 border-b',
                                                                                                             {
                                                                                                                 'rounded-b-md border-b-0':
                                                                                                                     isLastChild(
@@ -1673,7 +1673,7 @@ export default function Items() {
                                                             {/* Grand Total Row */}
                                                             {itemsByProyekData.length >
                                                                 0 && (
-                                                                <div className="grid grid-cols-5 gap-4 px-4 py-5 bg-gray-100 font-semibold rounded-b-md">
+                                                                <div className="grid grid-cols-5 gap-4 px-4 py-5  border border-indigo-400 bg-indigo-100 font-semibold rounded-b-md">
                                                                     <div className="col-span-1">
                                                                         Total
                                                                         Keseluruhan
@@ -1709,8 +1709,8 @@ export default function Items() {
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-center py-5 bg-gray-50 rounded-lg">
-                                                        <HiOutlineClipboardList className="mx-auto text-4xl text-gray-400 mb-2" />
+                                                    <div className="text-center py-5 bg-indigo-50 rounded-lg">
+                                                        <HiOutlineClipboardList className="mx-auto text-4xl text-indigo-400 mb-2" />
                                                         <p className="text-gray-500">
                                                             Belum ada item yang
                                                             ditambahkan

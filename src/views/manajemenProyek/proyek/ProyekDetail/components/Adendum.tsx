@@ -127,13 +127,13 @@ export default function Adendum() {
                     {adendumByProyekData && adendumByProyekData.length > 0 ? (
                         adendumByProyekData.map((item, index) => (
                             <div
-                                className={`flex flex-row items-center p-6 relative min-w-[540px]
+                                className={`flex bg-indigo-50 overflow-hidden flex-row items-center p-6 relative min-w-[540px]
                     ${
                         index === 0
-                            ? 'rounded-t-md border'
+                            ? 'rounded-t-md border border-indigo-400'
                             : index === adendumByProyekData.length - 1
-                            ? 'rounded-b-md border-b border-x'
-                            : 'border-b border-x'
+                            ? 'rounded-b-md border-b border-x border-indigo-400'
+                            : 'border-b border-x border-indigo-400'
                     }`}
                                 key={item.id}
                             >
@@ -169,7 +169,7 @@ export default function Adendum() {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="absolute right-0 -top-2 bg-slate-100 text-gray-500 px-4 rounded-bl-md py-2 text-xs">
+                                    <div className="absolute right-0 -top-2 bg-indigo-600 text-white px-4 rounded-bl-md py-2 text-xs">
                                         Tanggal: {formatDate(item.tanggal)}
                                     </div>
 

@@ -73,7 +73,7 @@ export async function apiPutPurchaseOrder<T, U extends Record<string, unknown>>(
 }
 
 // update status lunas
-export async function apiUpdateStatusKirimPurchase<
+export async function apiUpdateStatusLunasPurchase<
     T,
     U extends Record<string, unknown>
 >(data: U) {
@@ -86,7 +86,7 @@ export async function apiUpdateStatusKirimPurchase<
 }
 
 // update status kirim
-export async function apiUpdateStatusLunasPurchase<
+export async function apiUpdateStatusKirimPurchase<
     T,
     U extends Record<string, unknown>
 >(data: U) {

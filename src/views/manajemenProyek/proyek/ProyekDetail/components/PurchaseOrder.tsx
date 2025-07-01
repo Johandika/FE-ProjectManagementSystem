@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, ChangeEvent } from 'react'
 import { Field, FieldProps, Form, Formik } from 'formik'
 import { FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
@@ -35,6 +35,7 @@ import dayjs from 'dayjs'
 import { NumericFormat } from 'react-number-format'
 import { extractNumberFromString } from '@/utils/extractNumberFromString'
 import DescriptionSection from './DesriptionSection'
+import Checkbox from '@/components/ui/Checkbox/Checkbox'
 
 // Added a comment to force refresh
 
@@ -134,7 +135,6 @@ const PurchaseOrder = () => {
         purchaseId: string
         statusKey: 'status_lunas' | 'status_dikirim' | 'status_sampai'
         newStatus: boolean
-        label: string // Untuk menampilkan di dialog
     } | null>(null)
 
     const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] =
@@ -162,76 +162,84 @@ const PurchaseOrder = () => {
         }
     }, [dispatch, projectId])
 
-    // const handleStatusChange = (
-    //     purchase: PurchaseOrder,
-    //     statusKey: 'status_sampai' | 'status_lunas' | 'status_dikirim'
-    // ) => {
-    //     console.log(!purchase[statusKey])
-    //     // Abaikan nilai dari Switcher, kita hitung sendiri nilai barunya
-    //     const newStatus = !purchase[statusKey]
+    const handleStatusChange =
+        (
+            item: any,
+            statusKey: 'status_lunas' | 'status_dikirim' | 'status_sampai'
+        ) =>
+        (checked: boolean, e: ChangeEvent<HTMLInputElement>) => {
+            setStatusChangeInfo({
+                purchaseId: item.id,
+                statusKey: statusKey,
+                newStatus: !checked,
+            })
 
-    //     // Membuat teks yang lebih deskriptif untuk dialog
-    //     let statusLabel = ''
-    //     if (statusKey === 'status_lunas') statusLabel = 'Lunas'
-    //     if (statusKey === 'status_dikirim') statusLabel = 'Dikirim'
-    //     if (statusKey === 'status_sampai') statusLabel = 'Sampai'
+            // Open the confirmation dialog
+            setIsStatusChangeDialogOpen(true)
 
-    //     // console.log('puurchase', {
-    //     //     purchaseId: purchase.id,
-    //     //     statusKey: statusKey,
-    //     //     newStatus: newStatus,
-    //     //     label: `status ${statusLabel} untuk PO "${purchase.nomor_po}"`,
-    //     // })
+            // Prevent default checkbox behavior to wait for confirmation
+            e.preventDefault()
+        }
 
-    //     // Simpan semua info yang dibutuhkan untuk konfirmasi
-    //     setStatusChangeInfo({
-    //         purchaseId: purchase.id,
-    //         statusKey: statusKey,
-    //         newStatus: newStatus,
-    //         label: `status ${statusLabel} untuk PO "${purchase.nomor_po}"`,
-    //     })
-    //     setIsStatusChangeDialogOpen(true)
-    // }
+    const confirmStatusChange = async () => {
+        if (!statusChangeInfo) return
 
-    // Fungsi ini akan dipanggil saat pengguna klik "Confirm"
-    // const confirmStatusChange = async () => {
-    //     if (!statusChangeInfo) return
+        try {
+            const data = {
+                id: statusChangeInfo.purchaseId,
+                [statusChangeInfo.statusKey]: statusChangeInfo.newStatus,
+            }
 
-    //     const { purchaseId, statusKey, newStatus } = statusChangeInfo
-    //     let apiCall
-    //     // Tentukan API mana yang akan dipanggil berdasarkan statusKey
-    //     switch (statusKey) {
-    //         case 'status_lunas':
-    //             apiCall = apiUpdateStatusLunasPurchase
-    //             break
-    //         case 'status_dikirim':
-    //             apiCall = apiUpdateStatusKirimPurchase
-    //             break
-    //         case 'status_sampai':
-    //             apiCall = apiUpdateStatusSampaiPurchase
-    //             break
-    //         default:
-    //             return
-    //     }
+            let result
 
-    //     setIsSubmitting(true)
-    //     try {
-    //         await apiCall({ id: purchaseId, [statusKey]: newStatus })
-    //         popNotification(`Status berhasil diubah`)
-    //         dispatch(getPurchaseByProyek({ id: projectId }))
-    //     } catch (error) {
-    //         console.error(`Error updating ${statusKey}:`, error)
-    //         toast.push(
-    //             <Notification title="Error" type="danger">
-    //                 Gagal memperbarui status.
-    //             </Notification>
-    //         )
-    //     } finally {
-    //         setIsSubmitting(false)
-    //         setIsStatusChangeDialogOpen(false)
-    //         setStatusChangeInfo(null)
-    //     }
-    // }
+            if (statusChangeInfo.statusKey === 'status_sampai') {
+                result = await apiUpdateStatusSampaiPurchase(data)
+            } else if (statusChangeInfo.statusKey === 'status_dikirim') {
+                result = await apiUpdateStatusKirimPurchase(data)
+            } else if (statusChangeInfo.statusKey === 'status_lunas') {
+                result = await apiUpdateStatusLunasPurchase(data)
+            }
+
+            console.log(result)
+            // Show success notification if update was successful
+            if (result.data.statusCode === 200) {
+                popNotification('updated')
+            } else {
+                toast.push(
+                    <Notification
+                        title="Error updating status"
+                        type="danger"
+                        duration={2500}
+                    >
+                        {result.data.message}
+                    </Notification>,
+                    {
+                        placement: 'top-center',
+                    }
+                )
+            }
+        } catch (error) {
+            console.error('Error updating status:', error)
+
+            // Show error notification
+            toast.push(
+                <Notification
+                    title="Error updating status"
+                    type="danger"
+                    duration={2500}
+                >
+                    An error occurred while updating the status
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
+            )
+        } finally {
+            setIsStatusChangeDialogOpen(false)
+            setStatusChangeInfo(null)
+            dispatch(getPurchaseByProyek({ id: projectId }))
+        }
+    }
 
     // Fungsi untuk menutup dialog jika dibatalkan
     const cancelStatusChange = () => {
@@ -710,7 +718,7 @@ const PurchaseOrder = () => {
 
                                 {/* Form untuk input purchase order */}
                                 {showForm && (
-                                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
+                                    <div className="mb-4 border  bg-slate-50 rounded-md p-4">
                                         <h6 className="mb-3">
                                             {editIndex !== null
                                                 ? 'Edit Purchase Order'
@@ -816,7 +824,7 @@ const PurchaseOrder = () => {
                                                         <NumericFormat
                                                             {...field}
                                                             customInput={Input}
-                                                            placeholder="Harga"
+                                                            placeholder="0"
                                                             thousandSeparator="."
                                                             decimalSeparator=","
                                                             onValueChange={(
@@ -1237,7 +1245,7 @@ const PurchaseOrder = () => {
                                     </div>
                                 )}
 
-                                {/* Daftar purchase order */}
+                                {/* Card Purchase Orders */}
                                 {purchaseOrdersData &&
                                     purchaseOrdersData.map(
                                         (purchase, index) => {
@@ -1251,13 +1259,14 @@ const PurchaseOrder = () => {
                                                     key={purchase.id}
                                                     className="overflow-x-scroll sm:overflow-auto"
                                                 >
-                                                    <div className="mb-4 border bg-slate-50 rounded-md p-4 min-w-[500px]">
-                                                        <div className="flex justify-between items-center mb-2">
-                                                            <h6>
+                                                    <div className="mb-4 border border-indigo-400 bg-slate-50 rounded-md min-w-[500px] overflow-hidden">
+                                                        {/* Pabrik dan Icon */}
+                                                        <div className="flex justify-between items-center border-b p-4 bg-indigo-100">
+                                                            <h5 className="">
                                                                 {
                                                                     purchase.pabrik
                                                                 }
-                                                            </h6>
+                                                            </h5>
                                                             <div className="flex space-x-2">
                                                                 <Button
                                                                     type="button"
@@ -1291,7 +1300,9 @@ const PurchaseOrder = () => {
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <div className="grid grid-cols-3 gap-4 mb-4">
+                                                        {/* Data Field */}
+                                                        <div className="grid grid-cols-4 gap-4 border-t border-indigo-400  p-4 bg-indigo-50">
+                                                            {/* Nomor PO */}
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Nomor PO:
@@ -1302,6 +1313,7 @@ const PurchaseOrder = () => {
                                                                     }
                                                                 </p>
                                                             </div>
+                                                            {/* Tanggal PO */}
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Tanggal PO:
@@ -1312,6 +1324,7 @@ const PurchaseOrder = () => {
                                                                     )}
                                                                 </p>
                                                             </div>
+                                                            {/* Uang Muka */}
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Uang Muka:
@@ -1323,6 +1336,7 @@ const PurchaseOrder = () => {
                                                                     )}
                                                                 </p>
                                                             </div>
+                                                            {/* Tanggal Uang Muka */}
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Tanggal Uang
@@ -1335,20 +1349,26 @@ const PurchaseOrder = () => {
                                                                 </p>
                                                             </div>
 
-                                                            {/* <div>
+                                                            {/* Status Lunas */}
+                                                            <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Status Lunas
                                                                 </span>
-                                                                <div className="flex items-center gap-2">
+                                                                <div className="flex items-center gap-2 ">
                                                                     <Switcher
                                                                         checked={
                                                                             purchase.status_lunas
                                                                         }
-                                                                        // Panggil handler tanpa menangkap nilai dari event
-                                                                        onChange={() =>
+                                                                        onChange={(
+                                                                            checked,
+                                                                            e
+                                                                        ) =>
                                                                             handleStatusChange(
                                                                                 purchase,
                                                                                 'status_lunas'
+                                                                            )(
+                                                                                checked,
+                                                                                e
                                                                             )
                                                                         }
                                                                     />
@@ -1358,80 +1378,70 @@ const PurchaseOrder = () => {
                                                                             : 'Belum Lunas'}
                                                                     </p>
                                                                 </div>
-                                                            </div> */}
-                                                            {/* <div>
-                                                                <span className="text-xs font-bold text-gray-500">
-                                                                    Status
-                                                                    Dikirim
-                                                                </span>
-                                                                <div className="flex items-center gap-2">
-                                                                    <Switcher
-                                                                        checked={
-                                                                            purchase.status_dikirim
-                                                                        }
-                                                                        onChange={() =>
-                                                                            handleStatusChange(
-                                                                                purchase,
-                                                                                'status_dikirim'
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                    <p>
-                                                                        {purchase.status_dikirim
-                                                                            ? 'Dikirim'
-                                                                            : 'Belum Dikirim'}
-                                                                    </p>
-                                                                </div>
-                                                            </div> */}
+                                                            </div>
                                                             {/* Status Sampai */}
-                                                            {/* <div>
+                                                            <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Status
                                                                     Sampai
                                                                 </span>
-                                                                <div className="flex items-center gap-2">
+                                                                <div className="flex items-center gap-2 ">
                                                                     <Switcher
                                                                         checked={
                                                                             purchase.status_sampai
                                                                         }
-                                                                        onChange={() =>
+                                                                        onChange={(
+                                                                            checked,
+                                                                            e
+                                                                        ) =>
                                                                             handleStatusChange(
                                                                                 purchase,
                                                                                 'status_sampai'
+                                                                            )(
+                                                                                checked,
+                                                                                e
                                                                             )
                                                                         }
                                                                     />
                                                                     <p>
                                                                         {purchase.status_sampai
-                                                                            ? 'true'
-                                                                            : 'false'}
+                                                                            ? 'Sampai'
+                                                                            : 'Belum Sampai'}
                                                                     </p>
                                                                 </div>
-                                                            </div> */}
-                                                            {/* Status Lunas */}
-                                                            {/* <div>
+                                                            </div>
+                                                            {/* Status Sampai */}
+                                                            <div>
                                                                 <span className="text-xs font-bold text-gray-500">
-                                                                    Status Lunas
+                                                                    Status
+                                                                    Dikirim
                                                                 </span>
-                                                                <div className="flex items-center gap-2">
+                                                                <div className="flex items-center gap-2 ">
                                                                     <Switcher
                                                                         checked={
-                                                                            purchase.status_lunas
+                                                                            purchase.status_dikirim
                                                                         }
-                                                                        onChange={() =>
+                                                                        onChange={(
+                                                                            checked,
+                                                                            e
+                                                                        ) =>
                                                                             handleStatusChange(
                                                                                 purchase,
-                                                                                'status_lunas'
+                                                                                'status_dikirim'
+                                                                            )(
+                                                                                checked,
+                                                                                e
                                                                             )
                                                                         }
                                                                     />
                                                                     <p>
-                                                                        {purchase.status_lunas
-                                                                            ? 'true'
-                                                                            : 'galse'}
+                                                                        {purchase.status_dikirim
+                                                                            ? 'Sudah Dikirim'
+                                                                            : 'Belum Dikirim'}
                                                                     </p>
                                                                 </div>
-                                                            </div> */}
+                                                            </div>
+
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
                                                                     Keterangan
@@ -1450,7 +1460,7 @@ const PurchaseOrder = () => {
                                                             purchase
                                                                 .DetailPurchases
                                                                 .length > 0 && (
-                                                                <div className="mt-3">
+                                                                <div className="bg-indigo-100 p-4 border-t border-indigo-400">
                                                                     <h6 className="text-sm font-semibold mb-2">
                                                                         Detail
                                                                         Barang:
@@ -1560,7 +1570,7 @@ const PurchaseOrder = () => {
                                     )}
                             </AdaptableCard>
 
-                            {/* <ConfirmDialog
+                            <ConfirmDialog
                                 isOpen={isStatusChangeDialogOpen}
                                 type="warning"
                                 title="Konfirmasi Perubahan Status"
@@ -1571,11 +1581,7 @@ const PurchaseOrder = () => {
                                 onConfirm={confirmStatusChange}
                             >
                                 <p>
-                                    Apakah Anda yakin ingin mengubah{' '}
-                                    <span className="font-semibold">
-                                        {statusChangeInfo?.label}
-                                    </span>{' '}
-                                    menjadi{' '}
+                                    Apakah Anda yakin ingin mengubah status?
                                     <strong>
                                         {statusChangeInfo?.newStatus
                                             ? 'IYA'
@@ -1583,7 +1589,7 @@ const PurchaseOrder = () => {
                                     </strong>
                                     ?
                                 </p>
-                            </ConfirmDialog> */}
+                            </ConfirmDialog>
 
                             {/* Confirmation dialog for deleting purchase order */}
                             <ConfirmDialog

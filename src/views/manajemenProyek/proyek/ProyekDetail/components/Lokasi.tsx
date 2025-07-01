@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { IoLocationSharp } from 'react-icons/io5'
-import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi'
 import classNames from 'classnames'
 import isLastChild from '@/utils/isLastChild'
 import DescriptionSection from './DesriptionSection'
@@ -409,7 +408,7 @@ export default function Lokasi() {
 
                                 {/* Form untuk input lokasi */}
                                 {showForm && (
-                                    <div className="mb-4 border bg-slate-50 rounded-md p-4">
+                                    <div className="mb-4 border bg-indigo-50 rounded-md p-4">
                                         <h6 className="mb-3">
                                             {editIndex !== null
                                                 ? 'Edit Lokasi'
@@ -522,7 +521,7 @@ export default function Lokasi() {
 
                                 {/* Daftar lokasi */}
                                 {lokasiData && lokasiData.length > 0 ? (
-                                    <div className="rounded-lg border border-gray-200 dark:border-gray-600">
+                                    <div className="rounded-lg border border-indigo-400  bg-indigo-50  dark:border-gray-600">
                                         {lokasiData.map(
                                             (data: any, index: number) => {
                                                 // If currently editing this item, don't show it in the list
@@ -539,7 +538,7 @@ export default function Lokasi() {
                                                                 lokasiData,
                                                                 index
                                                             ) &&
-                                                                'border-b border-gray-200 dark:border-gray-600'
+                                                                'border-b  border-indigo-400  dark:border-gray-600'
                                                         )}
                                                     >
                                                         <a
@@ -549,7 +548,7 @@ export default function Lokasi() {
                                                             className="flex items-center group flex-grow"
                                                         >
                                                             <div className="text-3xl">
-                                                                <IoLocationSharp className="group-hover:text-blue-600 transition" />
+                                                                <IoLocationSharp className="text-indigo-500 group-hover:text-blue-600 transition group-hover:scale-110" />
                                                             </div>
                                                             <div className="ml-3 rtl:mr-3">
                                                                 <div className="flex items-center">
@@ -576,7 +575,7 @@ export default function Lokasi() {
                                                             <Button
                                                                 type="button"
                                                                 shape="circle"
-                                                                variant="twoTone"
+                                                                variant="solid"
                                                                 size="sm"
                                                                 className="text-indigo-500"
                                                                 onClick={() =>
