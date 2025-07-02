@@ -80,6 +80,18 @@ const ActionColumn = ({ row }: { row: Product }) => {
         <div className="flex justify-end text-lg">
             {row.status === 'Pengajuan' ? (
                 <>
+                    <Tooltip title="Progress">
+                        <span
+                            className={`cursor-pointer p-2 hover:${textTheme}`}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                onProgressUpdate()
+                            }}
+                        >
+                            <GiProgression />
+                        </span>
+                    </Tooltip>
                     <span
                         className={`cursor-pointer p-2 hover:${textTheme}`}
                         onClick={(e) => {
@@ -127,8 +139,64 @@ const ActionColumn = ({ row }: { row: Product }) => {
                             <HiOutlineDocumentAdd />
                         </span>
                     </Tooltip>
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onEdit()
+                        }}
+                    >
+                        <HiOutlinePencil />
+                    </span>
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onDelete()
+                        }}
+                    >
+                        <HiOutlineTrash />
+                    </span>
                 </>
-            ) : null}
+            ) : (
+                <>
+                    <Tooltip title="Progress">
+                        <span
+                            className={`cursor-pointer p-2 hover:${textTheme}`}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                onProgressUpdate()
+                            }}
+                        >
+                            <GiProgression />
+                        </span>
+                    </Tooltip>
+
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onEdit()
+                        }}
+                    >
+                        <HiOutlinePencil />
+                    </span>
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onDelete()
+                        }}
+                    >
+                        <HiOutlineTrash />
+                    </span>
+                </>
+            )}
         </div>
     )
 }
@@ -261,7 +329,9 @@ const TenderTable = () => {
                         <span className="capitalize">
                             {row.status === 'Pengajuan' ? (
                                 <div className="gap-2 flex flex-col">
-                                    Pengajuan
+                                    <div className="text-gray-500 px-4 rounded-lg py-2 bg-gray-200 text-center">
+                                        Pengajuan
+                                    </div>{' '}
                                     <div className="flex flex-row gap-2">
                                         <Button
                                             size="xs"
@@ -299,14 +369,18 @@ const TenderTable = () => {
                                     </div>
                                 </div>
                             ) : row.status === 'Diterima' ? (
-                                <span className="text-green-500">Menang</span>
+                                <div className="text-green-600 px-4 rounded-lg py-2 bg-green-100 text-center">
+                                    Menang
+                                </div>
                             ) : row.status === 'Ditolak' ? (
-                                <span className="text-rose-500">Kalah</span>
+                                <div className="text-rose-500 px-4 rounded-lg py-2 bg-rose-100 text-center">
+                                    Kalah
+                                </div>
                             ) : row.status === 'Diproses' ? (
                                 <div className="gap-2 flex flex-col">
-                                    <span className="text-indigo-500">
+                                    <div className="text-indigo-500 px-4 rounded-lg py-2 bg-indigo-100 text-center">
                                         Diproses
-                                    </span>{' '}
+                                    </div>{' '}
                                     <div className="flex flex-row gap-2">
                                         <Button
                                             size="xs"
@@ -362,9 +436,9 @@ const TenderTable = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <span className="text-gray-500">
+                                <div className="text-gray-500 px-4  rounded-lg py-2 bg-gray-200 text-center">
                                     {row.status}
-                                </span>
+                                </div>
                             )}
                         </span>
                     )
@@ -376,13 +450,7 @@ const TenderTable = () => {
                 minWidth: 150,
                 cell: (props) => {
                     const row = props.row.original
-                    return (
-                        <span>
-                            {row.status === 'Diterima'
-                                ? `${row.progress}%`
-                                : '-'}
-                        </span>
-                    )
+                    return <span>{row.progress}%</span>
                 },
             },
             {

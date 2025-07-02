@@ -183,6 +183,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     )}
                 </Field>
             </FormItem>
+
             {/* Prioritas */}
             <FormItem
                 label="Prioritas"
@@ -193,7 +194,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     {({ field, form }: FieldProps) => (
                         <Select
                             placeholder="Pilih Prioritas"
-                            isDisabled={type === 'edit'}
+                            // isDisabled={type === 'edit'}
                             options={prioritasOptions}
                             value={prioritasOptions.find(
                                 (option) => option.value === field.value

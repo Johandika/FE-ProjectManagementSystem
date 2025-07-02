@@ -18,7 +18,11 @@ import TenderForm, {
     OnDeleteCallback,
 } from '@/views/manajemenProyek/tender/TenderForm'
 import isEmpty from 'lodash/isEmpty'
-import { apiDeleteTender, apiPutTender } from '@/services/TenderService'
+import {
+    apiDeleteTender,
+    apiPutTender,
+    apiUpdateStatusPrioritasTender,
+} from '@/services/TenderService'
 
 injectReducer('tenderEdit', reducer)
 
@@ -69,20 +73,28 @@ const TenderEdit = () => {
     ) => {
         try {
             setSubmitting(true)
+            let { prioritas, ...valuesUpdateTender } = values
 
-            const result = await apiPutTender(values)
+            const dataPrioritas = { prioritas: prioritas, id: values.id }
 
-            if (result.data.statusCode === 200) {
+            const result = await apiPutTender(valuesUpdateTender)
+            const resultPrioritas = await apiUpdateStatusPrioritasTender(
+                dataPrioritas
+            )
+
+            if (
+                result.data.statusCode === 200 ||
+                resultPrioritas.data.statusCode === 200
+            ) {
                 popNotification('updated')
             } else {
-                // Menampilkan notifikasi error
                 toast.push(
                     <Notification
                         title={'Gagal menambahkan'}
                         type="danger"
                         duration={3500}
                     >
-                        {result.data.message}
+                        {result?.data.message}
                     </Notification>,
                     {
                         placement: 'top-center',
@@ -90,7 +102,6 @@ const TenderEdit = () => {
                 )
             }
         } finally {
-            // Pastikan setSubmitting selalu dipanggil di akhir proses
             setSubmitting(false)
         }
     }
