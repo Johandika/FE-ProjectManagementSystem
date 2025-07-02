@@ -223,9 +223,7 @@ const TenderTable = () => {
 
     // Setelah diubah
     const handleRowClick = (row: any) => {
-        if (row.status === 'Diterima') {
-            navigate(`/manajemen-tender-detail/${row.id}`)
-        }
+        navigate(`/manajemen-tender-detail/${row.id}`)
     }
 
     useEffect(() => {
