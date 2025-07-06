@@ -12,7 +12,7 @@ import Button from '@/components/ui/Button'
 import Drawer from '@/components/ui/Drawer'
 import { Field, Form, Formik, FormikProps, FieldProps } from 'formik'
 import type { MouseEvent } from 'react'
-import { Select } from '@/components/ui'
+import { Radio, Select } from '@/components/ui'
 import { getSelectDivisi, RootState } from '@/store'
 
 type FormModel = {
@@ -116,6 +116,36 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                             />
                                         )
                                     }}
+                                </Field>
+                            </FormItem>
+                            {/* Filter Active Inactive */}
+                            <FormItem
+                                invalid={
+                                    errors.klienStatus && touched.klienStatus
+                                }
+                                errorMessage={errors.klienStatus}
+                            >
+                                <h6 className="mb-4">Klien Status</h6>
+                                <Field name="klienStatus">
+                                    {({ field, form }: FieldProps) => (
+                                        <Radio.Group
+                                            vertical
+                                            value={values.klienStatus}
+                                            onChange={(val) => {
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    val
+                                                )
+                                            }}
+                                        >
+                                            <Radio value={'active'}>
+                                                Active
+                                            </Radio>
+                                            <Radio value={'inactive'}>
+                                                Inactive
+                                            </Radio>
+                                        </Radio.Group>
+                                    )}
                                 </Field>
                             </FormItem>
                         </FormContainer>

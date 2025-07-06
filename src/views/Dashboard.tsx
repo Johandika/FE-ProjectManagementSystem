@@ -18,6 +18,7 @@ import {
 } from '@/store'
 import dayjs from 'dayjs'
 import { HiOutlineFilter } from 'react-icons/hi'
+import TableDataProyekDashboard from '@/components/custom/TableDataProyekDashboard'
 
 const BastpSchema = Yup.object().shape({
     tanggal_awal: Yup.string().required('Wajib diisi'),
@@ -81,6 +82,8 @@ const Dashboard = () => {
             })
         )
     }, [selectDivisi])
+
+    console.log(dataDashboard)
 
     const handleFilter = (values: FilterFormValues) => {
         const params: {
@@ -188,6 +191,10 @@ const Dashboard = () => {
                     <div className="flex flex-col sm:flex-row gap-4 mt-4">
                         <BasicBarVertical dataAwal={dataAwal} />
                         <SimplePie dataAwal={dataAwal} />
+                    </div>
+                    {/* Tabel Data Proyek */}
+                    <div className=" rounded-lg p-4 border">
+                        <TableDataProyekDashboard dataAwal={dataAwal} />
                     </div>
                 </Loading>
             </div>

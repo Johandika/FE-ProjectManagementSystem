@@ -88,19 +88,19 @@ const TerminFields = (props: TerminFieldsProps) => {
 
                             {values.termin &&
                                 values.termin.map((_, index) => {
-                                    // Otomatis set keterangan sebagai "Termin {index+1}"
-                                    const terminName = `Termin ${index + 1}`
+                                    // // Otomatis set keterangan sebagai "Termin {index+1}"
+                                    // const terminName = `Termin ${index + 1}`
 
-                                    // Jika keterangan kosong atau berbeda dengan format yang diharapkan, update
-                                    if (
-                                        values.termin[index].keterangan !==
-                                        terminName
-                                    ) {
-                                        setFieldValue(
-                                            `termin[${index}].keterangan`,
-                                            terminName
-                                        )
-                                    }
+                                    // // Jika keterangan kosong atau berbeda dengan format yang diharapkan, update
+                                    // if (
+                                    //     values.termin[index].keterangan !==
+                                    //     terminName
+                                    // ) {
+                                    //     setFieldValue(
+                                    //         `termin[${index}].keterangan`,
+                                    //         terminName
+                                    //     )
+                                    // }
 
                                     const keteranganError =
                                         errors.termin?.[index]?.keterangan &&
@@ -129,18 +129,21 @@ const TerminFields = (props: TerminFieldsProps) => {
                                                         : ''
                                                 }
                                             >
-                                                <Input
-                                                    type="text"
-                                                    value={terminName}
-                                                    disabled
-                                                    readOnly
-                                                    className="bg-gray-100"
-                                                />
                                                 <Field
-                                                    type="hidden"
                                                     name={`termin[${index}].keterangan`}
-                                                    value={terminName}
-                                                />
+                                                >
+                                                    {({
+                                                        field,
+                                                    }: FieldProps) => (
+                                                        <Input
+                                                            {...field}
+                                                            type="text"
+                                                            disabled
+                                                            readOnly
+                                                            className="bg-gray-100"
+                                                        />
+                                                    )}
+                                                </Field>
                                             </FormItem>
                                             <FormItem
                                                 className="w-32 mb-0 mr-2"
@@ -225,9 +228,21 @@ const TerminFields = (props: TerminFieldsProps) => {
                                 type="button"
                                 variant="twoTone"
                                 icon={<HiPlus />}
-                                onClick={() =>
-                                    push({ keterangan: '', persen: 0 })
-                                }
+                                onClick={() => {
+                                    // Tentukan nama termin baru berdasarkan jumlah item saat ini
+                                    const newIndex = values.termin
+                                        ? values.termin.length
+                                        : 0
+                                    const newKeterangan = `Termin ${
+                                        newIndex + 1
+                                    }`
+
+                                    // Push data yang sudah memiliki keterangan yang benar
+                                    push({
+                                        keterangan: newKeterangan,
+                                        persen: 0,
+                                    })
+                                }}
                             >
                                 Tambah Termin
                             </Button>

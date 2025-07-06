@@ -97,7 +97,7 @@ const TenderForm = forwardRef<FormikRef, TenderForm>((props, ref) => {
             pekerjaan: '',
             tanggal_pengajuan: '',
             nilai_kontrak: 0,
-            idDivisi: '',
+            // idDivisi: '',
         },
         dataDivisi,
         kliensData,

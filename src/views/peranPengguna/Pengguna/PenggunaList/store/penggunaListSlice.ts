@@ -2,27 +2,22 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
-import { apiGetUsers } from '@/services/UserService'
+import { apiGetUsers, apiRestoreUser } from '@/services/UserService'
 
 type Pengguna = {
     id: string
     pengguna: string
 }
 
-type Penggunas = Pengguna[]
-
-type GetMasterPenggunaResponse = {
-    data: Penggunas
-    total: number
-}
-
 type FilterQueries = {
-    idDivisi: string
+    idDivisi?: string
+    penggunaStatus: string
 }
 
 export type MasterPenggunaListSlice = {
     loading: boolean
     deleteConfirmation: boolean
+    restoreConfirmation: boolean
     selectedPengguna: string
     tableData: TableQueries
     filterData: FilterQueries
@@ -49,6 +44,13 @@ export const getPenggunas = createAsyncThunk(
     }
 )
 
+export const restorePengguna = async (data: { id: string | string[] }) => {
+    const response = await apiRestoreUser<boolean, { id: string | string[] }>(
+        data
+    )
+    return response.data
+}
+
 export const initialTableData: TableQueries = {
     total: 0,
     pageIndex: 1,
@@ -71,6 +73,7 @@ const initialState: MasterPenggunaListSlice = {
     tableData: initialTableData,
     filterData: {
         idDivisi: '',
+        penggunaStatus: 'active',
     },
 }
 
@@ -89,6 +92,9 @@ const penggunaListSlice = createSlice({
         },
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
+        },
+        toggleRestoreConfirmation: (state, action) => {
+            state.restoreConfirmation = action.payload
         },
         setSelectedPengguna: (state, action) => {
             state.selectedPengguna = action.payload
@@ -123,6 +129,7 @@ export const {
     toggleDeleteConfirmation,
     setDialogUpdatePassword,
     setDialogResetPassword,
+    toggleRestoreConfirmation,
     setIdUserActive,
     setSelectedPengguna,
 } = penggunaListSlice.actions

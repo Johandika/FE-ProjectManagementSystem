@@ -8,6 +8,7 @@ import {
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
+    toggleRestoreConfirmation,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import SatuanDeleteConfirmation from './SatuanDeleteConfirmation'
@@ -18,6 +19,8 @@ import type {
     OnSortParam,
     ColumnDef,
 } from '@/components/shared/DataTable'
+import SatuanRestoreConfirmation from './SatuanRestoreConfirmation copy'
+import { FaTrashRestoreAlt } from 'react-icons/fa'
 
 type Satuan = {
     id: string
@@ -38,20 +41,36 @@ const ActionColumn = ({ row }: { row: Satuan }) => {
         dispatch(setSelectedSatuan(row.id))
     }
 
+    const onRestore = () => {
+        dispatch(toggleRestoreConfirmation(true))
+        dispatch(setSelectedSatuan(row.id))
+    }
+
     return (
         <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
-            >
-                <HiOutlinePencil />
-            </span>
-            <span
-                className="cursor-pointer p-2 hover:text-red-500"
-                onClick={onDelete}
-            >
-                <HiOutlineTrash />
-            </span>
+            {row.deletedAt === null ? (
+                <>
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={onEdit}
+                    >
+                        <HiOutlinePencil />
+                    </span>
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={onDelete}
+                    >
+                        <HiOutlineTrash />
+                    </span>
+                </>
+            ) : (
+                <span
+                    className={`cursor-pointer p-2 hover:${textTheme}`}
+                    onClick={onRestore}
+                >
+                    <FaTrashRestoreAlt />
+                </span>
+            )}
         </div>
     )
 }
@@ -78,7 +97,7 @@ const SatuanTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
+    }, [pageIndex, pageSize, sort, filterData])
 
     useEffect(() => {
         if (tableRef) {
@@ -156,6 +175,7 @@ const SatuanTable = () => {
                 onSort={onSort}
             />
             <SatuanDeleteConfirmation />
+            <SatuanRestoreConfirmation />
         </>
     )
 }

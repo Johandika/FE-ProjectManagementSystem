@@ -24,6 +24,8 @@ import type {
 } from '@/components/shared/DataTable'
 import DialogUpdatePassword from './DialogUpdatePassword'
 import DialogConfirmResetPassword from './DialogConfirmResetPassword'
+import PenggunaRestoreConfirmation from './PenggunaRestoreConfirmation copy'
+import { FaTrashRestoreAlt } from 'react-icons/fa'
 
 type Pengguna = {
     id: string
@@ -49,6 +51,11 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
         dispatch(setIdUserActive(row.id))
     }
 
+    const onRestore = () => {
+        dispatch(toggleRestoreConfirmation(true))
+        dispatch(setSelectedPengguna(row.id))
+    }
+
     const onDelete = () => {
         dispatch(toggleDeleteConfirmation(true))
         dispatch(setSelectedPengguna(row.id))
@@ -69,29 +76,39 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
                     <MdOutlinePassword />
                 </span>
             )}
-            {user.authority === 'Super Admin' && (
+            {row.deletedAt === null && (
                 <span
                     className={`cursor-pointer p-2 hover:${textTheme}`}
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onResetPassword(row)
-                    }}
+                    onClick={onEdit}
                 >
-                    <MdLockReset />
+                    <HiOutlinePencil />
                 </span>
             )}
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
-            >
-                <HiOutlinePencil />
-            </span>
-            {user.authority === 'Super Admin' && (
+            {user.authority === 'Super Admin' && row.deletedAt === null ? (
+                <>
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onResetPassword(row)
+                        }}
+                    >
+                        <MdLockReset />
+                    </span>
+
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={onDelete}
+                    >
+                        <HiOutlineTrash />
+                    </span>
+                </>
+            ) : (
                 <span
-                    className="cursor-pointer p-2 hover:text-red-500"
-                    onClick={onDelete}
+                    className={`cursor-pointer p-2 hover:${textTheme}`}
+                    onClick={onRestore}
                 >
-                    <HiOutlineTrash />
+                    <FaTrashRestoreAlt />
                 </span>
             )}
         </div>
@@ -238,6 +255,7 @@ const PenggunaTable = () => {
             <PenggunaDeleteConfirmation />
             <DialogUpdatePassword />
             <DialogConfirmResetPassword />
+            <PenggunaRestoreConfirmation />
         </>
     )
 }

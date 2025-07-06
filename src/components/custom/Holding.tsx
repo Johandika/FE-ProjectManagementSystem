@@ -1,5 +1,6 @@
 import SimplePieMini from './SimplePieMini'
 import { theme } from 'twin.macro'
+import TableDataProyekDashboard from './TableDataProyekDashboard'
 
 const twColor: Record<string, string> = theme`colors`
 
@@ -79,7 +80,7 @@ export default function Holding({ dataAwal }: any) {
                     />
                 </div>
 
-                {/* Card 6: Total Tender */}
+                {/* Card 4: Total Tender */}
                 <div className=" rounded-lg p-4 border">
                     <div>
                         <p className="text-sm">Total Faktur Pajak</p>
@@ -127,7 +128,7 @@ export default function Holding({ dataAwal }: any) {
                     </div>
                 </div>
 
-                {/* Card 4:Statistik Progress */}
+                {/* Card 5:Statistik Progress */}
                 <div className=" rounded-lg p-4 border">
                     <SimplePieMini
                         dataAwal={dataAwal?.grafik_pie_progress}

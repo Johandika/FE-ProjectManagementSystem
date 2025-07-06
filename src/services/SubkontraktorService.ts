@@ -12,7 +12,8 @@ export async function apiGetSubkontraktors<
             ? {
                   page: data.pageIndex,
                   limit: data.pageSize,
-                  search: data.query,
+                  search: data.query || null,
+                  type: data.filterData?.subkontraktorStatus || null,
               }
             : undefined,
     })
@@ -28,15 +29,15 @@ export async function apiDeleteSubkontraktors<
     if (Array.isArray(data.id)) {
         // jika ada penghapusan multiple
         return ApiService.fetchData<T>({
-            url: '/subkon',
+            url: '/subkon/softDeleted',
             method: 'delete',
             data,
         })
     } else {
         // Untuk id tunggal
         return ApiService.fetchData<T>({
-            url: `/subkon/${data.id}`,
-            method: 'delete',
+            url: `/subkon/softDeleted/${data.id}`,
+            method: 'patch',
         })
     }
 }
@@ -72,6 +73,18 @@ export async function apiCreateSubkontraktor<
     return ApiService.fetchData<T>({
         url: '/subkon',
         method: 'post',
+        data,
+    })
+}
+
+// restore
+export async function apiRestoreSubkontraktor<
+    T,
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<T>({
+        url: `/subkon/restore/${data.id}`,
+        method: 'patch',
         data,
     })
 }

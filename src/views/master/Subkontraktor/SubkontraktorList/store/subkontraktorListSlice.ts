@@ -5,6 +5,7 @@ import type { TableQueries } from '@/@types/common'
 import {
     apiDeleteSubkontraktors,
     apiGetSubkontraktors,
+    apiRestoreSubkontraktor,
 } from '@/services/SubkontraktorService'
 
 type Subkontraktor = {
@@ -22,15 +23,13 @@ type GetMasterSubkontraktorResponse = {
 }
 
 type FilterQueries = {
-    name: string
-    category: string[]
-    status: number[]
-    subkontraktorStatus: number
+    subkontraktorStatus: string
 }
 
 export type MasterSubkontraktorListSlice = {
     loading: boolean
     deleteConfirmation: boolean
+    restoreConfirmation: boolean
     selectedSubkontraktor: string
     tableData: TableQueries
     filterData: FilterQueries
@@ -66,6 +65,14 @@ export const deleteSubkontraktor = async (data: { id: string | string[] }) => {
     return response.data
 }
 
+export const restoreSubkontraktor = async (data: { id: string | string[] }) => {
+    const response = await apiRestoreSubkontraktor<
+        boolean,
+        { id: string | string[] }
+    >(data)
+    return response.data
+}
+
 export const initialTableData: TableQueries = {
     total: 0,
     pageIndex: 1,
@@ -80,14 +87,12 @@ export const initialTableData: TableQueries = {
 const initialState: MasterSubkontraktorListSlice = {
     loading: false,
     deleteConfirmation: false,
+    restoreConfirmation: false,
     selectedSubkontraktor: '',
     subkontraktorList: [],
     tableData: initialTableData,
     filterData: {
-        name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'e'],
-        status: [0, 1, 2],
-        subkontraktorStatus: 0,
+        subkontraktorStatus: 'active',
     },
 }
 
@@ -104,8 +109,12 @@ const subkontraktorListSlice = createSlice({
         setFilterData: (state, action) => {
             state.filterData = action.payload
         },
+
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
+        },
+        toggleRestoreConfirmation: (state, action) => {
+            state.restoreConfirmation = action.payload
         },
         setSelectedSubkontraktor: (state, action) => {
             state.selectedSubkontraktor = action.payload
@@ -129,6 +138,7 @@ export const {
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
+    toggleRestoreConfirmation,
     setSelectedSubkontraktor,
 } = subkontraktorListSlice.actions
 

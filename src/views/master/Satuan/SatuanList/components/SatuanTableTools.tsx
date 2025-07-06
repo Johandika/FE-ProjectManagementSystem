@@ -11,8 +11,8 @@ const SatuanTableTools = () => {
     return (
         <div className="flex flex-col lg:flex-row lg:items-center">
             <SatuanTableSearch />
-            {/* <SatuanFilter />
-            <Link
+            <SatuanFilter />
+            {/* <Link
                 download
                 className="block lg:inline-block md:mx-2 md:mb-0 mb-4"
                 to="/data/product-list.csv"

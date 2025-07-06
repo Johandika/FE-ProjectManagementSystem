@@ -41,7 +41,6 @@ type FormFieldsName = {
     pekerjaan: string
     pic: string
     uang_muka: number
-    idDivisi: string
     nomor_kontrak: string
     tanggal_service_po: string
     tanggal_kontrak: string
@@ -83,6 +82,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
     )
 
     const onCheck = (value: boolean, form: any) => {
+        setCheckRetensi(value)
         form.setFieldValue('is_retensi', value)
 
         // Reset field retensi jika unchecked
@@ -386,44 +386,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </div>
                     </>
                 )}
-
-                <div className="col-span-2 md:col-span-1">
-                    {/* Pilih Divisi */}
-                    <FormItem
-                        label="Divisi"
-                        invalid={
-                            (errors.idDivisi && touched.idDivisi) as boolean
-                        }
-                        errorMessage={errors.idDivisi}
-                    >
-                        <Field name="idDivisi">
-                            {({ field, form }: FieldProps) => (
-                                <Select
-                                    placeholder="Pilih divisi"
-                                    isDisabled={disabledState}
-                                    options={dataDivisi?.map((role) => ({
-                                        label: role.name,
-                                        value: role.id,
-                                    }))}
-                                    value={dataDivisi
-                                        ?.map((role) => ({
-                                            label: role.name,
-                                            value: role.id,
-                                        }))
-                                        .find(
-                                            (opt) => opt.value === field.value
-                                        )}
-                                    onChange={(selected) => {
-                                        form.setFieldValue(
-                                            field.name,
-                                            selected?.value || ''
-                                        )
-                                    }}
-                                />
-                            )}
-                        </Field>
-                    </FormItem>
-                </div>
 
                 {type === 'new' && (
                     <>

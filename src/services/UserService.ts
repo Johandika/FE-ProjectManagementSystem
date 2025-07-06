@@ -11,6 +11,7 @@ export async function apiGetUsers(data: any) {
                   limit: data.pageSize,
                   search: data.query || null,
                   idDivisi: data.filterData?.idDivisi || null,
+                  type: data.filterData?.penggunaStatus || null,
               }
             : undefined,
     })
@@ -49,6 +50,17 @@ export async function apiUpdateUser<T, U extends Record<string, unknown>>(
 ) {
     return ApiService.fetchData<T>({
         url: `/user/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// restore
+export async function apiRestoreUser<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: `/user/restore/${data.id}`,
         method: 'patch',
         data,
     })

@@ -179,7 +179,25 @@ const ProyekNew = () => {
                     loadingSelectDivisi
                 }
             >
-                {!isEmpty(kliensData && berkasesData) && (
+                {!loadingKliens &&
+                    !loadingBerkases &&
+                    !loadingSubkontraktors &&
+                    !loadingSatuans &&
+                    !loadingSelectDivisi && (
+                        <>
+                            <ProyekForm
+                                type="new"
+                                dataDivisi={selectDivisi.data}
+                                kliensList={kliensData}
+                                berkasesList={berkasesData}
+                                subkontraktorsList={subkontraktorsData}
+                                satuansList={satuansData}
+                                onFormSubmit={handleFormSubmit}
+                                onDiscard={handleDiscard}
+                            />
+                        </>
+                    )}
+                {/* {!isEmpty(kliensData && berkasesData) && (
                     <>
                         <ProyekForm
                             type="new"
@@ -192,7 +210,7 @@ const ProyekNew = () => {
                             onDiscard={handleDiscard}
                         />
                     </>
-                )}
+                )} */}
             </Loading>
         </>
     )

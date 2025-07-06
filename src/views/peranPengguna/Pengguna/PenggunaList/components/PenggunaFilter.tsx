@@ -1,5 +1,5 @@
 import { useState, useRef, forwardRef, useEffect, useMemo } from 'react'
-import { HiOutlineFilter, HiOutlineSearch } from 'react-icons/hi'
+import { HiOutlineFilter } from 'react-icons/hi'
 import {
     getPenggunas,
     setFilterData,
@@ -8,14 +8,11 @@ import {
     useAppSelector,
 } from '../store'
 import { FormItem, FormContainer } from '@/components/ui/Form'
-import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import Checkbox from '@/components/ui/Checkbox'
-import Radio from '@/components/ui/Radio'
 import Drawer from '@/components/ui/Drawer'
 import { Field, Form, Formik, FormikProps, FieldProps } from 'formik'
 import type { MouseEvent } from 'react'
-import { Select } from '@/components/ui'
+import { Radio, Select } from '@/components/ui'
 import { getSelectDivisi } from '@/store'
 
 type FormModel = {
@@ -118,6 +115,37 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                             />
                                         )
                                     }}
+                                </Field>
+                            </FormItem>
+                            {/* Filter Status */}
+                            <FormItem
+                                invalid={
+                                    errors.penggunaStatus &&
+                                    touched.penggunaStatus
+                                }
+                                errorMessage={errors.penggunaStatus}
+                            >
+                                <h6 className="mb-4">Pengguna Status</h6>
+                                <Field name="penggunaStatus">
+                                    {({ field, form }: FieldProps) => (
+                                        <Radio.Group
+                                            vertical
+                                            value={values.penggunaStatus}
+                                            onChange={(val) => {
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    val
+                                                )
+                                            }}
+                                        >
+                                            <Radio value={'active'}>
+                                                Active
+                                            </Radio>
+                                            <Radio value={'inactive'}>
+                                                Inactive
+                                            </Radio>
+                                        </Radio.Group>
+                                    )}
                                 </Field>
                             </FormItem>
                         </FormContainer>

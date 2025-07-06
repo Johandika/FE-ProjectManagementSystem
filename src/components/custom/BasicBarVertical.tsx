@@ -17,12 +17,13 @@ const BasicBarVertical = ({ dataAwal }: any) => {
     }
 
     return (
-        <div className="flex flex-col w-full sm:w-3/4 border p-4 rounded-md">
+        <div className="flex flex-col w-full sm:w-8/12 border p-4 rounded-md">
             <div className="mb-4 lg:mb-0">
                 <h4>Statistik Proyek & Tender</h4>
             </div>
             <Chart
                 options={{
+                    labels: category?.map((label) => `${label}`),
                     plotOptions: {
                         bar: {
                             horizontal: true,

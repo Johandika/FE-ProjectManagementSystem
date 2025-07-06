@@ -2,7 +2,11 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
-import { apiDeleteBerkases, apiGetBerkases } from '@/services/BerkasService'
+import {
+    apiDeleteBerkases,
+    apiGetBerkases,
+    apiRestoreBerkas,
+} from '@/services/BerkasService'
 
 type Berkas = {
     id: string
@@ -23,12 +27,13 @@ type FilterQueries = {
     name: string
     category: string[]
     status: number[]
-    berkasStatus: number
+    berkasStatus: string
 }
 
 export type MasterBerkasListSlice = {
     loading: boolean
     deleteConfirmation: boolean
+    restoreConfirmation: boolean
     selectedBerkas: string
     tableData: TableQueries
     filterData: FilterQueries
@@ -61,6 +66,13 @@ export const deleteBerkas = async (data: { id: string | string[] }) => {
         boolean,
         { id: string | string[] }
     >(data)
+    return response.data
+}
+
+export const restoreBerkas = async (data: { id: string | string[] }) => {
+    const response = await apiRestoreBerkas<boolean, { id: string | string[] }>(
+        data
+    )
     return response.data
 }
 
@@ -105,6 +117,9 @@ const berkasListSlice = createSlice({
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
         },
+        toggleRestoreConfirmation: (state, action) => {
+            state.restoreConfirmation = action.payload
+        },
         setSelectedBerkas: (state, action) => {
             state.selectedBerkas = action.payload
         },
@@ -127,6 +142,7 @@ export const {
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
+    toggleRestoreConfirmation,
     setSelectedBerkas,
 } = berkasListSlice.actions
 

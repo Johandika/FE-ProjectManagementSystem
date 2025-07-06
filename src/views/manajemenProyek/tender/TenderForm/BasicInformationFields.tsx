@@ -13,7 +13,7 @@ type FormFieldsName = {
     tanggal_pengajuan: string
     nilai_kontrak: number
     idClient: string
-    idDivisi: string
+    // idDivisi: string
     prioritas: string
 }
 
@@ -153,7 +153,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 </Field>
             </FormItem>
 
-            {/* Pilih Divisi */}
+            {/* Pilih Divisi
             <FormItem
                 label="Divisi"
                 invalid={(errors.idDivisi && touched.idDivisi) as boolean}
@@ -182,7 +182,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         />
                     )}
                 </Field>
-            </FormItem>
+            </FormItem> */}
 
             {/* Prioritas */}
             <FormItem

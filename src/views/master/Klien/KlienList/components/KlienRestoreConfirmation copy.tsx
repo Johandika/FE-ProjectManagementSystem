@@ -2,41 +2,50 @@ import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import {
-    toggleDeleteConfirmation,
-    deleteProyek,
-    getProyeks,
+    toggleRestoreConfirmation,
+    getKliens,
     useAppDispatch,
     useAppSelector,
+    restoreKlien,
 } from '../store'
 
-const ProyekDeleteConfirmation = () => {
+const KlienRestoreConfirmation = () => {
     const dispatch = useAppDispatch()
     const dialogOpen = useAppSelector(
-        (state) => state.proyekList.data.deleteConfirmation
+        (state) => state.klienList.data.restoreConfirmation
     )
-    const selectedProyek = useAppSelector(
-        (state) => state.proyekList.data.selectedProyek
+
+    const selectedKlien = useAppSelector(
+        (state) => state.klienList.data.selectedKlien
     )
-    const tableData = useAppSelector((state) => state.proyekList.data.tableData)
+    const tableData = useAppSelector((state) => state.klienList.data.tableData)
 
     const onDialogClose = () => {
-        dispatch(toggleDeleteConfirmation(false))
+        dispatch(toggleRestoreConfirmation(false))
     }
 
     const onDelete = async () => {
-        dispatch(toggleDeleteConfirmation(false))
-        const success = await deleteProyek({ id: selectedProyek })
+        dispatch(toggleRestoreConfirmation(false))
+        const success = await restoreKlien({
+            id: selectedKlien,
+        })
 
         if (success) {
-            console.log('tableData', tableData)
-            dispatch(getProyeks(tableData))
+            dispatch(
+                getKliens({
+                    ...tableData,
+                    filterData: {
+                        klienStatus: 'inactive',
+                    },
+                })
+            )
             toast.push(
                 <Notification
-                    title={'Successfuly Deleted'}
+                    title={'Successfuly Restored'}
                     type="success"
                     duration={2500}
                 >
-                    Item berhasil dihapus
+                    Item berhasil direstore
                 </Notification>,
                 {
                     placement: 'top-center',
@@ -49,16 +58,16 @@ const ProyekDeleteConfirmation = () => {
         <ConfirmDialog
             isOpen={dialogOpen}
             type="danger"
-            title="Hapus Proyek"
+            title="Restore Klien"
             confirmButtonColor="red-600"
             onClose={onDialogClose}
             onRequestClose={onDialogClose}
             onCancel={onDialogClose}
             onConfirm={onDelete}
         >
-            <p>Apakah kamu yakin ingin menghapus faktur pajak ini?</p>
+            <p>Apakah kamu yakin ingin merestore data klien ini?</p>
         </ConfirmDialog>
     )
 }
 
-export default ProyekDeleteConfirmation
+export default KlienRestoreConfirmation

@@ -131,7 +131,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
 
                             {/* Pilih divisi */}
                             <FormItem
-                                label="Klien"
+                                label="Divisi"
                                 invalid={errors.idDivisi && touched.idDivisi}
                                 errorMessage={errors.idDivisi}
                             >

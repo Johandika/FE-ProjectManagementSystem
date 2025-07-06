@@ -8,6 +8,7 @@ import {
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
+    toggleRestoreConfirmation,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import SubkontraktorDeleteConfirmation from './SubkontraktorDeleteConfirmation'
@@ -18,6 +19,8 @@ import type {
     OnSortParam,
     ColumnDef,
 } from '@/components/shared/DataTable'
+import { FaTrashRestoreAlt } from 'react-icons/fa'
+import SubkontraktorRestoreConfirmation from './SubkontraktorRestoreConfirmation copy'
 
 type Subkontraktor = {
     id: string
@@ -33,6 +36,11 @@ const ActionColumn = ({ row }: { row: Subkontraktor }) => {
         navigate(`/master/subkontraktor-edit/${row.id}`)
     }
 
+    const onRestore = () => {
+        dispatch(toggleRestoreConfirmation(true))
+        dispatch(setSelectedSubkontraktor(row.id))
+    }
+
     const onDelete = () => {
         dispatch(toggleDeleteConfirmation(true))
         dispatch(setSelectedSubkontraktor(row.id))
@@ -40,18 +48,29 @@ const ActionColumn = ({ row }: { row: Subkontraktor }) => {
 
     return (
         <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
-            >
-                <HiOutlinePencil />
-            </span>
-            <span
-                className="cursor-pointer p-2 hover:text-red-500"
-                onClick={onDelete}
-            >
-                <HiOutlineTrash />
-            </span>
+            {row.deletedAt === null ? (
+                <>
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={onEdit}
+                    >
+                        <HiOutlinePencil />
+                    </span>
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={onDelete}
+                    >
+                        <HiOutlineTrash />
+                    </span>
+                </>
+            ) : (
+                <span
+                    className={`cursor-pointer p-2 hover:${textTheme}`}
+                    onClick={onRestore}
+                >
+                    <FaTrashRestoreAlt />
+                </span>
+            )}
         </div>
     )
 }
@@ -82,7 +101,7 @@ const SubkontraktorTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
+    }, [pageIndex, pageSize, sort, filterData])
 
     useEffect(() => {
         if (tableRef) {
@@ -162,6 +181,7 @@ const SubkontraktorTable = () => {
                 onSort={onSort}
             />
             <SubkontraktorDeleteConfirmation />
+            <SubkontraktorRestoreConfirmation />
         </>
     )
 }

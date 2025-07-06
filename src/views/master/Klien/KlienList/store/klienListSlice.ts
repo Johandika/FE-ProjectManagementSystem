@@ -2,7 +2,11 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
-import { apiDeleteKliens, apiGetKliens } from '@/services/KlienService'
+import {
+    apiDeleteKliens,
+    apiGetKliens,
+    apiRestoreKlien,
+} from '@/services/KlienService'
 
 type Klien = {
     id: string
@@ -25,16 +29,14 @@ type GetMasterKlienResponse = {
 }
 
 type FilterQueries = {
-    name: string
-    category: string[]
-    status: number[]
-    productStatus: number
+    klienStatus: string
 }
 
 export type MasterKlienListSlice = {
     loading: boolean
     deleteConfirmation: boolean
-    selectedProduct: string
+    restoreConfirmation: boolean
+    selectedKlien: string
     tableData: TableQueries & { totalPage?: number }
     filterData: FilterQueries
     productList: Klien[]
@@ -69,6 +71,14 @@ export const deleteKlien = async (data: { id: string | string[] }) => {
     return response.data
 }
 
+// restore
+export const restoreKlien = async (data: { id: string | string[] }) => {
+    const response = await apiRestoreKlien<boolean, { id: string | string[] }>(
+        data
+    )
+    return response.data
+}
+
 export const initialTableData: TableQueries = {
     total: 0,
     pageIndex: 1,
@@ -83,14 +93,12 @@ export const initialTableData: TableQueries = {
 const initialState: MasterKlienListSlice = {
     loading: false,
     deleteConfirmation: false,
-    selectedProduct: '',
+    restoreConfirmation: false,
+    selectedKlien: '',
     productList: [],
     tableData: initialTableData,
     filterData: {
-        name: '',
-        category: ['bags', 'cloths', 'devices', 'shoes', 'd'],
-        status: [0, 1, 2],
-        productStatus: 0,
+        klienStatus: 'active',
     },
 }
 
@@ -110,8 +118,11 @@ const klienListSlice = createSlice({
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
         },
-        setSelectedProduct: (state, action) => {
-            state.selectedProduct = action.payload
+        toggleRestoreConfirmation: (state, action) => {
+            state.restoreConfirmation = action.payload
+        },
+        setSelectedKlien: (state, action) => {
+            state.selectedKlien = action.payload
         },
     },
     extraReducers: (builder) => {
@@ -133,7 +144,8 @@ export const {
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
-    setSelectedProduct,
+    toggleRestoreConfirmation,
+    setSelectedKlien,
 } = klienListSlice.actions
 
 export default klienListSlice.reducer

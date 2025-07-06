@@ -79,13 +79,13 @@ const TerminSchema = Yup.object().shape({
     //     .min(0, 'Persentase minimal 0')
     //     .max(100, 'Persentase maksimal 100'),
     // nilai_termin: Yup.number().required('Nilai termin wajib diisi'),
-    keterangan: Yup.string().required('Keterangan wajib diisi'),
+    // keterangan: Yup.string().required('Keterangan wajib diisi'),
 })
 
 // Interface untuk nilai awal form termin
 interface TerminFormValues {
     persen: number | string
-    keterangan: string
+    // keterangan: string
 }
 
 export default function Termin() {
@@ -117,7 +117,7 @@ export default function Termin() {
     const [terminFormInitialValues, setTerminFormInitialValues] =
         useState<TerminFormValues>({
             persen: 0,
-            keterangan: '',
+            // keterangan: '',
         })
 
     // Get project ID from path
@@ -372,6 +372,66 @@ export default function Termin() {
     }
 
     // Handle termin form submission
+    // const handleTerminSubmit = async (
+    //     values: TerminFormValues,
+    //     { setSubmitting }: { setSubmitting: SetSubmitting }
+    // ) => {
+    //     setSubmitting(true)
+    //     const projectId = getProjectId()
+
+    //     const processedData = {
+    //         ...values,
+    //         persen: extractNumberFromString(values.persen),
+    //         idProject: projectId,
+    //     }
+
+    //     try {
+    //         let success = false
+    //         if (isEditTerminMode && selectedTerminToEdit) {
+    //             // Update existing termin
+    //             const updateData = {
+    //                 ...processedData,
+    //                 id: selectedTerminToEdit.id,
+    //             }
+
+    //             success = await apiEditTermin(updateData)
+    //             if (success) {
+    //                 popNotification('updated', 'Termin')
+    //             }
+    //         } else {
+    //             // Create new termin
+    //             success = await apiCreateTermin(processedData)
+    //             if (success) {
+    //                 popNotification('added', 'Termin')
+    //             }
+    //         }
+
+    //         if (success) {
+    //             // Refresh termins data
+    //             fetchData({ id: projectId })
+    //         }
+    //     } catch (error) {
+    //         console.error(
+    //             `Error ${isEditTerminMode ? 'updating' : 'creating'} termin:`,
+    //             error
+    //         )
+    //         toast.push(
+    //             <Notification
+    //                 title={`${isEditTerminMode ? 'Update' : 'Create'} Failed`}
+    //                 type="danger"
+    //                 duration={2500}
+    //             >
+    //                 Failed to {isEditTerminMode ? 'update' : 'create'} termin
+    //             </Notification>,
+    //             {
+    //                 placement: 'top-center',
+    //             }
+    //         )
+    //     } finally {
+    //         setSubmitting(false)
+    //         setTerminDialogIsOpen(false)
+    //     }
+    // }
     const handleTerminSubmit = async (
         values: TerminFormValues,
         { setSubmitting }: { setSubmitting: SetSubmitting }
@@ -379,8 +439,11 @@ export default function Termin() {
         setSubmitting(true)
         const projectId = getProjectId()
 
-        const processedData = {
-            ...values,
+        // 1. Tentukan keterangan baru SECARA OTOMATIS hanya saat mode 'create'
+        const newKeterangan = `Termin ${terminsData.length + 1}`
+
+        // 2. Siapkan data yang akan dikirim ke API
+        let payload: any = {
             persen: extractNumberFromString(values.persen),
             idProject: projectId,
         }
@@ -388,26 +451,31 @@ export default function Termin() {
         try {
             let success = false
             if (isEditTerminMode && selectedTerminToEdit) {
-                // Update existing termin
-                const updateData = {
-                    ...processedData,
+                // === MODE EDIT ===
+                payload = {
+                    ...payload,
                     id: selectedTerminToEdit.id,
+                    // Saat edit, gunakan keterangan yang sudah ada, jangan buat baru
+                    keterangan: selectedTerminToEdit.keterangan,
                 }
-
-                success = await apiEditTermin(updateData)
+                success = await apiEditTermin(payload)
                 if (success) {
                     popNotification('updated', 'Termin')
                 }
             } else {
-                // Create new termin
-                success = await apiCreateTermin(processedData)
+                // === MODE CREATE ===
+                payload = {
+                    ...payload,
+                    // Gunakan keterangan yang sudah dibuat secara otomatis
+                    keterangan: newKeterangan,
+                }
+                success = await apiCreateTermin(payload)
                 if (success) {
                     popNotification('added', 'Termin')
                 }
             }
 
             if (success) {
-                // Refresh termins data
                 fetchData({ id: projectId })
             }
         } catch (error) {
@@ -1050,7 +1118,7 @@ export default function Termin() {
                                         </FormItem>
 
                                         {/* Keterangan */}
-                                        <FormItem
+                                        {/* <FormItem
                                             label="Keterangan"
                                             invalid={
                                                 (errors.keterangan &&
@@ -1063,7 +1131,7 @@ export default function Termin() {
                                                 placeholder="Masukkan keterangan termin"
                                                 component={Input}
                                             />
-                                        </FormItem>
+                                        </FormItem> */}
                                     </div>
                                     {/* Button Dialog Option */}
                                     <div className="text-right mt-6">

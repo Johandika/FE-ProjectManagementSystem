@@ -10,7 +10,8 @@ export async function apiGetSatuans<T, U extends Record<string, unknown>>(
             ? {
                   page: data.pageIndex,
                   limit: data.pageSize,
-                  search: data.query,
+                  search: data.query || null,
+                  type: data.filterData?.satuanStatus || null,
               }
             : undefined,
     })
@@ -24,8 +25,8 @@ export async function apiDeleteSatuans<T, U extends Record<string, unknown>>(
 ) {
     // Untuk id tunggal
     return ApiService.fetchData<T>({
-        url: `/satuan/${data.id}`,
-        method: 'delete',
+        url: `/satuan/softDeleted/${data.id}`,
+        method: 'patch',
     })
 }
 
@@ -47,6 +48,17 @@ export async function apiPutSatuan<T, U extends Record<string, unknown>>(
 ) {
     return ApiService.fetchData<T>({
         url: `/satuan/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// restore satuan
+export async function apiRestoreSatuan<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: `/satuan/restore/${data.id}`,
         method: 'patch',
         data,
     })

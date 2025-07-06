@@ -2,7 +2,11 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
-import { apiDeleteDivisi, apiGetDivisis } from '@/services/DivisiService'
+import {
+    apiDeleteDivisi,
+    apiGetDivisis,
+    apiRestoreDivisi,
+} from '@/services/DivisiService'
 
 type Divisi = {
     id: string
@@ -23,12 +27,13 @@ type FilterQueries = {
     name: string
     category: string[]
     status: number[]
-    divisiStatus: number
+    divisiStatus: string
 }
 
 export type MasterDivisiListSlice = {
     loading: boolean
     deleteConfirmation: boolean
+    restoreConfirmation: boolean
     selectedDivisi: string
     tableData: TableQueries
     filterData: FilterQueries
@@ -63,6 +68,13 @@ export const deleteDivisi = async (data: { id: string | string[] }) => {
     return response.data
 }
 
+export const restoreDivisi = async (data: { id: string | string[] }) => {
+    const response = await apiRestoreDivisi<boolean, { id: string | string[] }>(
+        data
+    )
+    return response.data
+}
+
 export const initialTableData: TableQueries = {
     total: 0,
     pageIndex: 1,
@@ -84,7 +96,7 @@ const initialState: MasterDivisiListSlice = {
         name: '',
         category: ['bags', 'cloths', 'devices', 'shoes', 'b'],
         status: [0, 1, 2],
-        divisiStatus: 0,
+        divisiStatus: 'active',
     },
 }
 
@@ -107,6 +119,9 @@ const divisiListSlice = createSlice({
         setSelectedDivisi: (state, action) => {
             state.selectedDivisi = action.payload
         },
+        toggleRestoreConfirmation: (state, action) => {
+            state.restoreConfirmation = action.payload
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -126,6 +141,7 @@ export const {
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
+    toggleRestoreConfirmation,
     setSelectedDivisi,
 } = divisiListSlice.actions
 

@@ -8,6 +8,7 @@ import {
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
+    toggleRestoreConfirmation,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import DivisiDeleteConfirmation from './DivisiDeleteConfirmation'
@@ -18,6 +19,8 @@ import type {
     OnSortParam,
     ColumnDef,
 } from '@/components/shared/DataTable'
+import { FaTrashRestoreAlt } from 'react-icons/fa'
+import DivisiRestoreConfirmation from './DivisiRestoreConfirmation copy'
 
 type Divisi = {
     id: string
@@ -34,6 +37,11 @@ const ActionColumn = ({ row }: { row: Divisi }) => {
         navigate(`/master/divisi-edit/${row.id}`)
     }
 
+    const onRestore = () => {
+        dispatch(toggleRestoreConfirmation(true))
+        dispatch(setSelectedDivisi(row.id))
+    }
+
     const onDelete = () => {
         dispatch(toggleDeleteConfirmation(true))
         dispatch(setSelectedDivisi(row.id))
@@ -41,18 +49,29 @@ const ActionColumn = ({ row }: { row: Divisi }) => {
 
     return (
         <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
-            >
-                <HiOutlinePencil />
-            </span>
-            <span
-                className="cursor-pointer p-2 hover:text-red-500"
-                onClick={onDelete}
-            >
-                <HiOutlineTrash />
-            </span>
+            {row.deletedAt === null ? (
+                <>
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={onEdit}
+                    >
+                        <HiOutlinePencil />
+                    </span>
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={onDelete}
+                    >
+                        <HiOutlineTrash />
+                    </span>
+                </>
+            ) : (
+                <span
+                    className={`cursor-pointer p-2 hover:${textTheme}`}
+                    onClick={onRestore}
+                >
+                    <FaTrashRestoreAlt />
+                </span>
+            )}
         </div>
     )
 }
@@ -79,7 +98,7 @@ const DivisiTable = () => {
     useEffect(() => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageIndex, pageSize, sort])
+    }, [pageIndex, pageSize, sort, filterData])
 
     useEffect(() => {
         if (tableRef) {
@@ -165,6 +184,7 @@ const DivisiTable = () => {
                 onSort={onSort}
             />
             <DivisiDeleteConfirmation />
+            <DivisiRestoreConfirmation />
         </>
     )
 }

@@ -28,6 +28,7 @@ const KlienDeleteConfirmation = () => {
         const success = await deleteKlien({ id: selectedProduct })
 
         if (success) {
+            console.log('tableData', tableData)
             dispatch(getKliens(tableData))
             toast.push(
                 <Notification

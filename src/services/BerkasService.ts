@@ -10,7 +10,8 @@ export async function apiGetBerkases<T, U extends Record<string, unknown>>(
         params: {
             page: data.pageIndex,
             limit: data.pageSize,
-            search: data.query,
+            search: data.query || null,
+            type: data.filterData?.berkasStatus || null,
         },
     })
 }
@@ -64,6 +65,17 @@ export async function apiPutBerkas<T, U extends Record<string, unknown>>(
 ) {
     return ApiService.fetchData<T>({
         url: `/berkas/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// restore
+export async function apiRestoreBerkas<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: `/berkas/restore/${data.id}`,
         method: 'patch',
         data,
     })

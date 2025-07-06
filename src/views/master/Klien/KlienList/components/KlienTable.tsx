@@ -4,10 +4,11 @@ import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
 import {
     getKliens,
     setTableData,
-    setSelectedProduct,
+    setSelectedKlien,
     toggleDeleteConfirmation,
     useAppDispatch,
     useAppSelector,
+    toggleRestoreConfirmation,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import KlienDeleteConfirmation from './KlienDeleteConfirmation'
@@ -18,6 +19,8 @@ import type {
     OnSortParam,
     ColumnDef,
 } from '@/components/shared/DataTable'
+import { FaTrashRestoreAlt } from 'react-icons/fa'
+import KlienRestoreConfirmation from './KlienRestoreConfirmation copy'
 
 type Product = {
     id: string
@@ -37,23 +40,39 @@ const ActionColumn = ({ row }: { row: Product }) => {
 
     const onDelete = () => {
         dispatch(toggleDeleteConfirmation(true))
-        dispatch(setSelectedProduct(row.id))
+        dispatch(setSelectedKlien(row.id))
+    }
+
+    const onRestore = () => {
+        dispatch(toggleRestoreConfirmation(true))
+        dispatch(setSelectedKlien(row.id))
     }
 
     return (
         <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={onEdit}
-            >
-                <HiOutlinePencil />
-            </span>
-            <span
-                className="cursor-pointer p-2 hover:text-red-500"
-                onClick={onDelete}
-            >
-                <HiOutlineTrash />
-            </span>
+            {row.deletedAt === null ? (
+                <>
+                    <span
+                        className={`cursor-pointer p-2 hover:${textTheme}`}
+                        onClick={onEdit}
+                    >
+                        <HiOutlinePencil />
+                    </span>
+                    <span
+                        className="cursor-pointer p-2 hover:text-red-500"
+                        onClick={onDelete}
+                    >
+                        <HiOutlineTrash />
+                    </span>
+                </>
+            ) : (
+                <span
+                    className={`cursor-pointer p-2 hover:${textTheme}`}
+                    onClick={onRestore}
+                >
+                    <FaTrashRestoreAlt />
+                </span>
+            )}
         </div>
     )
 }
@@ -175,6 +194,7 @@ const KlienTable = () => {
                 onSort={onSort}
             />
             <KlienDeleteConfirmation />
+            <KlienRestoreConfirmation />
         </>
     )
 }

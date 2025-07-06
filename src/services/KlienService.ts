@@ -4,6 +4,7 @@ import ApiService from './ApiService'
 export async function apiGetKliens<T, U extends Record<string, unknown>>(
     data: U
 ) {
+    console.log('dat', data)
     const res = await ApiService.fetchData<T>({
         url: '/client',
         method: 'get',
@@ -12,7 +13,8 @@ export async function apiGetKliens<T, U extends Record<string, unknown>>(
                   page: data.pageIndex,
                   limit: data.pageSize,
                   search: data.query || null,
-                  idDivisi: data.filterData.idDivisi || null,
+                  idDivisi: data.filterData?.idDivisi || null,
+                  type: data.filterData?.klienStatus || null,
               }
             : undefined,
     })
@@ -58,6 +60,17 @@ export async function apiPutKlien<T, U extends Record<string, unknown>>(
 ) {
     return ApiService.fetchData<T>({
         url: `/client/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// restore
+export async function apiRestoreKlien<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: `/client/restore/${data.id}`,
         method: 'patch',
         data,
     })

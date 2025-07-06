@@ -456,7 +456,7 @@ export default function Detail() {
                                             ) || '-'}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col gap-0  border-b md:border-0  py-4">
+                                    <div className="flex flex-col gap-0  border-b  py-4">
                                         <div className="text-sm">
                                             Status Retensi :
                                         </div>
@@ -492,12 +492,19 @@ export default function Detail() {
                                 </>
                             )}
 
-                            {/* batas */}
-                            <div className="flex flex-col gap-0  py-4">
-                                <div className="text-sm">Keterangan :</div>
+                            {/* Divisi */}
+                            <div className="flex flex-col gap-0 border-b py-4">
+                                <div className="text-sm">Divisi :</div>
                                 <div className="text-base font-semibold text-neutral-500">
-                                    {proyekData.keterangan || '-'}
+                                    {proyekData.Divisi?.name}
                                 </div>
+                            </div>
+                        </div>
+                        {/* batas */}
+                        <div className="flex flex-col gap-0  py-4">
+                            <div className="text-sm">Keterangan :</div>
+                            <div className="text-base font-semibold text-neutral-500">
+                                {proyekData.keterangan || '-'}
                             </div>
                         </div>
                     </div>

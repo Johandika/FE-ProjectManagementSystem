@@ -2,7 +2,11 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { TableQueries } from '@/@types/common'
-import { apiDeleteSatuans, apiGetSatuans } from '@/services/SatuanService'
+import {
+    apiDeleteSatuans,
+    apiGetSatuans,
+    apiRestoreSatuan,
+} from '@/services/SatuanService'
 
 type Satuan = {
     id: string
@@ -28,6 +32,7 @@ type FilterQueries = {
 export type MasterSatuanListSlice = {
     loading: boolean
     deleteConfirmation: boolean
+    restoreConfirmation: boolean
     selectedSatuan: string
     tableData: TableQueries
     filterData: FilterQueries
@@ -57,6 +62,13 @@ export const getSatuans = createAsyncThunk(
 
 export const deleteSatuan = async (data: { id: string | string[] }) => {
     const response = await apiDeleteSatuans<boolean, { id: string | string[] }>(
+        data
+    )
+    return response.data
+}
+
+export const restoreSatuan = async (data: { id: string | string[] }) => {
+    const response = await apiRestoreSatuan<boolean, { id: string | string[] }>(
         data
     )
     return response.data
@@ -103,6 +115,9 @@ const satuanListSlice = createSlice({
         toggleDeleteConfirmation: (state, action) => {
             state.deleteConfirmation = action.payload
         },
+        toggleRestoreConfirmation: (state, action) => {
+            state.restoreConfirmation = action.payload
+        },
         setSelectedSatuan: (state, action) => {
             state.selectedSatuan = action.payload
         },
@@ -125,6 +140,7 @@ export const {
     setTableData,
     setFilterData,
     toggleDeleteConfirmation,
+    toggleRestoreConfirmation,
     setSelectedSatuan,
 } = satuanListSlice.actions
 

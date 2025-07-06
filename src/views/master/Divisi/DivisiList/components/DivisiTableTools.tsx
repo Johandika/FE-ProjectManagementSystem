@@ -3,6 +3,7 @@ import { HiPlusCircle } from 'react-icons/hi'
 import DivisiTableSearch from './DivisiTableSearch'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@/store'
+import DivisiFilter from './DivisiFilter'
 
 const DivisiTableTools = () => {
     const user = useAppSelector((state) => state.auth.user)
@@ -10,7 +11,7 @@ const DivisiTableTools = () => {
     return (
         <div className="flex flex-col lg:flex-row lg:items-center">
             <DivisiTableSearch />
-            {/* <DivisiFilter /> */}
+            <DivisiFilter />
             {/* <Link
                 download
                 className="block lg:inline-block md:mx-2 md:mb-0 mb-4"

@@ -3,6 +3,7 @@ import { HiPlusCircle } from 'react-icons/hi'
 import SubkontraktorTableSearch from './SubkontraktorTableSearch'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@/store'
+import SubkontraktorFilter from './SubkontraktorFilter'
 
 const SubkontraktorTableTools = () => {
     const user = useAppSelector((state) => state.auth.user)
@@ -10,7 +11,7 @@ const SubkontraktorTableTools = () => {
     return (
         <div className="flex flex-col lg:flex-row lg:items-center">
             <SubkontraktorTableSearch />
-            {/* <SubkontraktorFilter /> */}
+            <SubkontraktorFilter />
             {/* <Link
                 download
                 className="block lg:inline-block md:mx-2 md:mb-0 mb-4"

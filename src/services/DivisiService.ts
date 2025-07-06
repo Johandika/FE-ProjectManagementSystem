@@ -11,7 +11,8 @@ export async function apiGetDivisis<T, U extends Record<string, unknown>>(
             ? {
                   page: data.pageIndex,
                   limit: data.pageSize,
-                  search: data.query,
+                  search: data.query || null,
+                  type: data.filterData?.divisiStatus || null,
               }
             : undefined,
     })
@@ -48,6 +49,17 @@ export async function apiUpdateDivisi<T, U extends Record<string, unknown>>(
 ) {
     return ApiService.fetchData<T>({
         url: `/divisi/${data.id}`,
+        method: 'patch',
+        data,
+    })
+}
+
+// edit
+export async function apiRestoreDivisi<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    return ApiService.fetchData<T>({
+        url: `/divisi/restore/${data.id}`,
         method: 'patch',
         data,
     })
