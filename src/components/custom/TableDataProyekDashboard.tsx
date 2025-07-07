@@ -27,7 +27,11 @@ export default function TableDataProyekDashboard(data: any) {
                                 <Tr key={index}>
                                     <Td>{index + 1}</Td>
                                     <Td>{proyek.pekerjaan}</Td>
-                                    <Td>{proyek.total_nilai_proyek}sss</Td>
+                                    <Td>
+                                        {proyek.total_nilai_proyek.toLocaleString(
+                                            'id-ID'
+                                        )}
+                                    </Td>
                                     <Td>
                                         {proyek.total_sudah_tertagih.toLocaleString(
                                             'id-ID'

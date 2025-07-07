@@ -28,9 +28,10 @@ import type {
     ColumnDef,
 } from '@/components/shared/DataTable'
 import { formatDate } from '@/utils/formatDate'
-import { Button, Tooltip } from '@/components/ui'
+import { Button, Notification, Select, toast, Tooltip } from '@/components/ui'
 import TenderUpdateStatusConfirmation from './TenderUpdateStatusConfirmation'
 import TenderUpdateProgress from './TenderUpdateProgress'
+import { apiUpdateStatusPrioritasTender } from '@/services/TenderService'
 
 type Product = {
     id: string
@@ -221,9 +222,41 @@ const TenderTable = () => {
 
     const data = useAppSelector((state) => state.tenderList.data.productList)
 
+    const prioritasOptions = [
+        { value: 'Rendah', label: 'Rendah' },
+        { value: 'Sedang', label: 'Sedang' },
+        { value: 'Tinggi', label: 'Tinggi' },
+    ]
+
     // Setelah diubah
     const handleRowClick = (row: any) => {
         navigate(`/manajemen-tender-detail/${row.id}`)
+    }
+
+    const handleUpdatePrioritas = async (id: string, prioritas: string) => {
+        try {
+            // Panggil API untuk update data
+            // Anda perlu membuat fungsi apiUpdateTender ini di service Anda
+            const response = await apiUpdateStatusPrioritasTender({
+                id,
+                prioritas,
+            })
+
+            if (response.data) {
+                // Refresh data tabel untuk menampilkan perubahan
+                fetchData()
+                toast.push(
+                    <Notification
+                        title="Prioritas berhasil diubah"
+                        type="success"
+                    />
+                )
+            }
+        } catch (error) {
+            toast.push(
+                <Notification title="Gagal mengubah prioritas" type="danger" />
+            )
+        }
     }
 
     useEffect(() => {
@@ -454,10 +487,29 @@ const TenderTable = () => {
             {
                 header: 'Prioritas',
                 accessorKey: 'prioritas',
-                minWidth: 150,
+                minWidth: 160,
                 cell: (props) => {
                     const row = props.row.original
-                    return <span>{row.prioritas || '-'}</span>
+                    return (
+                        // GANTI <span> DENGAN <Select>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <Select
+                                size="sm"
+                                options={prioritasOptions}
+                                value={prioritasOptions.find(
+                                    (opt) => opt.value === row.prioritas
+                                )}
+                                onChange={(selected) => {
+                                    if (selected) {
+                                        handleUpdatePrioritas(
+                                            row.id,
+                                            selected.value
+                                        )
+                                    }
+                                }}
+                            />
+                        </div>
+                    )
                 },
             },
             {

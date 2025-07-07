@@ -18,11 +18,7 @@ import TenderForm, {
     OnDeleteCallback,
 } from '@/views/manajemenProyek/tender/TenderForm'
 import isEmpty from 'lodash/isEmpty'
-import {
-    apiDeleteTender,
-    apiPutTender,
-    apiUpdateStatusPrioritasTender,
-} from '@/services/TenderService'
+import { apiDeleteTender, apiPutTender } from '@/services/TenderService'
 
 injectReducer('tenderEdit', reducer)
 
@@ -73,19 +69,10 @@ const TenderEdit = () => {
     ) => {
         try {
             setSubmitting(true)
-            let { prioritas, ...valuesUpdateTender } = values
 
-            const dataPrioritas = { prioritas: prioritas, id: values.id }
+            const result = await apiPutTender(values)
 
-            const result = await apiPutTender(valuesUpdateTender)
-            const resultPrioritas = await apiUpdateStatusPrioritasTender(
-                dataPrioritas
-            )
-
-            if (
-                result.data.statusCode === 200 ||
-                resultPrioritas.data.statusCode === 200
-            ) {
+            if (result.data.statusCode === 200) {
                 popNotification('updated')
             } else {
                 toast.push(

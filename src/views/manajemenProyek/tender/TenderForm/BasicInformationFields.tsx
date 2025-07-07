@@ -183,29 +183,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     )}
                 </Field>
             </FormItem> */}
-
-            {/* Prioritas */}
-            <FormItem
-                label="Prioritas"
-                invalid={(errors.prioritas && touched.prioritas) as boolean}
-                errorMessage={errors.prioritas}
-            >
-                <Field name="prioritas">
-                    {({ field, form }: FieldProps) => (
-                        <Select
-                            placeholder="Pilih Prioritas"
-                            // isDisabled={type === 'edit'}
-                            options={prioritasOptions}
-                            value={prioritasOptions.find(
-                                (option) => option.value === field.value
-                            )}
-                            onChange={(option) => {
-                                form.setFieldValue(field.name, option?.value)
-                            }}
-                        />
-                    )}
-                </Field>
-            </FormItem>
         </AdaptableCard>
     )
 }
