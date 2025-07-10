@@ -69,6 +69,7 @@ const initialState: MasterPenggunaListSlice = {
     penggunaList: [],
     dialogUpdatePassword: false,
     dialogResetPassword: false,
+    restoreConfirmation: false,
     idUserActive: '',
     tableData: initialTableData,
     filterData: {

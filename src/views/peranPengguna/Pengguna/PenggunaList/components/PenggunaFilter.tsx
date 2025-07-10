@@ -46,7 +46,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
         const handleSubmit = (values: FormModel) => {
             onSubmitComplete?.()
             dispatch(setFilterData(values))
-            dispatch(getPenggunas(initialTableData))
+            // dispatch(getPenggunas(initialTableData))
         }
 
         const divisiOptions = useMemo(() => {

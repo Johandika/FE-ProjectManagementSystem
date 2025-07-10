@@ -18,10 +18,12 @@ const PenggunaRestoreConfirmation = () => {
     const selectedPengguna = useAppSelector(
         (state) => state.penggunaList.data.selectedPengguna
     )
+
     const tableData = useAppSelector(
         (state) => state.penggunaList.data.tableData
     )
-
+    console.log(dialogOpen)
+    console.log(selectedPengguna)
     const onDialogClose = () => {
         dispatch(toggleRestoreConfirmation(false))
     }

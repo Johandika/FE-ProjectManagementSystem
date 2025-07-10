@@ -41,7 +41,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
         const handleSubmit = (values: FormModel) => {
             onSubmitComplete?.()
             dispatch(setFilterData(values))
-            dispatch(getSatuans(initialTableData))
+            // dispatch(getSatuans(initialTableData))
         }
 
         return (

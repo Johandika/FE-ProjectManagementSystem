@@ -91,6 +91,7 @@ const initialState: MasterDivisiListSlice = {
     deleteConfirmation: false,
     selectedDivisi: '',
     divisiList: [],
+    restoreConfirmation: false,
     tableData: initialTableData,
     filterData: {
         name: '',

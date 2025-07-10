@@ -12,6 +12,7 @@ import {
     setDialogUpdatePassword,
     setIdUserActive,
     setDialogResetPassword,
+    toggleRestoreConfirmation,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import PenggunaDeleteConfirmation from './PenggunaDeleteConfirmation'
@@ -106,7 +107,7 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
             ) : (
                 <span
                     className={`cursor-pointer p-2 hover:${textTheme}`}
-                    onClick={onRestore}
+                    onClick={() => onRestore()}
                 >
                     <FaTrashRestoreAlt />
                 </span>
