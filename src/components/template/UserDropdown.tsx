@@ -13,7 +13,13 @@ type DropdownList = {
     icon: JSX.Element
 }
 
-const dropdownItemList: DropdownList[] = []
+const dropdownItemList: DropdownList[] = [
+    {
+        label: 'Profile',
+        path: '/app/account/settings/profile',
+        icon: <HiOutlineUser />,
+    },
+]
 
 const _UserDropdown = ({ className }: CommonProps) => {
     const { signOut, user } = useAuth()
@@ -28,6 +34,7 @@ const _UserDropdown = ({ className }: CommonProps) => {
         </div>
     )
 
+    console.log(user)
     return (
         <div>
             <Dropdown

@@ -42,6 +42,7 @@ function useAuth() {
 
                 // Menyiapkan data user dari respons
                 const userData = {
+                    id: resp.data.id || '',
                     username: resp.data.username || '',
                     authority: resp.data.role || '',
                     email: resp.data.email || '',
@@ -77,7 +78,6 @@ function useAuth() {
                         setUser(
                             resp.data.user || {
                                 avatar: '',
-                                userName: 'Anonymous',
                                 authority: ['USER'],
                                 email: '',
                             }
@@ -112,8 +112,9 @@ function useAuth() {
         // Hapus data user dari Redux store
         dispatch(
             setUser({
+                id: '',
                 avatar: '',
-                userName: '',
+                username: '',
                 email: '',
                 authority: [],
             })

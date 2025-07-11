@@ -4,7 +4,6 @@ import DoubleSidedImage from '@/components/shared/DoubleSidedImage'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import reducer, {
-    getPengguna,
     useAppSelector,
     useAppDispatch,
     getOnePengguna,

@@ -9,6 +9,7 @@ export type CommonState = {
     loadingDashboard: boolean
     loadingSelectClient: boolean
     loadingSelectDivisi: boolean
+    deletePasswordConfirmation: boolean
     selectClient: any
     selectDivisi: any
     errorDashboard: string | null
@@ -19,6 +20,7 @@ export const initialState: CommonState = {
     dataDashboard: [],
     selectClient: [],
     selectDivisi: [],
+    deletePasswordConfirmation: false,
     loadingDashboard: false,
     loadingSelectClient: false,
     loadingSelectDivisi: false,
@@ -77,6 +79,9 @@ export const commonSlice = createSlice({
         setCurrentRouteKey: (state, action: PayloadAction<string>) => {
             state.currentRouteKey = action.payload
         },
+        setDeletePasswordConfirmation: (state, action) => {
+            state.deletePasswordConfirmation = action.payload
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -109,6 +114,7 @@ export const commonSlice = createSlice({
     },
 })
 
-export const { setCurrentRouteKey } = commonSlice.actions
+export const { setCurrentRouteKey, setDeletePasswordConfirmation } =
+    commonSlice.actions
 
 export default commonSlice.reducer

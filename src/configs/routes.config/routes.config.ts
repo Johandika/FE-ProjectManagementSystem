@@ -11,6 +11,16 @@ import {
 export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes = [
+    {
+        key: 'appsAccount.settings',
+        path: `/app/account/settings/:tab`,
+        component: lazy(() => import('@/views/account/Settings')),
+        authority: [ADMIN, SUPER_ADMIN, OWNER, DEVELOPER],
+        meta: {
+            header: 'Settings',
+            headerContainer: true,
+        },
+    },
     // Dashboard
     {
         key: 'apps.dashboard',

@@ -85,7 +85,7 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
                     <HiOutlinePencil />
                 </span>
             )}
-            {user.authority === 'Super Admin' && row.deletedAt === null ? (
+            {user.authority === 'Super Admin' && row.deletedAt === null && (
                 <>
                     <span
                         className={`cursor-pointer p-2 hover:${textTheme}`}
@@ -104,13 +104,6 @@ const ActionColumn = ({ row }: { row: Pengguna }) => {
                         <HiOutlineTrash />
                     </span>
                 </>
-            ) : (
-                <span
-                    className={`cursor-pointer p-2 hover:${textTheme}`}
-                    onClick={() => onRestore()}
-                >
-                    <FaTrashRestoreAlt />
-                </span>
             )}
         </div>
     )
