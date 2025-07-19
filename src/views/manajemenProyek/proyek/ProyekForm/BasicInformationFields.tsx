@@ -76,6 +76,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
     const dispatch = useAppDispatch()
     const [checkRetensi, setCheckRetensi] = useState(false)
     const [disabledState, setDisabledState] = useState(false)
+    const user = useAppSelector((state) => state.auth.user)
 
     const { selectClient, loadingSelectClient } = useAppSelector(
         (state) => state.base.common
@@ -259,6 +260,83 @@ const BasicInformationFields = (props: BasicInformationFields) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 {type === 'new' && (
+                    <>
+                        {/* Timeline Awal  */}
+                        <div className="col-span-2 md:col-span-1">
+                            <FormItem
+                                label="Timeline Awal"
+                                invalid={
+                                    (errors.timeline_awal &&
+                                        touched.timeline_awal) as boolean
+                                }
+                                errorMessage={errors.timeline_awal}
+                            >
+                                <Field name="timeline_awal">
+                                    {({ field, form }: FieldProps) => (
+                                        <DatePicker
+                                            placeholder="Pilih Tanggal"
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : null
+                                            }
+                                            inputFormat="DD-MM-YYYY"
+                                            onChange={(date) => {
+                                                const formattedDate = date
+                                                    ? dayjs(date).format(
+                                                          'YYYY-MM-DD'
+                                                      )
+                                                    : ''
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    formattedDate
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                            </FormItem>
+                        </div>
+                        {/* Timeline Akhir  */}
+                        <div className="col-span-2 md:col-span-1">
+                            <FormItem
+                                label="Timeline Akhir"
+                                invalid={
+                                    (errors.timeline_akhir &&
+                                        touched.timeline_akhir) as boolean
+                                }
+                                errorMessage={errors.timeline_akhir}
+                            >
+                                <Field name="timeline_akhir">
+                                    {({ field, form }: FieldProps) => (
+                                        <DatePicker
+                                            placeholder="Pilih Tanggal"
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : null
+                                            }
+                                            inputFormat="DD-MM-YYYY"
+                                            onChange={(date) => {
+                                                const formattedDate = date
+                                                    ? dayjs(date).format(
+                                                          'YYYY-MM-DD'
+                                                      )
+                                                    : ''
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    formattedDate
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                            </FormItem>
+                        </div>
+                    </>
+                )}
+
+                {type === 'edit' && user.authority === 'Super Admin' && (
                     <>
                         {/* Timeline Awal  */}
                         <div className="col-span-2 md:col-span-1">

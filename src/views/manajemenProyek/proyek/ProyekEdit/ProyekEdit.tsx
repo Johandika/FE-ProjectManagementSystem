@@ -127,6 +127,8 @@ const ProyekEdit = () => {
               pic: proyekData.pic,
               nomor_kontrak: proyekData.nomor_kontrak,
               tanggal_kontrak: proyekData.tanggal_kontrak,
+              timeline_awal: proyekData.timeline_awal,
+              timeline_akhir: proyekData.timeline_akhir,
               nilai_kontrak: proyekData.nilai_kontrak,
               timeline: proyekData.timeline,
               keterangan: proyekData.keterangan,
@@ -135,6 +137,7 @@ const ProyekEdit = () => {
           }
         : {}
 
+    console.log(proyekData)
     return (
         <>
             <Loading loading={loading || loadingKliens || loadingSelectDivisi}>

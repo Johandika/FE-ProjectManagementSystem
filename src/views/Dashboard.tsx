@@ -83,8 +83,6 @@ const Dashboard = () => {
         )
     }, [selectDivisi])
 
-    console.log(dataDashboard)
-
     const handleFilter = (values: FilterFormValues) => {
         const params: {
             tanggal_awal: string

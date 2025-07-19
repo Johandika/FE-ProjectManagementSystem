@@ -481,7 +481,47 @@ const TenderTable = () => {
                 minWidth: 150,
                 cell: (props) => {
                     const row = props.row.original
-                    return <span>{row.progress}%</span>
+                    const progress = row.progress || 0
+                    return (
+                        <div className="flex items-center justify-start">
+                            <div className="relative w-16 h-16">
+                                {/* Background circle */}
+                                <svg
+                                    className="w-full h-full"
+                                    viewBox="0 0 100 100"
+                                >
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="40"
+                                        fill="none"
+                                        stroke="#a8e6d5"
+                                        strokeWidth="15"
+                                    />
+                                    {/* Progress circle */}
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="40"
+                                        fill="none"
+                                        stroke="#3cbfa6"
+                                        strokeWidth="15"
+                                        strokeDasharray={`${
+                                            progress * 2.51
+                                        } 251`}
+                                        strokeDashoffset="0"
+                                        transform="rotate(-90 50 50)"
+                                    />
+                                </svg>
+                                {/* Percentage text in the middle */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-xs font-medium text-teal-500">
+                                        {progress}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )
                 },
             },
             {

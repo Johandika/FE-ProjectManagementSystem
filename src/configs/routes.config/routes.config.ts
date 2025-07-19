@@ -109,7 +109,7 @@ export const protectedRoutes = [
         component: lazy(
             () => import('@/views/manajemenProyek/tender/TenderDetail')
         ),
-        authority: [SUPER_ADMIN, DEVELOPER],
+        authority: [SUPER_ADMIN, DEVELOPER, ADMIN],
         meta: {
             header: 'Detail Tender',
         },

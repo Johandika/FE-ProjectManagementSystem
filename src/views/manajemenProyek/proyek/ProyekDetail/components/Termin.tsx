@@ -39,7 +39,7 @@ import {
 import DescriptionSection from './DesriptionSection'
 import { formatDate } from '@/utils/formatDate'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-import { IoIosAdd, IoIosCheckmark } from 'react-icons/io'
+import { IoIosAdd, IoIosCheckmark, IoIosClose } from 'react-icons/io'
 import { setUnreadNotification } from '@/views/notifikasi/store'
 
 // Define missing interfaces
@@ -119,6 +119,7 @@ export default function Termin() {
             persen: 0,
             // keterangan: '',
         })
+    const user = useAppSelector((state) => state.auth.user)
 
     // Get project ID from path
     const getProjectId = () => {
@@ -371,67 +372,6 @@ export default function Termin() {
         setSelectedTerminToEdit(null)
     }
 
-    // Handle termin form submission
-    // const handleTerminSubmit = async (
-    //     values: TerminFormValues,
-    //     { setSubmitting }: { setSubmitting: SetSubmitting }
-    // ) => {
-    //     setSubmitting(true)
-    //     const projectId = getProjectId()
-
-    //     const processedData = {
-    //         ...values,
-    //         persen: extractNumberFromString(values.persen),
-    //         idProject: projectId,
-    //     }
-
-    //     try {
-    //         let success = false
-    //         if (isEditTerminMode && selectedTerminToEdit) {
-    //             // Update existing termin
-    //             const updateData = {
-    //                 ...processedData,
-    //                 id: selectedTerminToEdit.id,
-    //             }
-
-    //             success = await apiEditTermin(updateData)
-    //             if (success) {
-    //                 popNotification('updated', 'Termin')
-    //             }
-    //         } else {
-    //             // Create new termin
-    //             success = await apiCreateTermin(processedData)
-    //             if (success) {
-    //                 popNotification('added', 'Termin')
-    //             }
-    //         }
-
-    //         if (success) {
-    //             // Refresh termins data
-    //             fetchData({ id: projectId })
-    //         }
-    //     } catch (error) {
-    //         console.error(
-    //             `Error ${isEditTerminMode ? 'updating' : 'creating'} termin:`,
-    //             error
-    //         )
-    //         toast.push(
-    //             <Notification
-    //                 title={`${isEditTerminMode ? 'Update' : 'Create'} Failed`}
-    //                 type="danger"
-    //                 duration={2500}
-    //             >
-    //                 Failed to {isEditTerminMode ? 'update' : 'create'} termin
-    //             </Notification>,
-    //             {
-    //                 placement: 'top-center',
-    //             }
-    //         )
-    //     } finally {
-    //         setSubmitting(false)
-    //         setTerminDialogIsOpen(false)
-    //     }
-    // }
     const handleTerminSubmit = async (
         values: TerminFormValues,
         { setSubmitting }: { setSubmitting: SetSubmitting }
@@ -628,9 +568,9 @@ export default function Termin() {
                         <Button
                             size="sm"
                             variant="twoTone"
-                            onClick={() => openTerminDialog()}
                             className="w-fit text-xs"
                             disabled={remainingPercentage <= 0}
+                            onClick={() => openTerminDialog()}
                         >
                             Tambah Termin
                         </Button>
@@ -742,7 +682,7 @@ export default function Termin() {
                                         {termin.FakturPajak?.id && (
                                             <>
                                                 {fakturByTermin && (
-                                                    <div className="bg-indigo-50 flex-1 p-6 w-full flex flex-col sm:flex-row gap-4 rounded-lg justify-between">
+                                                    <div className="bg-indigo-100 flex-1 p-6 w-full flex flex-col sm:flex-row gap-4 rounded-lg justify-between">
                                                         <div className="flex flex-col items-center sm:items-start ">
                                                             <div>
                                                                 <span>
@@ -782,31 +722,73 @@ export default function Termin() {
                                                             )}
                                                         </div>
                                                         <div className="flex flex-col md:flex-row space-x-4 sm:space-x-0 justify-center sm:justify-start items-center gap-2 md:gap-0">
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="solid"
-                                                                size="sm"
-                                                                icon={
-                                                                    <IoIosCheckmark />
-                                                                }
-                                                                className="text-indigo-500"
-                                                                onClick={() =>
-                                                                    handleOpenStatusChangeDialog(
-                                                                        fakturByTermin
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    fakturByTermin.status ===
-                                                                        'Sudah Bayar' &&
-                                                                    true
-                                                                }
-                                                            >
-                                                                {fakturByTermin.status ===
-                                                                'Sudah Bayar'
-                                                                    ? 'Sudah Bayar'
-                                                                    : 'Update Status'}
-                                                            </Button>
+                                                            {user.authority ===
+                                                            'Super Admin' ? (
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="solid"
+                                                                    size="sm"
+                                                                    icon={
+                                                                        <IoIosCheckmark />
+                                                                    }
+                                                                    className="text-indigo-500"
+                                                                    onClick={() =>
+                                                                        handleOpenStatusChangeDialog(
+                                                                            fakturByTermin
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        fakturByTermin.status ===
+                                                                            'Sudah Bayar' &&
+                                                                        true
+                                                                    }
+                                                                >
+                                                                    {fakturByTermin.status ===
+                                                                    'Sudah Bayar'
+                                                                        ? 'Sudah Bayar'
+                                                                        : 'Update Status'}
+                                                                </Button>
+                                                            ) : (
+                                                                <div>
+                                                                    {fakturByTermin.status ===
+                                                                    'Sudah Bayar' ? (
+                                                                        <Button
+                                                                            type="button"
+                                                                            shape="circle"
+                                                                            variant="solid"
+                                                                            size="sm"
+                                                                            color={
+                                                                                'green'
+                                                                            }
+                                                                            icon={
+                                                                                <IoIosCheckmark />
+                                                                            }
+                                                                            className={`text-indigo-500 cursor-default hover:bg-green-600`}
+                                                                        >
+                                                                            Sudah
+                                                                            Bayar
+                                                                        </Button>
+                                                                    ) : (
+                                                                        <Button
+                                                                            type="button"
+                                                                            shape="circle"
+                                                                            variant="solid"
+                                                                            size="sm"
+                                                                            color={
+                                                                                'rose'
+                                                                            }
+                                                                            icon={
+                                                                                <IoIosClose />
+                                                                            }
+                                                                            className={`text-indigo-500 cursor-default hover:bg-rose-600`}
+                                                                        >
+                                                                            Belum
+                                                                            Bayar
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+                                                            )}
 
                                                             <div className="flex flex-row">
                                                                 {fakturByTermin.status !==

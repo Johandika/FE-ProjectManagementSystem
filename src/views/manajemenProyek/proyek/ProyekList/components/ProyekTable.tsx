@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from '@/components/shared/DataTable'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
 import {
@@ -25,7 +25,7 @@ import type {
 import { IoLocationSharp } from 'react-icons/io5'
 import { AiFillCreditCard } from 'react-icons/ai'
 import { formatDate } from '@/utils/formatDate'
-import { Button } from '@/components/ui'
+import { Button, Dialog } from '@/components/ui'
 import reducer, { getAllNotification } from '@/views/notifikasi/store'
 import { injectReducer } from '@/store'
 
@@ -91,6 +91,11 @@ const ProyekTable = () => {
     const tableRef = useRef<DataTableResetHandle>(null)
 
     const dispatch = useAppDispatch()
+
+    const [isLokasiDialogOpen, setLokasiDialogOpen] = useState(false)
+    const [selectedLokasis, setSelectedLokasis] = useState<Proyek['Lokasis']>(
+        []
+    )
 
     const user = useAppSelector((state) => state.auth.user)
 
@@ -177,6 +182,35 @@ const ProyekTable = () => {
         [dispatch]
     )
 
+    // 4. Buat fungsi handler untuk dialog
+    const handleLihatLokasi = (lokasis: Proyek['Lokasis']) => {
+        setSelectedLokasis(lokasis || [])
+        setLokasiDialogOpen(true)
+    }
+
+    const onLokasiDialogClose = () => {
+        setLokasiDialogOpen(false)
+    }
+
+    // Komponen kecil untuk merender satu item lokasi (agar tidak duplikasi kode)
+    const LokasiLink = ({ loc, index }: { loc: any; index: number }) => (
+        <a
+            key={index}
+            href={`http://maps.google.com/maps?q=${loc.latitude},${loc.longitude}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group"
+            onClick={(e) => e.stopPropagation()}
+        >
+            <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
+                <div className="text-lg group-hover:scale-110 transition">
+                    <IoLocationSharp />
+                </div>
+                <div className="group-hover:underline">{loc.lokasi}</div>
+            </div>
+        </a>
+    )
+
     const columns: ColumnDef<Proyek>[] = useMemo(() => {
         const baseColumns: ColumnDef<Proyek>[] = [
             {
@@ -212,6 +246,7 @@ const ProyekTable = () => {
                 minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
+                    console.log(row)
                     return (
                         <div>
                             {row.nomor_kontrak || row.tanggal_kontrak ? (
@@ -226,6 +261,18 @@ const ProyekTable = () => {
                                             {formatDate(row.tanggal_kontrak)}
                                         </div>
                                     )}
+                                    {row.timeline_awal && (
+                                        <div className="text-xs mt-1 rounded-md text-center text-slate-500 w-fit">
+                                            T.Awal:{' '}
+                                            {formatDate(row.timeline_awal)}
+                                        </div>
+                                    )}
+                                    {row.timeline_akhir && (
+                                        <div className="text-xs mt-1 rounded-md text-center text-slate-500 w-fit">
+                                            T.Akhir:{' '}
+                                            {formatDate(row.timeline_akhir)}
+                                        </div>
+                                    )}
                                 </>
                             ) : (
                                 <div>-</div>
@@ -234,37 +281,44 @@ const ProyekTable = () => {
                     )
                 },
             },
+
             {
                 header: 'Lokasi',
                 accessorKey: 'lokasi',
                 minWidth: 200,
                 cell: (props) => {
                     const row = props.row.original
+                    const lokasis = row.Lokasis || []
+                    const limit = 3
 
                     return (
                         <div className="flex flex-col gap-1">
-                            {row.Lokasis && row.Lokasis.length > 0 ? (
-                                row.Lokasis.map((loc, index) => {
-                                    return (
-                                        <a
-                                            key={index}
-                                            href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group"
-                                            onClick={(e) => e.stopPropagation()}
+                            {lokasis.length > 0 ? (
+                                <>
+                                    {lokasis
+                                        .slice(0, limit)
+                                        .map((loc, index) => (
+                                            <LokasiLink
+                                                loc={loc}
+                                                index={index}
+                                                key={index}
+                                            />
+                                        ))}
+                                    {lokasis.length > limit && (
+                                        <Button
+                                            size="xs"
+                                            variant="solid"
+                                            className="mt-2"
+                                            onClick={(e) => {
+                                                e.stopPropagation() // Mencegah row click
+                                                handleLihatLokasi(lokasis)
+                                            }}
                                         >
-                                            <div className="text-sm font-medium flex gap-1 items-center group-hover:text-blue-600 transition">
-                                                <div className="text-lg group-hover:scale-110 transition">
-                                                    <IoLocationSharp className="group-hover:text-blue-600 transition" />
-                                                </div>
-                                                <div className="text-blue-600">
-                                                    {loc.lokasi}
-                                                </div>
-                                            </div>
-                                        </a>
-                                    )
-                                })
+                                            Lihat {lokasis.length - limit}{' '}
+                                            Lainnya...
+                                        </Button>
+                                    )}
+                                </>
                             ) : (
                                 <span>-</span>
                             )}
@@ -500,6 +554,30 @@ const ProyekTable = () => {
             />
             <ProyekDeleteConfirmation />
             <ProyekUpdateStatusConfirmation />
+            {/* 6. TAMBAHKAN DIALOG DI SINI */}
+            <Dialog
+                isOpen={isLokasiDialogOpen}
+                onClose={onLokasiDialogClose}
+                onRequestClose={onLokasiDialogClose}
+                width={600}
+            >
+                <h5 className="mb-4">Daftar Semua Lokasi</h5>
+                <div className="max-h-[60vh] overflow-y-auto">
+                    {selectedLokasis?.map((loc, index) => (
+                        <div
+                            className="py-2 border-b last:border-b-0"
+                            key={index}
+                        >
+                            <LokasiLink loc={loc} index={index} />
+                        </div>
+                    ))}
+                </div>
+                <div className="text-right mt-6">
+                    <Button variant="solid" onClick={onLokasiDialogClose}>
+                        Tutup
+                    </Button>
+                </div>
+            </Dialog>
         </>
     )
 }

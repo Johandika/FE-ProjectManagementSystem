@@ -13,6 +13,7 @@ import Drawer from '@/components/ui/Drawer'
 import { Field, Form, Formik, FormikProps, FieldProps } from 'formik'
 import type { MouseEvent } from 'react'
 import { Select } from '@/components/ui'
+import { getSelectDivisi } from '@/store'
 
 type FormModel = {
     order: string
@@ -64,6 +65,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
 
         useEffect(() => {
             dispatch(getKliens()) // kliens
+            dispatch(getSelectDivisi())
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [])
 

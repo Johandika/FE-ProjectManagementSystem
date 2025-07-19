@@ -110,7 +110,9 @@ export default function Holding({ dataAwal }: any) {
                             </div>
                             <div>
                                 <span className="text-blue-600">Proses: </span>
-                                <span>{dataAwal?.total_proses || 0}</span>
+                                <span>
+                                    {dataAwal?.total_tender_proses || 0}
+                                </span>
                             </div>
                             <div>
                                 <span className="text-amber-600">
