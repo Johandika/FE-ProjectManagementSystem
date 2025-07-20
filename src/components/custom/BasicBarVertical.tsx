@@ -2,7 +2,16 @@ import Chart from 'react-apexcharts'
 import { COLORS } from '@/constants/chart.constant'
 
 const BasicBarVertical = ({ dataAwal }: any) => {
-    const dataGrafikSatu = dataAwal?.grafik_satu
+    const customColors = [
+        '#13B5C8',
+        '#E19E19',
+        '#3175E4',
+        '#1CA684',
+        '#C81313',
+        '#565656',
+    ]
+
+    const dataGrafikSatu = dataAwal?.grafik_tender.grafik_tender
 
     const series = [
         {
@@ -31,22 +40,25 @@ const BasicBarVertical = ({ dataAwal }: any) => {
     }
 
     return (
-        <div className="flex flex-col w-full sm:w-8/12 border p-4 rounded-md">
+        <div className="flex flex-col w-full  rounded-md h-full">
             <div className="mb-4 lg:mb-0">
-                <h4>Statistik Proyek & Tender</h4>
+                <h4>Statistik Jumlah Tender</h4>
             </div>
             <Chart
                 series={series}
                 type="bar"
-                height={300}
+                height="100%"
                 options={{
+                    legend: {
+                        show: false,
+                    },
                     plotOptions: {
                         bar: {
                             horizontal: true,
+                            distributed: true,
                         },
                     },
-                    colors: COLORS,
-
+                    colors: customColors,
                     xaxis: {
                         categories: category,
                     },

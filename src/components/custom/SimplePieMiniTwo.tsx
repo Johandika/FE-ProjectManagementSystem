@@ -1,25 +1,16 @@
 import Chart from 'react-apexcharts'
 
-const SimplePieMini = ({ dataAwal, title, colors }: any) => {
+const SimplePieMiniTwo = ({ dataAwal, title, colors }: any) => {
     const dataGrafikPie = dataAwal
     const data = dataGrafikPie?.data
     const category = dataGrafikPie?.key
 
     const formatNumber = (number: number) => {
-        // 1. Ubah input menjadi angka
-        const num = parseFloat(number)
-
-        // 2. Jika hasilnya bukan angka (misalnya dari null atau string kosong), kembalikan '0'
-        if (isNaN(num)) {
-            return '0'
-        }
-
-        // 3. Jika valid, format seperti biasa
-        return num.toLocaleString('id-ID')
+        return number.toLocaleString('id-ID')
     }
 
     return (
-        <div className="flex flex-col ">
+        <div className="flex flex-col w-full h-full">
             {/* Title */}
             <div>
                 <p className="text-lg font-bold text-black">{title}</p>
@@ -35,7 +26,7 @@ const SimplePieMini = ({ dataAwal, title, colors }: any) => {
                             plotOptions: {
                                 pie: {
                                     donut: {
-                                        size: '0%', // Mengubah ukuran donat
+                                        size: '65%', // Mengubah ukuran donat
                                     },
                                 },
                             },
@@ -43,8 +34,7 @@ const SimplePieMini = ({ dataAwal, title, colors }: any) => {
                                 y: {
                                     formatter: (value) => {
                                         return `${formatNumber(value)}${
-                                            title === 'Progress Proyek' ||
-                                            title === 'Progress Tender'
+                                            title === 'Statistik Progress'
                                                 ? '%'
                                                 : ''
                                         }`
@@ -91,19 +81,16 @@ const SimplePieMini = ({ dataAwal, title, colors }: any) => {
 
                             {/* Label & Value */}
                             <div
-                                className="flex flex-col items-start"
+                                className="flex flex-col sm:flex-row items-start sm:items-center"
                                 style={{ color: colors[index] }}
                             >
-                                <span className="text-xs">{label}</span>
-                                <div className="text-sm font-bold">
+                                <span className="text-xs">{label}: </span>
+                                <div className="text-sm font-bold ml-0 sm:ml-2">
                                     {title === 'Statistik Nilai Kontrak'
                                         ? 'Rp '
                                         : ''}
                                     {formatNumber(data[index])}
-                                    {title === 'Progress Proyek' ||
-                                    title === 'Progress Tender'
-                                        ? ' %'
-                                        : ''}
+                                    {title === 'Progress Proyek' ? ' %' : ''}
                                 </div>
                             </div>
                         </div>
@@ -114,4 +101,4 @@ const SimplePieMini = ({ dataAwal, title, colors }: any) => {
     )
 }
 
-export default SimplePieMini
+export default SimplePieMiniTwo

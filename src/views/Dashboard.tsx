@@ -185,11 +185,9 @@ const Dashboard = () => {
 
             <div className="grid grid-cols-1 gap-4">
                 <Loading loading={loadingDashboard}>
+                    {/* Baris 1 Holding */}
                     <Holding dataAwal={dataAwal} />
-                    <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                        <BasicBarVertical dataAwal={dataAwal} />
-                        <SimplePie dataAwal={dataAwal} />
-                    </div>
+
                     {/* Tabel Data Proyek */}
                     <div className=" rounded-lg p-4 border">
                         <TableDataProyekDashboard dataAwal={dataAwal} />
@@ -197,6 +195,7 @@ const Dashboard = () => {
                 </Loading>
             </div>
 
+            {/* filter */}
             <Drawer
                 title="Filter Dashboard"
                 isOpen={isFilterOpen}

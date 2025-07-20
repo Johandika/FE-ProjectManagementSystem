@@ -27,6 +27,8 @@ export default function AllNotification() {
     const [statusChangeItem, setStatusChangeItem] = useState(null)
     const [openDetailId, setOpenDetailId] = useState<string | null>(null)
 
+    const user = useAppSelector((state) => state.auth.user)
+
     const dataNotification = useAppSelector(
         (state) => state.notification.data.dataNotification.data
     )
@@ -285,7 +287,8 @@ export default function AllNotification() {
                                         <p>{item.pesan}</p>
                                         {item.type === 'faktur_pajak' &&
                                             (item.FakturPajak.status !==
-                                            'Sudah Bayar' ? (
+                                                'Sudah Bayar' &&
+                                            user.authority === 'Super Admin' ? (
                                                 <div className="mt-4 flex gap-3">
                                                     <Button
                                                         size="sm"
@@ -298,6 +301,21 @@ export default function AllNotification() {
                                                         }
                                                     >
                                                         Update Status Faktur
+                                                    </Button>
+                                                </div>
+                                            ) : item.FakturPajak.status !==
+                                                  'Sudah Bayar' &&
+                                              (user.authority === 'Admin' ||
+                                                  user.authority === 'Owner' ||
+                                                  user.authority ===
+                                                      'Developer') ? (
+                                                <div className="mt-4 flex gap-3">
+                                                    <Button
+                                                        disabled
+                                                        size="sm"
+                                                        className="text-xs flex justify-center items-center"
+                                                    >
+                                                        Menunggu Konfirmasi
                                                     </Button>
                                                 </div>
                                             ) : (
