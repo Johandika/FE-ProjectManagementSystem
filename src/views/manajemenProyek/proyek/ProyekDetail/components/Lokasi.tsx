@@ -108,6 +108,8 @@ export default function Lokasi() {
         (state) => state.proyekDetail.data.loadingLokasiProyeks
     )
 
+    console.log('lokasiData', lokasiData)
+
     // Fetch locations when component mounts
     useEffect(() => {
         const rquestParam = { id: projectId }
@@ -531,6 +533,16 @@ export default function Lokasi() {
                                                     return null
                                                 }
 
+                                                // --- LOGIKA PENGECEKAN DIMULAI DI SINI ---
+                                                // Cek apakah ada adendum yang statusnya 'Belum Disetujui' untuk lokasi ini
+                                                const hasPendingAdendum =
+                                                    data.Adendums?.some(
+                                                        (adendum: any) =>
+                                                            adendum.status ===
+                                                            'Belum Disetujui'
+                                                    )
+                                                // --- LOGIKA PENGECEKAN SELESAI ---
+
                                                 return (
                                                     <div
                                                         key={data.id}
@@ -576,21 +588,29 @@ export default function Lokasi() {
                                                         {user.authority !==
                                                             'Owner' && (
                                                             <div className="flex space-x-2">
-                                                                <Button
-                                                                    type="button"
-                                                                    shape="circle"
-                                                                    variant="solid"
-                                                                    size="sm"
-                                                                    className="text-indigo-500"
-                                                                    onClick={() =>
-                                                                        handleAdendum(
-                                                                            index
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Adendum
-                                                                    Lokasi
-                                                                </Button>
+                                                                {hasPendingAdendum ===
+                                                                true ? (
+                                                                    <div className="bg-indigo-600 opacity-50 text-white px-4 py-2 rounded-md">
+                                                                        Menunggu
+                                                                        Konfirmasi
+                                                                    </div>
+                                                                ) : (
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="solid"
+                                                                        size="sm"
+                                                                        onClick={() =>
+                                                                            !hasPendingAdendum &&
+                                                                            handleAdendum(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {hasPendingAdendum
+                                                                            ? 'Menunggu Konfirmasi'
+                                                                            : 'Adendum Lokasi'}
+                                                                    </Button>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </div>
