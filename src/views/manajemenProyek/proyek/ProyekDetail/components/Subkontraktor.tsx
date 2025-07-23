@@ -87,6 +87,7 @@ export default function Subkontraktor() {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
     const [subkonOptions, setSubkonOptions] = useState<SubkonOption[]>([])
+    const user = useAppSelector((state) => state.auth.user)
 
     const dispatch = useAppDispatch()
     const projectId = location.pathname.substring(
@@ -426,17 +427,18 @@ export default function Subkontraktor() {
                                         title="Informasi Subkontraktor"
                                         desc="Informasi subkontraktor proyek"
                                     />
-                                    {!showForm && (
-                                        <Button
-                                            size="sm"
-                                            variant="twoTone"
-                                            onClick={handleAddSubkontraktor}
-                                            className="w-fit text-xs"
-                                            type="button"
-                                        >
-                                            Tambah Subkontraktor
-                                        </Button>
-                                    )}
+                                    {user.authority !== 'Owner' &&
+                                        !showForm && (
+                                            <Button
+                                                size="sm"
+                                                variant="twoTone"
+                                                onClick={handleAddSubkontraktor}
+                                                className="w-fit text-xs"
+                                                type="button"
+                                            >
+                                                Tambah Subkontraktor
+                                            </Button>
+                                        )}
                                 </div>
 
                                 {/* Form untuk input subkontraktor */}
@@ -745,38 +747,41 @@ export default function Subkontraktor() {
                                                             </div>
                                                         </div>
 
-                                                        <div className="flex space-x-2">
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                icon={
-                                                                    <HiOutlinePencil />
-                                                                }
-                                                                className="text-indigo-500"
-                                                                onClick={() =>
-                                                                    handleEdit(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                className="text-red-500"
-                                                                icon={
-                                                                    <HiOutlineTrash />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleConfirmDelete(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
-                                                        </div>
+                                                        {user.authority !==
+                                                            'Owner' && (
+                                                            <div className="flex space-x-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    icon={
+                                                                        <HiOutlinePencil />
+                                                                    }
+                                                                    className="text-indigo-500"
+                                                                    onClick={() =>
+                                                                        handleEdit(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    className="text-red-500"
+                                                                    icon={
+                                                                        <HiOutlineTrash />
+                                                                    }
+                                                                    onClick={() =>
+                                                                        handleConfirmDelete(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )
                                             }

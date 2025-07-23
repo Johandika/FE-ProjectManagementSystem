@@ -11,8 +11,9 @@ import {
 } from '../store'
 // import AdendumDeleteConfirmation from './AdendumDeleteConfirmation'
 import cloneDeep from 'lodash/cloneDeep'
-import type { ColumnDef } from '@/components/shared/DropdDataTableDropdown'
-import DataTableDropdown from '@/components/shared/DataTableDropdown'
+import DataTableDropdown, {
+    ColumnDef,
+} from '@/components/shared/DataTableDropdown'
 import { Button } from '@/components/ui'
 import AdendumUpdateStatusConfirmation from './AdendumUpdateStatusConfirmation'
 import { formatDate } from '@/utils/formatDate'
@@ -29,6 +30,7 @@ type Product = {
 
 const ActionColumn = ({ row }: { row: Product }) => {
     const dispatch = useAppDispatch()
+    const user = useAppSelector((state) => state.auth.user)
 
     const handleApproveClick = (
         e: React.MouseEvent<HTMLSpanElement, MouseEvent>
@@ -50,20 +52,27 @@ const ActionColumn = ({ row }: { row: Product }) => {
 
     return (
         <div className="flex justify-end gap-2">
-            {row.status === 'Belum Disetujui' && (
-                <>
-                    <Button
-                        size="sm"
-                        variant="solid"
-                        onClick={(e) => handleApproveClick(e)}
-                    >
-                        Terima
-                    </Button>
-                    <Button size="sm" onClick={(e) => handleRejectClick(e)}>
-                        Tolak
-                    </Button>
-                </>
-            )}
+            {row.status === 'Belum Disetujui' &&
+                (user.authority === 'Owner' ? (
+                    <>
+                        <div className="bg-slate-200 py-2 px-4 rounded-lg">
+                            Belum Dikonfirmasi
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <Button
+                            size="sm"
+                            variant="solid"
+                            onClick={(e) => handleApproveClick(e)}
+                        >
+                            Terima
+                        </Button>
+                        <Button size="sm" onClick={(e) => handleRejectClick(e)}>
+                            Tolak
+                        </Button>
+                    </>
+                ))}
             {row.status === 'Sudah Disetujui' && (
                 <div className="text-green-600 px-4 rounded-lg py-2 bg-green-100">
                     {row.status}

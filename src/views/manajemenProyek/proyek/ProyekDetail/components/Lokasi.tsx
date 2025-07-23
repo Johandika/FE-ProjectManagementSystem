@@ -92,6 +92,7 @@ export default function Lokasi() {
             longitude_sebelum: '',
             longitude_adendum: '',
         })
+    const user = useAppSelector((state) => state.auth.user)
 
     const dispatch = useAppDispatch()
     const projectId = location.pathname.substring(
@@ -393,17 +394,18 @@ export default function Lokasi() {
                                         title="Informasi Lokasi"
                                         desc="Informasi lokasi proyek"
                                     />
-                                    {!showForm && (
-                                        <Button
-                                            size="sm"
-                                            variant="twoTone"
-                                            onClick={handleAddLokasi}
-                                            className="w-fit text-xs"
-                                            type="button"
-                                        >
-                                            Tambah Lokasi
-                                        </Button>
-                                    )}
+                                    {user.authority !== 'Owner' &&
+                                        !showForm && (
+                                            <Button
+                                                size="sm"
+                                                variant="twoTone"
+                                                onClick={handleAddLokasi}
+                                                className="w-fit text-xs"
+                                                type="button"
+                                            >
+                                                Tambah Lokasi
+                                            </Button>
+                                        )}
                                 </div>
 
                                 {/* Form untuk input lokasi */}
@@ -571,22 +573,26 @@ export default function Lokasi() {
                                                             </div>
                                                         </a>
 
-                                                        <div className="flex space-x-2">
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="solid"
-                                                                size="sm"
-                                                                className="text-indigo-500"
-                                                                onClick={() =>
-                                                                    handleAdendum(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            >
-                                                                Adendum Lokasi
-                                                            </Button>
-                                                        </div>
+                                                        {user.authority !==
+                                                            'Owner' && (
+                                                            <div className="flex space-x-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="solid"
+                                                                    size="sm"
+                                                                    className="text-indigo-500"
+                                                                    onClick={() =>
+                                                                        handleAdendum(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Adendum
+                                                                    Lokasi
+                                                                </Button>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )
                                             }

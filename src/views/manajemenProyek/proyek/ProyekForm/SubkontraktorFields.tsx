@@ -185,7 +185,7 @@ const SubcontractorFields = (props: SubcontractorFieldsProps) => {
                                             {/* Nilai Subkon */}
                                             <FormItem
                                                 className="mb-0"
-                                                label="Nilai Subkon"
+                                                label="Nilai Subkon (Rp)"
                                                 invalid={
                                                     (subcontractorErrors?.nilai_subkontrak &&
                                                         subcontractorTouched?.nilai_subkontrak) as boolean

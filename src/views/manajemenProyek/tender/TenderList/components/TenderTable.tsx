@@ -49,6 +49,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
     const dispatch = useAppDispatch()
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
+    const user = useAppSelector((state) => state.auth.user)
 
     const onProgressUpdate = () => {
         dispatch(setProgressConfirmation(true))
@@ -93,16 +94,19 @@ const ActionColumn = ({ row }: { row: Product }) => {
                             <GiProgression />
                         </span>
                     </Tooltip>
-                    <span
-                        className={`cursor-pointer p-2 hover:${textTheme}`}
-                        onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            onEdit()
-                        }}
-                    >
-                        <HiOutlinePencil />
-                    </span>
+                    {(user.authority === 'Super Admin' ||
+                        user.authority === 'Developer') && (
+                        <span
+                            className={`cursor-pointer p-2 hover:${textTheme}`}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                onEdit()
+                            }}
+                        >
+                            <HiOutlinePencil />
+                        </span>
+                    )}
                     <span
                         className="cursor-pointer p-2 hover:text-red-500"
                         onClick={(e) => {
@@ -230,7 +234,8 @@ const TenderTable = () => {
 
     // Setelah diubah
     const handleRowClick = (row: any) => {
-        navigate(`/manajemen-tender-detail/${row.id}`)
+        if (user.authority !== 'Owner')
+            navigate(`/manajemen-tender-detail/${row.id}`)
     }
 
     const handleUpdatePrioritas = async (id: string, prioritas: string) => {
@@ -534,6 +539,7 @@ const TenderTable = () => {
                         // GANTI <span> DENGAN <Select>
                         <div onClick={(e) => e.stopPropagation()}>
                             <Select
+                                isDisabled={user.authority === 'Owner'}
                                 size="sm"
                                 options={prioritasOptions}
                                 value={prioritasOptions.find(

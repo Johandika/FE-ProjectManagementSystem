@@ -81,7 +81,7 @@ export default function BerkasTagihan() {
             idTerminProject: null,
             idProject: null,
         })
-
+    const user = useAppSelector((state) => state.auth.user)
     // New state for status change confirmation
     const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false)
     const [statusChangeItem, setStatusChangeItem] =
@@ -388,44 +388,55 @@ export default function BerkasTagihan() {
                                                                 }
                                                                 className="flex flex-row items-center "
                                                             >
-                                                                <Checkbox
-                                                                    checked={
-                                                                        itemBerkas.status
-                                                                    }
-                                                                    onChange={(
-                                                                        checked,
-                                                                        e
-                                                                    ) =>
-                                                                        onCheck(
-                                                                            itemBerkas
-                                                                        )(
-                                                                            checked,
-                                                                            e
-                                                                        )
-                                                                    }
-                                                                    className="flex items-center"
-                                                                >
+                                                                {user.authority !==
+                                                                'Owner' ? (
+                                                                    <>
+                                                                        <Checkbox
+                                                                            checked={
+                                                                                itemBerkas.status
+                                                                            }
+                                                                            onChange={(
+                                                                                checked,
+                                                                                e
+                                                                            ) =>
+                                                                                onCheck(
+                                                                                    itemBerkas
+                                                                                )(
+                                                                                    checked,
+                                                                                    e
+                                                                                )
+                                                                            }
+                                                                            className="flex items-center"
+                                                                        >
+                                                                            <div>
+                                                                                {
+                                                                                    itemBerkas.nama
+                                                                                }
+                                                                            </div>
+                                                                        </Checkbox>
+                                                                        <Button
+                                                                            type="button"
+                                                                            shape="circle"
+                                                                            variant="plain"
+                                                                            size="xs"
+                                                                            className="text-red-500"
+                                                                            icon={
+                                                                                <HiOutlineTrash />
+                                                                            }
+                                                                            onClick={() =>
+                                                                                openDeleteDialog(
+                                                                                    itemBerkas.id
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </>
+                                                                ) : (
                                                                     <div>
                                                                         {
                                                                             itemBerkas.nama
                                                                         }
                                                                     </div>
-                                                                </Checkbox>
-                                                                <Button
-                                                                    type="button"
-                                                                    shape="circle"
-                                                                    variant="plain"
-                                                                    size="xs"
-                                                                    className="text-red-500"
-                                                                    icon={
-                                                                        <HiOutlineTrash />
-                                                                    }
-                                                                    onClick={() =>
-                                                                        openDeleteDialog(
-                                                                            itemBerkas.id
-                                                                        )
-                                                                    }
-                                                                />
+                                                                )}
                                                             </div>
                                                         )
                                                     )
@@ -433,23 +444,26 @@ export default function BerkasTagihan() {
                                                     <div>-</div>
                                                 )}
                                             </div>
-                                            <div>
-                                                <Button
-                                                    type="button"
-                                                    shape="circle"
-                                                    variant="solid"
-                                                    size="sm"
-                                                    className="w-fit text-xs text-indigo-500"
-                                                    icon={<IoIosAdd />}
-                                                    onClick={() =>
-                                                        handleOpenDialog(
-                                                            item.id
-                                                        )
-                                                    }
-                                                >
-                                                    Tambah Berkas
-                                                </Button>
-                                            </div>
+                                            {/* anchor */}
+                                            {user.authority !== 'Owner' && (
+                                                <div>
+                                                    <Button
+                                                        type="button"
+                                                        shape="circle"
+                                                        variant="solid"
+                                                        size="sm"
+                                                        className="w-fit text-xs text-indigo-500"
+                                                        icon={<IoIosAdd />}
+                                                        onClick={() =>
+                                                            handleOpenDialog(
+                                                                item.id
+                                                            )
+                                                        }
+                                                    >
+                                                        Tambah Berkas
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
                                     )
                                 })

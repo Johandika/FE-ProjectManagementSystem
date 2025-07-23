@@ -226,10 +226,11 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                         </Field>
                     </FormItem>
                 </div>
+
                 {/* Nilai Kontrak */}
                 <div className="col-span-1">
                     <FormItem
-                        label="Nilai Kontrak"
+                        label="Nilai Kontrak (Rp)"
                         invalid={
                             (errors.nilai_kontrak &&
                                 touched.nilai_kontrak) as boolean
@@ -436,7 +437,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     <>
                         <div className="col-span-2 md:col-span-1">
                             <FormItem
-                                label="Uang Muka"
+                                label="Uang Muka (Rp)"
                                 invalid={
                                     (errors.uang_muka &&
                                         touched.uang_muka) as boolean

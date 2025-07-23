@@ -79,7 +79,7 @@ export default function Bastp() {
         useState<BastpFormValues>({
             tanggal_pembayaran: null,
         })
-
+    const user = useAppSelector((state) => state.auth.user)
     const dispatch = useAppDispatch()
     const projectId = location.pathname.substring(
         location.pathname.lastIndexOf('/') + 1
@@ -414,7 +414,7 @@ export default function Bastp() {
                                     <div className="mb-4 border bg-slate-50 rounded-md p-4">
                                         <h6 className="mb-3">
                                             {editIndex !== null
-                                                ? 'Edit <BASTP></BASTP>'
+                                                ? 'Edit BASTP'
                                                 : 'Tambah BASTP Baru'}
                                         </h6>
 
@@ -520,6 +520,8 @@ export default function Bastp() {
                                                                         </div>
                                                                     </div>
                                                                 ) : (
+                                                                    user.authority !==
+                                                                        'Owner' &&
                                                                     !showForm && (
                                                                         <Button
                                                                             size="sm"
@@ -546,43 +548,45 @@ export default function Bastp() {
                                                                 )}
                                                             </div>
                                                         </div>
-
-                                                        <div className="flex items-center space-x-2">
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                icon={
-                                                                    <HiOutlinePencil />
-                                                                }
-                                                                className="text-indigo-500"
-                                                                onClick={() =>
-                                                                    // handleEdit(
-                                                                    //     index
-                                                                    // )
-                                                                    openBastpDialog(
-                                                                        data,
-                                                                        true
-                                                                    )
-                                                                }
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                className="text-red-500"
-                                                                icon={
-                                                                    <HiOutlineTrash />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleConfirmDelete(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            />
-                                                        </div>
+                                                        {user.authority !==
+                                                            'Owner' && (
+                                                            <div className="flex items-center space-x-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    icon={
+                                                                        <HiOutlinePencil />
+                                                                    }
+                                                                    className="text-indigo-500"
+                                                                    onClick={() =>
+                                                                        // handleEdit(
+                                                                        //     index
+                                                                        // )
+                                                                        openBastpDialog(
+                                                                            data,
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    className="text-red-500"
+                                                                    icon={
+                                                                        <HiOutlineTrash />
+                                                                    }
+                                                                    onClick={() =>
+                                                                        handleConfirmDelete(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )
                                             }

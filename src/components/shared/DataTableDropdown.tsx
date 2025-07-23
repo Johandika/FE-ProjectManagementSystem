@@ -428,7 +428,7 @@ function _DataTable<T>(
                                                                         Nilai
                                                                         kontrak
                                                                         sebelum
-                                                                        :{' '}
+                                                                        : Rp{' '}
                                                                         {formatRupiah(
                                                                             detail.value_sebelum
                                                                         )}
@@ -437,7 +437,7 @@ function _DataTable<T>(
                                                                         Nilai
                                                                         kontrak
                                                                         sesudah
-                                                                        :{' '}
+                                                                        : Rp{' '}
                                                                         {formatRupiah(
                                                                             detail.value_adendum
                                                                         )}

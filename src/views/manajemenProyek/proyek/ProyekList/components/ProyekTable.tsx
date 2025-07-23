@@ -56,6 +56,7 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
     const dispatch = useAppDispatch()
     const { textTheme } = useThemeClass()
     const navigate = useNavigate()
+    const user = useAppSelector((state) => state.auth.user)
 
     const onEdit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
         e.stopPropagation()
@@ -70,12 +71,16 @@ const ActionColumn = ({ row }: { row: Proyek }) => {
 
     return (
         <div className="flex justify-end text-lg">
-            <span
-                className={`cursor-pointer p-2 hover:${textTheme}`}
-                onClick={(e) => onEdit(e)}
-            >
-                <HiOutlinePencil />
-            </span>
+            {(user.authority === 'Super Admin' ||
+                user.authority === 'Owner' ||
+                user.authority === 'Developer') && (
+                <span
+                    className={`cursor-pointer p-2 hover:${textTheme}`}
+                    onClick={(e) => onEdit(e)}
+                >
+                    <HiOutlinePencil />
+                </span>
+            )}
             <span
                 className="cursor-pointer p-2 hover:text-red-500"
                 onClick={(e) => onDelete(e)}

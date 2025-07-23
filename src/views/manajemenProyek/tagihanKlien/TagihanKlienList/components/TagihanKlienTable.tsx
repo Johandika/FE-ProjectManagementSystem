@@ -102,7 +102,7 @@ const TagihanKlienTable = () => {
                     const row = props.row.original
                     return (
                         <span className="capitalize">
-                            {row.total_tagihan.toLocaleString('id-ID')}
+                            Rp {row.total_tagihan.toLocaleString('id-ID')}
                         </span>
                     )
                 },
@@ -215,6 +215,7 @@ const TagihanKlienTable = () => {
                                                         <strong>
                                                             Nliai Kontrak:
                                                         </strong>{' '}
+                                                        Rp{' '}
                                                         {item.nilai_kontrak.toLocaleString(
                                                             'id-ID'
                                                         )}
@@ -223,6 +224,7 @@ const TagihanKlienTable = () => {
                                                         <strong>
                                                             Nominal Tagihan:
                                                         </strong>{' '}
+                                                        Rp{' '}
                                                         {item.nominal_tagihan.toLocaleString(
                                                             'id-ID'
                                                         )}

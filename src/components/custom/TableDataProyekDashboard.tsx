@@ -1,15 +1,35 @@
 import Table from '@/components/ui/Table'
+import TFoot from '../ui/Table/TFoot'
 const { Tr, Th, Td, THead, TBody } = Table
 
 export default function TableDataProyekDashboard(data: any) {
-    console.log('data TableDataProyekDashboard', data.dataAwal)
     const formatIntegerRupiah = (nilai: any) => {
-        // Mengubah input menjadi angka dan menghilangkan desimalnya
         const angkaInteger = Math.trunc(parseFloat(nilai) || 0)
-
-        // Format angka integer dengan pemisah ribuan standar Indonesia
         return angkaInteger.toLocaleString('id-ID')
     }
+
+    // Ambil array data untuk mempermudah
+    const monitoringData = data?.dataAwal?.monitoringData || []
+
+    // 1. HITUNG TOTAL DARI SETIAP KOLOM
+    const totals = monitoringData.reduce(
+        (acc: any, proyek: any) => {
+            acc.total_nilai_proyek += parseFloat(proyek.total_nilai_proyek) || 0
+            acc.total_sudah_tertagih +=
+                parseFloat(proyek.total_sudah_tertagih) || 0
+            acc.total_belum_bayar += parseFloat(proyek.total_belum_bayar) || 0
+            acc.total_retensi += parseFloat(proyek.total_retensi) || 0
+            return acc
+        },
+        {
+            // Nilai awal accumulator
+            total_nilai_proyek: 0,
+            total_sudah_tertagih: 0,
+            total_belum_bayar: 0,
+            total_retensi: 0,
+        }
+    )
+
     return (
         <div>
             <div className="mb-4 md:mb-8 ">
@@ -62,6 +82,26 @@ export default function TableDataProyekDashboard(data: any) {
                             )
                         )}
                 </TBody>
+                {/* 2. TAMBAHKAN BARIS TOTAL DI FOOTER TABEL */}
+                <TFoot>
+                    <Tr>
+                        <Th></Th>
+                        <Th className="text-left pl-6  py-3">Total</Th>
+                        <Th className="text-left pl-6  ">
+                            Rp {formatIntegerRupiah(totals.total_nilai_proyek)}
+                        </Th>
+                        <Th className="text-left pl-6  ">
+                            Rp{' '}
+                            {formatIntegerRupiah(totals.total_sudah_tertagih)}
+                        </Th>
+                        <Th className="text-left pl-6  ">
+                            Rp {formatIntegerRupiah(totals.total_belum_bayar)}
+                        </Th>
+                        <Th className="text-left pl-6  ">
+                            Rp {formatIntegerRupiah(totals.total_retensi)}
+                        </Th>
+                    </Tr>
+                </TFoot>
             </Table>
         </div>
     )

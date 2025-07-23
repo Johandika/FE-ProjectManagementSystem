@@ -86,7 +86,8 @@ const SimplePieMiniTwo = ({ dataAwal, title, colors }: any) => {
                             >
                                 <span className="text-xs">{label}: </span>
                                 <div className="text-sm font-bold ml-0 sm:ml-2">
-                                    {title === 'Statistik Nilai Kontrak'
+                                    {title === 'Statistik Nilai Kontrak' ||
+                                    title === 'Statistik Nilai Tender'
                                         ? 'Rp '
                                         : ''}
                                     {formatNumber(data[index])}

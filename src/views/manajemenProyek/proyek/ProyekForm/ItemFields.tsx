@@ -300,7 +300,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                 {/* Harga satuan material */}
                                                                                 <FormItem
                                                                                     className="mb-0"
-                                                                                    label="Harga Satuan Material"
+                                                                                    label="Harga Satuan Material (Rp)"
                                                                                     invalid={
                                                                                         (detailErrors?.harga_satuan_material &&
                                                                                             detailTouched?.harga_satuan_material) as boolean
@@ -390,7 +390,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                 {/* Jumlah harga material */}
                                                                                 <FormItem
                                                                                     className="mb-0"
-                                                                                    label="Jumlah Harga Material"
+                                                                                    label="Jumlah Harga Material (Rp)"
                                                                                     invalid={
                                                                                         (detailErrors?.jumlah_harga_material &&
                                                                                             detailTouched?.jumlah_harga_material) as boolean
@@ -423,7 +423,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                 {/* Harga satuan jasa */}
                                                                                 <FormItem
                                                                                     className="mb-0"
-                                                                                    label="Harga Satuan Jasa"
+                                                                                    label="Harga Satuan Jasa (Rp)"
                                                                                     invalid={
                                                                                         (detailErrors?.harga_satuan_jasa &&
                                                                                             detailTouched?.harga_satuan_jasa) as boolean
@@ -512,7 +512,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                 {/* Jumlah harga jasa */}
                                                                                 <FormItem
                                                                                     className="mb-0"
-                                                                                    label="Jumlah Harga Jasa"
+                                                                                    label="Jumlah Harga Jasa (Rp)"
                                                                                     invalid={
                                                                                         (detailErrors?.jumlah_harga_jasa &&
                                                                                             detailTouched?.jumlah_harga_jasa) as boolean
@@ -643,7 +643,7 @@ const ItemFields = (props: ItemFieldsProps) => {
                                                                                 {/* Jumlah total */}
                                                                                 <FormItem
                                                                                     className="mb-0"
-                                                                                    label="Total"
+                                                                                    label="Total (Rp)"
                                                                                     invalid={
                                                                                         (detailErrors?.jumlah &&
                                                                                             detailTouched?.jumlah) as boolean

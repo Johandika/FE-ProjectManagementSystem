@@ -619,62 +619,66 @@ export default function Termin() {
                                             </div>
 
                                             <div className=" w-full flex space-x-2 justify-center sm:justify-end ">
-                                                <div>
-                                                    {!termin.FakturPajak
-                                                        ?.id && (
-                                                        <Button
-                                                            type="button"
-                                                            shape="circle"
-                                                            variant="solid"
-                                                            size="sm"
-                                                            icon={<IoIosAdd />}
-                                                            className="text-indigo-500"
-                                                            onClick={() =>
-                                                                openDialog(
-                                                                    termin
-                                                                )
-                                                            }
-                                                        >
-                                                            Faktur
-                                                        </Button>
-                                                    )}
-
-                                                    {/* anchor */}
-                                                    {!fakturByTermin && (
-                                                        <>
+                                                {user.authority !== 'Owner' && (
+                                                    <div>
+                                                        {!termin.FakturPajak
+                                                            ?.id && (
                                                             <Button
                                                                 type="button"
                                                                 shape="circle"
-                                                                variant="plain"
+                                                                variant="solid"
                                                                 size="sm"
                                                                 icon={
-                                                                    <HiOutlinePencil />
+                                                                    <IoIosAdd />
                                                                 }
                                                                 className="text-indigo-500"
                                                                 onClick={() =>
-                                                                    handleEditTermin(
+                                                                    openDialog(
                                                                         termin
                                                                     )
                                                                 }
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                shape="circle"
-                                                                variant="plain"
-                                                                size="sm"
-                                                                className="text-red-500"
-                                                                icon={
-                                                                    <HiOutlineTrash />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleConfirmDeleteTermin(
-                                                                        termin
-                                                                    )
-                                                                }
-                                                            />
-                                                        </>
-                                                    )}
-                                                </div>
+                                                            >
+                                                                Faktur
+                                                            </Button>
+                                                        )}
+
+                                                        {/* anchor */}
+                                                        {!fakturByTermin && (
+                                                            <>
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    icon={
+                                                                        <HiOutlinePencil />
+                                                                    }
+                                                                    className="text-indigo-500"
+                                                                    onClick={() =>
+                                                                        handleEditTermin(
+                                                                            termin
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    className="text-red-500"
+                                                                    icon={
+                                                                        <HiOutlineTrash />
+                                                                    }
+                                                                    onClick={() =>
+                                                                        handleConfirmDeleteTermin(
+                                                                            termin
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -792,40 +796,42 @@ export default function Termin() {
 
                                                             <div className="flex flex-row">
                                                                 {fakturByTermin.status !==
-                                                                    'Sudah Bayar' && (
-                                                                    <>
-                                                                        <Button
-                                                                            type="button"
-                                                                            shape="circle"
-                                                                            variant="plain"
-                                                                            size="sm"
-                                                                            icon={
-                                                                                <HiOutlinePencil />
-                                                                            }
-                                                                            className="text-indigo-500"
-                                                                            onClick={() =>
-                                                                                handleEditFaktur(
-                                                                                    termin
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                        <Button
-                                                                            type="button"
-                                                                            shape="circle"
-                                                                            variant="plain"
-                                                                            size="sm"
-                                                                            className="text-red-500"
-                                                                            icon={
-                                                                                <HiOutlineTrash />
-                                                                            }
-                                                                            onClick={() =>
-                                                                                handleConfirmDeleteFaktur(
-                                                                                    termin
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </>
-                                                                )}
+                                                                    'Sudah Bayar' &&
+                                                                    user.authority !==
+                                                                        'Owner' && (
+                                                                        <>
+                                                                            <Button
+                                                                                type="button"
+                                                                                shape="circle"
+                                                                                variant="plain"
+                                                                                size="sm"
+                                                                                icon={
+                                                                                    <HiOutlinePencil />
+                                                                                }
+                                                                                className="text-indigo-500"
+                                                                                onClick={() =>
+                                                                                    handleEditFaktur(
+                                                                                        termin
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                            <Button
+                                                                                type="button"
+                                                                                shape="circle"
+                                                                                variant="plain"
+                                                                                size="sm"
+                                                                                className="text-red-500"
+                                                                                icon={
+                                                                                    <HiOutlineTrash />
+                                                                                }
+                                                                                onClick={() =>
+                                                                                    handleConfirmDeleteFaktur(
+                                                                                        termin
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        </>
+                                                                    )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -882,7 +888,7 @@ export default function Termin() {
 
                                         {/* Nominal */}
                                         <FormItem
-                                            label="Nominal"
+                                            label="Nominal (DPP+PPN)"
                                             invalid={
                                                 (errors.nominal &&
                                                     touched.nominal) as boolean

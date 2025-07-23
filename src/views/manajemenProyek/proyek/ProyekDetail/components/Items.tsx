@@ -115,6 +115,7 @@ export default function Items() {
     const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
         {}
     )
+    const user = useAppSelector((state) => state.auth.user)
 
     const dispatch = useAppDispatch()
     const projectId = location.pathname.substring(
@@ -464,17 +465,18 @@ export default function Items() {
                                         title="Informasi RAB"
                                         desc="Daftar RAB dan detail RAB proyek"
                                     />
-                                    {!showItemForm && (
-                                        <Button
-                                            size="sm"
-                                            variant="twoTone"
-                                            onClick={handleAddItem}
-                                            className="w-fit text-xs"
-                                            type="button"
-                                        >
-                                            Tambah Item
-                                        </Button>
-                                    )}
+                                    {user.authority !== 'Owner' &&
+                                        !showItemForm && (
+                                            <Button
+                                                size="sm"
+                                                variant="twoTone"
+                                                onClick={handleAddItem}
+                                                className="w-fit text-xs"
+                                                type="button"
+                                            >
+                                                Tambah Item
+                                            </Button>
+                                        )}
                                 </div>
                                 {/* Form untuk input item */}
                                 {showItemForm && (
@@ -1110,7 +1112,7 @@ export default function Items() {
 
                                                                 {/* Harga Satuan Material */}
                                                                 <FormItem
-                                                                    label="Harga Satuan Material"
+                                                                    label="Harga Satuan Material (Rp)"
                                                                     errorMessage={
                                                                         detailErrors.tempHargaSatuanMaterial &&
                                                                         detailTouched.tempHargaSatuanMaterial
@@ -1157,7 +1159,7 @@ export default function Items() {
                                                                 </FormItem>
 
                                                                 {/* Jumlah Harga Material */}
-                                                                <FormItem label="Jumlah Harga Material">
+                                                                <FormItem label="Jumlah Harga Material (Rp)">
                                                                     <Field name="tempJumlahHargaMaterial">
                                                                         {({
                                                                             field,
@@ -1184,7 +1186,7 @@ export default function Items() {
 
                                                                 {/* Harga Satuan Jasa */}
                                                                 <FormItem
-                                                                    label="Harga Satuan Jasa"
+                                                                    label="Harga Satuan Jasa (Rp)"
                                                                     errorMessage={
                                                                         detailErrors.tempHargaSatuanJasa &&
                                                                         detailTouched.tempHargaSatuanJasa
@@ -1231,7 +1233,7 @@ export default function Items() {
                                                                 </FormItem>
 
                                                                 {/* Jumlah Harga Jasa */}
-                                                                <FormItem label="Jumlah Harga Jasa">
+                                                                <FormItem label="Jumlah Harga Jasa (Rp)">
                                                                     <Field name="tempJumlahHargaJasa">
                                                                         {({
                                                                             field,
@@ -1304,7 +1306,7 @@ export default function Items() {
                                                                 </FormItem>
 
                                                                 {/* Total */}
-                                                                <FormItem label="Total">
+                                                                <FormItem label="Total (Rp)">
                                                                     <Field name="tempJumlah">
                                                                         {({
                                                                             field,
@@ -1365,7 +1367,14 @@ export default function Items() {
                                                     <div className="overflow-auto sm:overflow-auto">
                                                         <div className="mb-4 bg-red min-w-[1000px] sm:w-full">
                                                             {/* Header */}
-                                                            <div className="grid grid-cols-5  px-4 gap-4 font-semibold bg-indigo-100 border border-indigo-400 py-5 rounded-t-md">
+                                                            <div
+                                                                className={`${
+                                                                    user.authority ===
+                                                                    'Owner'
+                                                                        ? 'grid grid-cols-4'
+                                                                        : 'grid grid-cols-5'
+                                                                }  px-4 gap-4 font-semibold bg-indigo-100 border border-indigo-400 py-5 rounded-t-md`}
+                                                            >
                                                                 <div className="col-span-1">
                                                                     Item
                                                                 </div>
@@ -1379,9 +1388,12 @@ export default function Items() {
                                                                 <div className="col-span-1">
                                                                     Grand Total
                                                                 </div>
-                                                                <div className="col-span-1 text-right">
-                                                                    Aksi
-                                                                </div>
+                                                                {user.authority !==
+                                                                    'Owner' && (
+                                                                    <div className="col-span-1 text-right">
+                                                                        Aksi
+                                                                    </div>
+                                                                )}
                                                             </div>
 
                                                             {/* Body */}
@@ -1412,7 +1424,12 @@ export default function Items() {
                                                                         >
                                                                             {/* Item Row */}
                                                                             <div
-                                                                                className={`grid grid-cols-5 border-x border-t border-indigo-400 gap-4 px-4 py-4 hover:bg-indigo-50 
+                                                                                className={`${
+                                                                                    user.authority ===
+                                                                                    'Owner'
+                                                                                        ? 'grid grid-cols-4'
+                                                                                        : 'grid grid-cols-5'
+                                                                                } border-x border-t border-indigo-400 gap-4 px-4 py-4 hover:bg-indigo-50 
                                                                             ${
                                                                                 expandedItems[
                                                                                     index
@@ -1441,6 +1458,10 @@ export default function Items() {
                                                                                     </button>
                                                                                     <span className="font-semibold">
                                                                                         <Checkbox
+                                                                                            disabled={
+                                                                                                user.authority ===
+                                                                                                'Owner'
+                                                                                            }
                                                                                             defaultChecked={
                                                                                                 item.status
                                                                                             }
@@ -1480,47 +1501,50 @@ export default function Items() {
                                                                                         totals.grandTotal
                                                                                     )}
                                                                                 </div>
-                                                                                <div className="col-span-1 flex justify-end space-x-2">
-                                                                                    <Button
-                                                                                        size="xs"
-                                                                                        variant="solid"
-                                                                                        onClick={() =>
-                                                                                            handleAddDetail(
-                                                                                                index
-                                                                                            )
-                                                                                        }
-                                                                                        icon={
-                                                                                            <HiOutlinePlus />
-                                                                                        }
-                                                                                    >
-                                                                                        Detail
-                                                                                    </Button>
-                                                                                    <Button
-                                                                                        size="xs"
-                                                                                        variant="twoTone"
-                                                                                        onClick={() =>
-                                                                                            handleEditItem(
-                                                                                                index
-                                                                                            )
-                                                                                        }
-                                                                                        icon={
-                                                                                            <HiOutlinePencil />
-                                                                                        }
-                                                                                    />
-                                                                                    <Button
-                                                                                        size="xs"
-                                                                                        variant="twoTone"
-                                                                                        color="red"
-                                                                                        onClick={() =>
-                                                                                            handleConfirmDeleteItem(
-                                                                                                index
-                                                                                            )
-                                                                                        }
-                                                                                        icon={
-                                                                                            <HiOutlineTrash />
-                                                                                        }
-                                                                                    />
-                                                                                </div>
+                                                                                {user.authority !==
+                                                                                    'Owner' && (
+                                                                                    <div className="col-span-1 flex justify-end space-x-2">
+                                                                                        <Button
+                                                                                            size="xs"
+                                                                                            variant="solid"
+                                                                                            onClick={() =>
+                                                                                                handleAddDetail(
+                                                                                                    index
+                                                                                                )
+                                                                                            }
+                                                                                            icon={
+                                                                                                <HiOutlinePlus />
+                                                                                            }
+                                                                                        >
+                                                                                            Detail
+                                                                                        </Button>
+                                                                                        <Button
+                                                                                            size="xs"
+                                                                                            variant="twoTone"
+                                                                                            onClick={() =>
+                                                                                                handleEditItem(
+                                                                                                    index
+                                                                                                )
+                                                                                            }
+                                                                                            icon={
+                                                                                                <HiOutlinePencil />
+                                                                                            }
+                                                                                        />
+                                                                                        <Button
+                                                                                            size="xs"
+                                                                                            variant="twoTone"
+                                                                                            color="red"
+                                                                                            onClick={() =>
+                                                                                                handleConfirmDeleteItem(
+                                                                                                    index
+                                                                                                )
+                                                                                            }
+                                                                                            icon={
+                                                                                                <HiOutlineTrash />
+                                                                                            }
+                                                                                        />
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
 
                                                                             {/* Detail Items Collapsible */}
@@ -1533,7 +1557,14 @@ export default function Items() {
                                                                                     0 && (
                                                                                     <div className="bg-indigo-50 border-l border-r border-indigo-400 p-2">
                                                                                         {/* Detail Header */}
-                                                                                        <div className="grid grid-cols-10 gap-4 text-white px-4 font-semibold items-center text-sm py-2 bg-indigo-500 rounded-md">
+                                                                                        <div
+                                                                                            className={`${
+                                                                                                user.authority ===
+                                                                                                'Owner'
+                                                                                                    ? 'grid grid-cols-9'
+                                                                                                    : 'grid grid-cols-10'
+                                                                                            } gap-4 text-white px-4 font-semibold items-center text-sm py-2 bg-indigo-500 rounded-md`}
+                                                                                        >
                                                                                             <div className="col-span-2">
                                                                                                 Uraian
                                                                                             </div>
@@ -1562,9 +1593,12 @@ export default function Items() {
                                                                                             <div className="col-span-1">
                                                                                                 Total
                                                                                             </div>
-                                                                                            <div className="col-span-1 text-right">
-                                                                                                Aksi
-                                                                                            </div>
+                                                                                            {user.authority !==
+                                                                                                'Owner' && (
+                                                                                                <div className="col-span-1 text-right">
+                                                                                                    Aksi
+                                                                                                </div>
+                                                                                            )}
                                                                                         </div>
 
                                                                                         {/* Detail Rows */}
@@ -1579,7 +1613,12 @@ export default function Items() {
                                                                                                             detail.id
                                                                                                         }
                                                                                                         className={classNames(
-                                                                                                            'grid grid-cols-10 gap-4 px-4 py-4 text-sm bg-white border-indigo-400 border-b',
+                                                                                                            `${
+                                                                                                                user.authority ===
+                                                                                                                'Owner'
+                                                                                                                    ? 'grid grid-cols-9'
+                                                                                                                    : 'grid grid-cols-10'
+                                                                                                            }  gap-4 px-4 py-4 text-sm bg-white border-indigo-400 border-b`,
                                                                                                             {
                                                                                                                 'rounded-b-md border-b-0':
                                                                                                                     isLastChild(
@@ -1630,35 +1669,38 @@ export default function Items() {
                                                                                                                 detail.jumlah
                                                                                                             )}
                                                                                                         </div>
-                                                                                                        <div className="col-span-1 flex justify-end space-x-2">
-                                                                                                            <Button
-                                                                                                                size="xs"
-                                                                                                                variant="twoTone"
-                                                                                                                onClick={() =>
-                                                                                                                    handleEditDetail(
-                                                                                                                        index,
-                                                                                                                        detailIndex
-                                                                                                                    )
-                                                                                                                }
-                                                                                                                icon={
-                                                                                                                    <HiOutlinePencil />
-                                                                                                                }
-                                                                                                            />
-                                                                                                            <Button
-                                                                                                                size="xs"
-                                                                                                                variant="twoTone"
-                                                                                                                color="red"
-                                                                                                                onClick={() =>
-                                                                                                                    handleConfirmDeleteDetail(
-                                                                                                                        index,
-                                                                                                                        detailIndex
-                                                                                                                    )
-                                                                                                                }
-                                                                                                                icon={
-                                                                                                                    <HiOutlineTrash />
-                                                                                                                }
-                                                                                                            />
-                                                                                                        </div>
+                                                                                                        {user.authority !==
+                                                                                                            'Owner' && (
+                                                                                                            <div className="col-span-1 flex justify-end space-x-2">
+                                                                                                                <Button
+                                                                                                                    size="xs"
+                                                                                                                    variant="twoTone"
+                                                                                                                    onClick={() =>
+                                                                                                                        handleEditDetail(
+                                                                                                                            index,
+                                                                                                                            detailIndex
+                                                                                                                        )
+                                                                                                                    }
+                                                                                                                    icon={
+                                                                                                                        <HiOutlinePencil />
+                                                                                                                    }
+                                                                                                                />
+                                                                                                                <Button
+                                                                                                                    size="xs"
+                                                                                                                    variant="twoTone"
+                                                                                                                    color="red"
+                                                                                                                    onClick={() =>
+                                                                                                                        handleConfirmDeleteDetail(
+                                                                                                                            index,
+                                                                                                                            detailIndex
+                                                                                                                        )
+                                                                                                                    }
+                                                                                                                    icon={
+                                                                                                                        <HiOutlineTrash />
+                                                                                                                    }
+                                                                                                                />
+                                                                                                            </div>
+                                                                                                        )}
                                                                                                     </div>
                                                                                                 )
                                                                                             }
@@ -1673,7 +1715,14 @@ export default function Items() {
                                                             {/* Grand Total Row */}
                                                             {itemsByProyekData.length >
                                                                 0 && (
-                                                                <div className="grid grid-cols-5 gap-4 px-4 py-5  border border-indigo-400 bg-indigo-100 font-semibold rounded-b-md">
+                                                                <div
+                                                                    className={`grid ${
+                                                                        user.authority ===
+                                                                        'Owner'
+                                                                            ? 'grid-cols-4'
+                                                                            : 'grid-cols-5'
+                                                                    } gap-4 px-4 py-5  border border-indigo-400 bg-indigo-100 font-semibold rounded-b-md`}
+                                                                >
                                                                     <div className="col-span-1">
                                                                         Total
                                                                         Keseluruhan
@@ -1700,7 +1749,10 @@ export default function Items() {
                                                                                         totals.grandTotal
                                                                                     )}
                                                                                 </div>
-                                                                                <div className="col-span-1"></div>
+                                                                                {user.authority !==
+                                                                                    'Owner' && (
+                                                                                    <div className="col-span-1"></div>
+                                                                                )}
                                                                             </>
                                                                         )
                                                                     })()}

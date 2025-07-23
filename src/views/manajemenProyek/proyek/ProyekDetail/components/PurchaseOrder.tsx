@@ -136,6 +136,7 @@ const PurchaseOrder = () => {
         statusKey: 'status_lunas' | 'status_dikirim' | 'status_sampai'
         newStatus: boolean
     } | null>(null)
+    const user = useAppSelector((state) => state.auth.user)
 
     const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] =
         useState(false)
@@ -174,8 +175,7 @@ const PurchaseOrder = () => {
                 newStatus: !checked,
             })
 
-            // Open the confirmation dialog
-            setIsStatusChangeDialogOpen(true)
+            if (user.authority !== 'Owner') setIsStatusChangeDialogOpen(true)
 
             // Prevent default checkbox behavior to wait for confirmation
             e.preventDefault()
@@ -690,17 +690,18 @@ const PurchaseOrder = () => {
                                         title="Purchase Order"
                                         desc="Tambahkan data purchase order"
                                     />
-                                    {!showForm && (
-                                        <Button
-                                            size="sm"
-                                            variant="twoTone"
-                                            onClick={handleAddPurchase}
-                                            className="w-fit text-xs"
-                                            type="button"
-                                        >
-                                            Tambah Purchase Order
-                                        </Button>
-                                    )}
+                                    {user.authority !== 'Owner' &&
+                                        !showForm && (
+                                            <Button
+                                                size="sm"
+                                                variant="twoTone"
+                                                onClick={handleAddPurchase}
+                                                className="w-fit text-xs"
+                                                type="button"
+                                            >
+                                                Tambah Purchase Order
+                                            </Button>
+                                        )}
                                 </div>
 
                                 {/* Form untuk input purchase order */}
@@ -972,7 +973,7 @@ const PurchaseOrder = () => {
                                                             <Field
                                                                 name={`tempStatusDikirim`}
                                                                 component={
-                                                                    Switcher
+                                                                    <Switcher />
                                                                 }
                                                             />
                                                             <span>
@@ -1254,38 +1255,41 @@ const PurchaseOrder = () => {
                                                                     purchase.pabrik
                                                                 }
                                                             </h5>
-                                                            <div className="flex space-x-2">
-                                                                <Button
-                                                                    type="button"
-                                                                    shape="circle"
-                                                                    variant="plain"
-                                                                    size="sm"
-                                                                    icon={
-                                                                        <HiOutlinePencil />
-                                                                    }
-                                                                    className="text-indigo-500"
-                                                                    onClick={() =>
-                                                                        handleEdit(
-                                                                            index
-                                                                        )
-                                                                    }
-                                                                />
-                                                                <Button
-                                                                    type="button"
-                                                                    shape="circle"
-                                                                    variant="plain"
-                                                                    size="sm"
-                                                                    className="text-red-500"
-                                                                    icon={
-                                                                        <HiOutlineTrash />
-                                                                    }
-                                                                    onClick={() =>
-                                                                        handleConfirmDelete(
-                                                                            index
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
+                                                            {user.authority !==
+                                                                'Owner' && (
+                                                                <div className="flex space-x-2">
+                                                                    <Button
+                                                                        type="button"
+                                                                        shape="circle"
+                                                                        variant="plain"
+                                                                        size="sm"
+                                                                        icon={
+                                                                            <HiOutlinePencil />
+                                                                        }
+                                                                        className="text-indigo-500"
+                                                                        onClick={() =>
+                                                                            handleEdit(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <Button
+                                                                        type="button"
+                                                                        shape="circle"
+                                                                        variant="plain"
+                                                                        size="sm"
+                                                                        className="text-red-500"
+                                                                        icon={
+                                                                            <HiOutlineTrash />
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleConfirmDelete(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            )}
                                                         </div>
                                                         {/* Data Field */}
                                                         <div className="grid grid-cols-4 gap-4 border-t border-indigo-400  p-4 bg-indigo-50">
@@ -1514,23 +1518,26 @@ const PurchaseOrder = () => {
                                                                                                 hari
                                                                                             </p>
                                                                                         </div>
-                                                                                        <div className="flex">
-                                                                                            <Button
-                                                                                                type="button"
-                                                                                                shape="circle"
-                                                                                                variant="plain"
-                                                                                                size="sm"
-                                                                                                className="text-red-500"
-                                                                                                icon={
-                                                                                                    <HiOutlineTrash />
-                                                                                                }
-                                                                                                onClick={() => {
-                                                                                                    handleRemoveDetail(
-                                                                                                        detail?.id
-                                                                                                    )
-                                                                                                }}
-                                                                                            />
-                                                                                        </div>
+                                                                                        {user.authority !==
+                                                                                            'Owner' && (
+                                                                                            <div className="flex">
+                                                                                                <Button
+                                                                                                    type="button"
+                                                                                                    shape="circle"
+                                                                                                    variant="plain"
+                                                                                                    size="sm"
+                                                                                                    className="text-red-500"
+                                                                                                    icon={
+                                                                                                        <HiOutlineTrash />
+                                                                                                    }
+                                                                                                    onClick={() => {
+                                                                                                        handleRemoveDetail(
+                                                                                                            detail?.id
+                                                                                                        )
+                                                                                                    }}
+                                                                                                />
+                                                                                            </div>
+                                                                                        )}
                                                                                     </div>
                                                                                 </div>
                                                                             )

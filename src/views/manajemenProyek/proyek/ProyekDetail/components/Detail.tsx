@@ -91,8 +91,24 @@ export default function Detail() {
         timeline_awal_sebelum: '',
         timeline_akhir_sebelum: '',
     })
+    const user = useAppSelector((state) => state.auth.user)
 
     const { proyekData } = useAppSelector((state) => state.proyekEdit.data)
+
+    // Cek apakah ada adendum "Nilai Kontrak" yang statusnya "Belum Disetujui"
+    const isAdendumNilaiKontrakPending = proyekData?.Adendums?.some(
+        (adendum: any) =>
+            adendum.dasar_adendum === 'Nilai Kontrak' &&
+            adendum.status === 'Belum Disetujui'
+    )
+
+    const isAdendumTimelinePending = proyekData?.Adendums?.some(
+        (adendum: any) =>
+            adendum.dasar_adendum === 'Timeline' &&
+            adendum.status === 'Belum Disetujui'
+    )
+
+    console.log(proyekData)
 
     const fetchData = (data: { id: string }) => {
         dispatch(getProyek(data))
@@ -373,26 +389,33 @@ export default function Detail() {
                                         Nilai Kontrak :
                                     </div>
                                     <div className="text-base font-semibold text-neutral-500">
+                                        Rp{' '}
                                         {proyekData.nilai_kontrak?.toLocaleString(
                                             'id-ID'
                                         ) || '-'}
                                     </div>
                                 </div>
-                                <Button
-                                    size="xs"
-                                    variant="solid"
-                                    onClick={() =>
-                                        handleOpenStatusChangeDialog(
-                                            'Adendum Nilai Kontrak'
-                                        )
-                                    }
-                                >
-                                    Adendum Nilai Kontrak
-                                </Button>
+                                {user.authority !== 'Owner' && (
+                                    <Button
+                                        size="xs"
+                                        variant="solid"
+                                        disabled={isAdendumNilaiKontrakPending}
+                                        onClick={() =>
+                                            handleOpenStatusChangeDialog(
+                                                'Adendum Nilai Kontrak'
+                                            )
+                                        }
+                                    >
+                                        {isAdendumNilaiKontrakPending
+                                            ? 'Menunggu Konfirmasi'
+                                            : 'Adendum Nilai Kontrak'}
+                                    </Button>
+                                )}
                             </div>
                             <div className="flex flex-col gap-0 border-b py-4">
                                 <div className="text-sm">Uang Muka :</div>
                                 <div className="text-base font-semibold text-neutral-500">
+                                    Rp{' '}
                                     {proyekData.uang_muka?.toLocaleString(
                                         'id-ID'
                                     ) || '-'}
@@ -417,15 +440,22 @@ export default function Detail() {
                                         )}
                                     </div>
                                 </div>
-                                <Button
-                                    size="xs"
-                                    variant="solid"
-                                    onClick={() =>
-                                        handleOpenStatusChangeDialog('Timeline')
-                                    }
-                                >
-                                    Adendum Timeline
-                                </Button>
+                                {user.authority !== 'Owner' && (
+                                    <Button
+                                        size="xs"
+                                        variant="solid"
+                                        disabled={isAdendumTimelinePending}
+                                        onClick={() =>
+                                            handleOpenStatusChangeDialog(
+                                                'Timeline'
+                                            )
+                                        }
+                                    >
+                                        {isAdendumTimelinePending
+                                            ? 'Menunggu Konfirmasi'
+                                            : 'Adendum Timeline'}
+                                    </Button>
+                                )}
                             </div>
 
                             {/* Retensi */}
@@ -767,7 +797,7 @@ export default function Detail() {
 
                                 {/* Nilai Kontrak Sebelum*/}
                                 <FormItem
-                                    label="Nilai Kontrak Awal Sebelum"
+                                    label="Nilai Kontrak Awal Sebelum (Rp)"
                                     invalid={
                                         (errors.nilai_kontrak_sebelum &&
                                             touched.nilai_kontrak_sebelum) as boolean
@@ -796,7 +826,7 @@ export default function Detail() {
 
                                 {/* Nilai Kontrak Sesudah*/}
                                 <FormItem
-                                    label="Nilai Kontrak Sesudah"
+                                    label="Nilai Kontrak Sesudah (Rp)"
                                     invalid={
                                         (errors.nilai_kontrak_sesudah &&
                                             touched.nilai_kontrak_sesudah) as boolean

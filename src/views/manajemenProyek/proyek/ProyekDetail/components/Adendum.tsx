@@ -19,6 +19,7 @@ injectReducer('adendumList', reducer)
 
 export default function Adendum() {
     const [idAdendum, setIdAdendum] = useState('')
+    const user = useAppSelector((state) => state.auth.user)
 
     const projectId = location.pathname.substring(
         location.pathname.lastIndexOf('/') + 1
@@ -286,21 +287,24 @@ export default function Adendum() {
                                         {/* Delete Button */}
                                         <div>
                                             {item.status ===
-                                                'Belum Disetujui' && (
-                                                <Button
-                                                    type="button"
-                                                    shape="circle"
-                                                    variant="plain"
-                                                    size="sm"
-                                                    className="text-red-500"
-                                                    icon={<HiOutlineTrash />}
-                                                    onClick={() =>
-                                                        handleConfirmDelete(
-                                                            item.id
-                                                        )
-                                                    }
-                                                />
-                                            )}
+                                                'Belum Disetujui' &&
+                                                user.authority !== 'Owner' && (
+                                                    <Button
+                                                        type="button"
+                                                        shape="circle"
+                                                        variant="plain"
+                                                        size="sm"
+                                                        className="text-red-500"
+                                                        icon={
+                                                            <HiOutlineTrash />
+                                                        }
+                                                        onClick={() =>
+                                                            handleConfirmDelete(
+                                                                item.id
+                                                            )
+                                                        }
+                                                    />
+                                                )}
                                         </div>
                                     </div>
                                 </div>

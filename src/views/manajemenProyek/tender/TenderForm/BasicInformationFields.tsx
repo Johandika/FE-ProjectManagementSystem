@@ -89,7 +89,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
 
             {/* Nilai Kontrak */}
             <FormItem
-                label="Nilai Kontrak"
+                label="Nilai Kontrak (Rp)"
                 invalid={
                     (errors.nilai_kontrak && touched.nilai_kontrak) as boolean
                 }

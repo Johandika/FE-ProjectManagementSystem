@@ -134,7 +134,7 @@ const LogTable = () => {
                     const row = props.row.original
                     return (
                         <span className="capitalize">
-                            {row.User.nama || '-'}
+                            {row?.User?.nama || '-'}
                         </span>
                     )
                 },

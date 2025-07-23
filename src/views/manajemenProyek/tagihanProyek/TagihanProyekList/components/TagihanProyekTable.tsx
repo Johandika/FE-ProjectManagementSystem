@@ -116,7 +116,7 @@ const TagihanProyekTable = () => {
                     const row = props.row.original
                     return (
                         <span className="capitalize">
-                            {row.nilai_kontrak.toLocaleString('id-ID')}
+                            Rp {row.nilai_kontrak.toLocaleString('id-ID')}
                         </span>
                     )
                 },
@@ -129,7 +129,7 @@ const TagihanProyekTable = () => {
                     const row = props.row.original
                     return (
                         <span className="capitalize">
-                            {row.total_tagihan.toLocaleString('id-ID')}
+                            Rp {row.total_tagihan.toLocaleString('id-ID')}
                         </span>
                     )
                 },

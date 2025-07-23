@@ -59,6 +59,7 @@ export default function KeteranganSection({ proyekData }: any) {
     const dataKeterangan = useAppSelector(
         (state) => state.proyekEdit.data.keteranganData.data
     )
+    const user = useAppSelector((state) => state.auth.user)
 
     const onDelete = (id: any) => {
         dispatch(toggleDeleteConfirmationKeterangan(true))
@@ -167,21 +168,25 @@ export default function KeteranganSection({ proyekData }: any) {
                     title="Keterangan Tambahan"
                     desc="Informasi keterangan tambahan proyek"
                 />
-                <div className="block lg:inline-block md:mb-0 mb-4 md:ml-2 ">
-                    <Button
-                        block
-                        variant="solid"
-                        size="sm"
-                        icon={<HiPlusCircle />}
-                        onClick={() => {
-                            setKeteranganFormInitialValues({ keterangan: '' })
-                            setTypeDialog('add')
-                            setDialogKeteranganOpen(true)
-                        }}
-                    >
-                        Tambah Keterangan
-                    </Button>
-                </div>
+                {user.authority !== 'Owner' && (
+                    <div className="block lg:inline-block md:mb-0 mb-4 md:ml-2 ">
+                        <Button
+                            block
+                            variant="solid"
+                            size="sm"
+                            icon={<HiPlusCircle />}
+                            onClick={() => {
+                                setKeteranganFormInitialValues({
+                                    keterangan: '',
+                                })
+                                setTypeDialog('add')
+                                setDialogKeteranganOpen(true)
+                            }}
+                        >
+                            Tambah Keterangan
+                        </Button>
+                    </div>
+                )}
             </div>
             <div className="overflow-x-auto">
                 <Table className="min-w-max lg:min-w-full table-fixed">
