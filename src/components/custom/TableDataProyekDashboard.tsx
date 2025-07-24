@@ -44,9 +44,9 @@ export default function TableDataProyekDashboard(data: any) {
                         <Th>No</Th>
                         <Th>Divisi</Th>
                         <Th>Nilai Kontrak</Th>
-                        <Th>Sudah Tertagih</Th>
-                        <Th>Sedang Berjalan</Th>
                         <Th>Sudah Dibayar</Th>
+                        <Th>Sedang Berjalan</Th>
+                        <Th>Sudah Ditagih</Th>
                         <Th>Retensi</Th>
                     </Tr>
                 </THead>
