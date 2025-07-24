@@ -1292,7 +1292,7 @@ const PurchaseOrder = () => {
                                                             )}
                                                         </div>
                                                         {/* Data Field */}
-                                                        <div className="grid grid-cols-4 gap-4 border-t border-indigo-400  p-4 bg-indigo-50">
+                                                        <div className="grid sm:grid-cols-4 md:grid-cols-5 gap-4 border-t border-indigo-400  p-4 bg-indigo-50">
                                                             {/* Nomor PO */}
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">
@@ -1315,18 +1315,79 @@ const PurchaseOrder = () => {
                                                                     )}
                                                                 </p>
                                                             </div>
-                                                            {/* Uang Muka */}
-                                                            <div>
-                                                                <span className="text-xs font-bold text-gray-500">
-                                                                    Uang Muka:
-                                                                </span>
-                                                                <p>
-                                                                    Rp{' '}
-                                                                    {purchase.uang_muka?.toLocaleString(
-                                                                        'id-ID'
-                                                                    )}
-                                                                </p>
-                                                            </div>
+
+                                                            {(() => {
+                                                                // 1. Hitung Total Biaya dari semua detail barang
+                                                                const totalBiaya =
+                                                                    purchase.DetailPurchases.reduce(
+                                                                        (
+                                                                            sum,
+                                                                            item
+                                                                        ) =>
+                                                                            sum +
+                                                                            Number(
+                                                                                item.harga ||
+                                                                                    0
+                                                                            ),
+                                                                        0
+                                                                    )
+
+                                                                // 2. Ambil Uang Muka sebagai angka
+                                                                const uangMuka =
+                                                                    Number(
+                                                                        purchase.uang_muka ||
+                                                                            0
+                                                                    )
+
+                                                                // 3. Hitung Total Tagihan
+                                                                const totalTagihan =
+                                                                    totalBiaya -
+                                                                    uangMuka
+
+                                                                return (
+                                                                    <>
+                                                                        {/* Total Biaya */}
+                                                                        <div>
+                                                                            <span className="text-xs font-bold text-gray-500">
+                                                                                Total
+                                                                                Biaya:
+                                                                            </span>
+                                                                            <p>
+                                                                                Rp{' '}
+                                                                                {totalBiaya.toLocaleString(
+                                                                                    'id-ID'
+                                                                                )}
+                                                                            </p>
+                                                                        </div>
+                                                                        {/* Uang Muka */}
+                                                                        <div>
+                                                                            <span className="text-xs font-bold text-gray-500">
+                                                                                Uang
+                                                                                Muka:
+                                                                            </span>
+                                                                            <p>
+                                                                                Rp{' '}
+                                                                                {purchase.uang_muka?.toLocaleString(
+                                                                                    'id-ID'
+                                                                                )}
+                                                                            </p>
+                                                                        </div>
+                                                                        {/* Total Tagihan */}
+                                                                        <div>
+                                                                            <span className="text-xs font-bold text-gray-500">
+                                                                                Total
+                                                                                Tagihan:
+                                                                            </span>
+                                                                            <p>
+                                                                                Rp{' '}
+                                                                                {totalTagihan.toLocaleString(
+                                                                                    'id-ID'
+                                                                                )}
+                                                                            </p>
+                                                                        </div>
+                                                                    </>
+                                                                )
+                                                            })()}
                                                             {/* Tanggal Uang Muka */}
                                                             <div>
                                                                 <span className="text-xs font-bold text-gray-500">

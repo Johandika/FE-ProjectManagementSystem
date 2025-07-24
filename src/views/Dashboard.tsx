@@ -51,10 +51,13 @@ const Dashboard = () => {
     const defaultStartDate = dayjs().startOf('year').format('YYYY-MM-DD')
     const defaultEndDate = dayjs().endOf('year').format('YYYY-MM-DD')
 
-    // const [tanggalAwal, setTanggalAwal] = useState(defaultStartDate)
-    // const [tanggalAkhir, setTanggalAkhir] = useState(defaultEndDate)
-    // const [idClient, setIdClient] = useState<string | null>(null)
-    // const [idDivisi, setIdDivisi] = useState<string | null>(null)
+    // Buat state untuk menyimpan filter yang aktif ##
+    const [activeFilters, setActiveFilters] = useState({
+        tanggal_awal: defaultStartDate,
+        tanggal_akhir: defaultEndDate,
+        idClient: '',
+        idDivisi: '',
+    })
 
     const dataAwal = dataDashboard?.data
 
@@ -103,6 +106,7 @@ const Dashboard = () => {
         }
 
         dispatch(getDashboard(params))
+        setActiveFilters(values) // Simpan filter yang baru disubmit
         setIsFilterOpen(false)
     }
 
@@ -110,8 +114,8 @@ const Dashboard = () => {
         // Panggil data dashboard dengan filter awal
         dispatch(
             getDashboard({
-                tanggal_awal: defaultStartDate, // Ganti ke sini
-                tanggal_akhir: defaultEndDate, // Ganti ke sini
+                tanggal_awal: activeFilters.tanggal_awal, // Gunakan state filter
+                tanggal_akhir: activeFilters.tanggal_akhir, // Gunakan state filter
             })
         )
         // Panggil data untuk select klien
@@ -128,10 +132,15 @@ const Dashboard = () => {
 
     // GANTI FUNGSI LAMA DENGAN INI
     const handleResetFilter = () => {
-        // Cukup reset form Formik ke initialValues-nya
-        formikRef.current?.resetForm()
+        const defaultFilters = {
+            tanggal_awal: defaultStartDate,
+            tanggal_akhir: defaultEndDate,
+            idClient: '',
+            idDivisi: '',
+        }
 
-        // Panggil kembali data dashboard dengan filter default
+        setActiveFilters(defaultFilters) // Reset state filter ke default
+
         dispatch(
             getDashboard({
                 tanggal_awal: defaultStartDate,
@@ -202,16 +211,11 @@ const Dashboard = () => {
                 onRequestClose={closeFilterDrawer}
             >
                 <Formik<FilterFormValues>
+                    enableReinitialize
                     innerRef={formikRef}
-                    initialValues={{
-                        tanggal_awal: defaultStartDate,
-                        tanggal_akhir: defaultEndDate,
-                        idClient: '', // Gunakan string kosong untuk nilai awal
-                        idDivisi: '', // Gunakan string kosong untuk nilai awal
-                    }}
+                    initialValues={activeFilters}
                     validationSchema={BastpSchema}
                     onSubmit={handleFilter}
-                    enableReinitialize
                 >
                     {({ errors, touched }) => (
                         <Form id="filter-form" className="flex flex-col gap-4">
