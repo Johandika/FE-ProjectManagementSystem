@@ -51,10 +51,10 @@ const Dashboard = () => {
     const defaultStartDate = dayjs().startOf('year').format('YYYY-MM-DD')
     const defaultEndDate = dayjs().endOf('year').format('YYYY-MM-DD')
 
-    const [tanggalAwal, setTanggalAwal] = useState(defaultStartDate)
-    const [tanggalAkhir, setTanggalAkhir] = useState(defaultEndDate)
-    const [idClient, setIdClient] = useState<string | null>(null)
-    const [idDivisi, setIdDivisi] = useState<string | null>(null)
+    // const [tanggalAwal, setTanggalAwal] = useState(defaultStartDate)
+    // const [tanggalAkhir, setTanggalAkhir] = useState(defaultEndDate)
+    // const [idClient, setIdClient] = useState<string | null>(null)
+    // const [idDivisi, setIdDivisi] = useState<string | null>(null)
 
     const dataAwal = dataDashboard?.data
 
@@ -110,8 +110,8 @@ const Dashboard = () => {
         // Panggil data dashboard dengan filter awal
         dispatch(
             getDashboard({
-                tanggal_awal: tanggalAwal,
-                tanggal_akhir: tanggalAkhir,
+                tanggal_awal: defaultStartDate, // Ganti ke sini
+                tanggal_akhir: defaultEndDate, // Ganti ke sini
             })
         )
         // Panggil data untuk select klien
@@ -126,14 +126,12 @@ const Dashboard = () => {
     const openFilterDrawer = () => setIsFilterOpen(true)
     const closeFilterDrawer = () => setIsFilterOpen(false)
 
+    // GANTI FUNGSI LAMA DENGAN INI
     const handleResetFilter = () => {
-        setTanggalAwal(defaultStartDate)
-        setTanggalAkhir(defaultEndDate)
-        setIdClient(null)
-        setIdDivisi(null)
-
+        // Cukup reset form Formik ke initialValues-nya
         formikRef.current?.resetForm()
 
+        // Panggil kembali data dashboard dengan filter default
         dispatch(
             getDashboard({
                 tanggal_awal: defaultStartDate,
@@ -206,10 +204,10 @@ const Dashboard = () => {
                 <Formik<FilterFormValues>
                     innerRef={formikRef}
                     initialValues={{
-                        tanggal_awal: tanggalAwal,
-                        tanggal_akhir: tanggalAkhir,
-                        idClient: idClient ?? '',
-                        idDivisi: idDivisi ?? '',
+                        tanggal_awal: defaultStartDate,
+                        tanggal_akhir: defaultEndDate,
+                        idClient: '', // Gunakan string kosong untuk nilai awal
+                        idDivisi: '', // Gunakan string kosong untuk nilai awal
                     }}
                     validationSchema={BastpSchema}
                     onSubmit={handleFilter}
@@ -239,14 +237,11 @@ const Dashboard = () => {
                                                 ) || null
                                             }
                                             onChange={(option) => {
-                                                const value = option
-                                                    ? option.value
-                                                    : ''
+                                                // Cukup panggil setFieldValue dari Formik
                                                 form.setFieldValue(
                                                     field.name,
-                                                    value
+                                                    option ? option.value : ''
                                                 )
-                                                setIdClient(value || null)
                                             }}
                                         />
                                     )}
@@ -275,14 +270,11 @@ const Dashboard = () => {
                                                 ) || null
                                             }
                                             onChange={(option) => {
-                                                const value = option
-                                                    ? option.value
-                                                    : ''
+                                                // Cukup panggil setFieldValue dari Formik
                                                 form.setFieldValue(
                                                     field.name,
-                                                    value
+                                                    option ? option.value : ''
                                                 )
-                                                setIdDivisi(value || null)
                                             }}
                                         />
                                     )}
@@ -316,11 +308,11 @@ const Dashboard = () => {
                                                           'YYYY-MM-DD'
                                                       )
                                                     : ''
+                                                // Cukup panggil setFieldValue dari Formik
                                                 form.setFieldValue(
                                                     field.name,
                                                     formattedDate
                                                 )
-                                                setTanggalAwal(formattedDate)
                                             }}
                                         />
                                     )}
@@ -352,11 +344,11 @@ const Dashboard = () => {
                                                           'YYYY-MM-DD'
                                                       )
                                                     : ''
+                                                // Cukup panggil setFieldValue dari Formik
                                                 form.setFieldValue(
                                                     field.name,
                                                     formattedDate
                                                 )
-                                                setTanggalAkhir(formattedDate)
                                             }}
                                         />
                                     )}
