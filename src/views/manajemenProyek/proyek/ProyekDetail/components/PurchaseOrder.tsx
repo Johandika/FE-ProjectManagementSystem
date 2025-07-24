@@ -695,9 +695,9 @@ const PurchaseOrder = () => {
                                             <Button
                                                 size="sm"
                                                 variant="twoTone"
-                                                onClick={handleAddPurchase}
                                                 className="w-fit text-xs"
                                                 type="button"
+                                                onClick={handleAddPurchase}
                                             >
                                                 Tambah Purchase Order
                                             </Button>
@@ -973,7 +973,7 @@ const PurchaseOrder = () => {
                                                             <Field
                                                                 name={`tempStatusDikirim`}
                                                                 component={
-                                                                    <Switcher />
+                                                                    Switcher
                                                                 }
                                                             />
                                                             <span>

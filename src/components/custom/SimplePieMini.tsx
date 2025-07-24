@@ -94,7 +94,11 @@ const SimplePieMini = ({ dataAwal, title, colors }: any) => {
                                 className="flex flex-col items-start"
                                 style={{ color: colors[index] }}
                             >
-                                <span className="text-xs">{label}</span>
+                                <span className="text-xs">
+                                    {label === 'Sudah Ditagih'
+                                        ? `${label} (FP)`
+                                        : `${label}`}
+                                </span>
                                 <div className="text-sm font-bold">
                                     {title === 'Statistik Nilai Kontrak'
                                         ? 'Rp '
