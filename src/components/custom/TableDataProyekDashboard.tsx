@@ -15,21 +15,19 @@ export default function TableDataProyekDashboard(data: any) {
     const totals = monitoringData.reduce(
         (acc: any, proyek: any) => {
             acc.total_nilai_proyek += parseFloat(proyek.total_nilai_proyek) || 0
-            acc.total_belum_tertagih +=
-                parseFloat(proyek.total_belum_tertagih) || 0
+
             acc.total_sudah_tertagih +=
                 parseFloat(proyek.total_sudah_tertagih) || 0
-            acc.total_belum_bayar += parseFloat(proyek.total_belum_bayar) || 0
+            acc.total_sedang_berjalan +=
+                parseFloat(proyek.total_sedang_berjalan) || 0
             acc.total_sudah_bayar += parseFloat(proyek.total_sudah_bayar) || 0
             acc.total_retensi += parseFloat(proyek.total_retensi) || 0
             return acc
         },
         {
-            // Nilai awal accumulator
             total_nilai_proyek: 0,
-            total_belum_tertagih: 0,
             total_sudah_tertagih: 0,
-            total_belum_bayar: 0,
+            total_sedang_berjalan: 0,
             total_sudah_bayar: 0,
             total_retensi: 0,
         }
@@ -46,9 +44,8 @@ export default function TableDataProyekDashboard(data: any) {
                         <Th>No</Th>
                         <Th>Divisi</Th>
                         <Th>Nilai Kontrak</Th>
-                        <Th>Belum Tertagih</Th>
                         <Th>Sudah Tertagih</Th>
-                        <Th>Belum Dibayar</Th>
+                        <Th>Sedang Berjalan</Th>
                         <Th>Sudah Dibayar</Th>
                         <Th>Retensi</Th>
                     </Tr>
@@ -67,12 +64,7 @@ export default function TableDataProyekDashboard(data: any) {
                                             'id-ID'
                                         )}
                                     </Td>
-                                    <Td>
-                                        Rp{' '}
-                                        {proyek.total_belum_tertagih.toLocaleString(
-                                            'id-ID'
-                                        )}
-                                    </Td>
+
                                     <Td>
                                         Rp{' '}
                                         {proyek.total_sudah_tertagih.toLocaleString(
@@ -81,7 +73,7 @@ export default function TableDataProyekDashboard(data: any) {
                                     </Td>
                                     <Td>
                                         Rp{' '}
-                                        {proyek.total_belum_bayar.toLocaleString(
+                                        {proyek.total_sedang_berjalan.toLocaleString(
                                             'id-ID'
                                         )}
                                     </Td>
@@ -109,17 +101,16 @@ export default function TableDataProyekDashboard(data: any) {
                         <Th className="text-left pl-6  ">
                             Rp {formatIntegerRupiah(totals.total_nilai_proyek)}
                         </Th>
-                        <Th className="text-left pl-6  ">
-                            Rp{' '}
-                            {formatIntegerRupiah(totals.total_belum_tertagih)}
-                        </Th>
+
                         <Th className="text-left pl-6  ">
                             Rp{' '}
                             {formatIntegerRupiah(totals.total_sudah_tertagih)}
                         </Th>
                         <Th className="text-left pl-6  ">
-                            Rp {formatIntegerRupiah(totals.total_belum_bayar)}
+                            Rp{' '}
+                            {formatIntegerRupiah(totals.total_sedang_berjalan)}
                         </Th>
+
                         <Th className="text-left pl-6  ">
                             Rp {formatIntegerRupiah(totals.total_sudah_bayar)}
                         </Th>
