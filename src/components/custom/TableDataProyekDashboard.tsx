@@ -64,10 +64,9 @@ export default function TableDataProyekDashboard(data: any) {
                                             'id-ID'
                                         )}
                                     </Td>
-
                                     <Td>
                                         Rp{' '}
-                                        {proyek.total_sudah_tertagih.toLocaleString(
+                                        {proyek.total_sudah_bayar.toLocaleString(
                                             'id-ID'
                                         )}
                                     </Td>
@@ -79,10 +78,11 @@ export default function TableDataProyekDashboard(data: any) {
                                     </Td>
                                     <Td>
                                         Rp{' '}
-                                        {proyek.total_sudah_bayar.toLocaleString(
+                                        {proyek.total_sudah_tertagih.toLocaleString(
                                             'id-ID'
                                         )}
                                     </Td>
+
                                     <Td>
                                         Rp{' '}
                                         {formatIntegerRupiah(
@@ -101,19 +101,18 @@ export default function TableDataProyekDashboard(data: any) {
                         <Th className="text-left pl-6  ">
                             Rp {formatIntegerRupiah(totals.total_nilai_proyek)}
                         </Th>
-
                         <Th className="text-left pl-6  ">
-                            Rp{' '}
-                            {formatIntegerRupiah(totals.total_sudah_tertagih)}
+                            Rp {formatIntegerRupiah(totals.total_sudah_bayar)}
                         </Th>
                         <Th className="text-left pl-6  ">
                             Rp{' '}
                             {formatIntegerRupiah(totals.total_sedang_berjalan)}
                         </Th>
-
                         <Th className="text-left pl-6  ">
-                            Rp {formatIntegerRupiah(totals.total_sudah_bayar)}
+                            Rp{' '}
+                            {formatIntegerRupiah(totals.total_sudah_tertagih)}
                         </Th>
+
                         <Th className="text-left pl-6  ">
                             Rp {formatIntegerRupiah(totals.total_retensi)}
                         </Th>
