@@ -1375,8 +1375,7 @@ const PurchaseOrder = () => {
                                                                         {/* Total Tagihan */}
                                                                         <div>
                                                                             <span className="text-xs font-bold text-gray-500">
-                                                                                Total
-                                                                                Tagihan:
+                                                                                Pelunasan:
                                                                             </span>
                                                                             <p>
                                                                                 Rp{' '}

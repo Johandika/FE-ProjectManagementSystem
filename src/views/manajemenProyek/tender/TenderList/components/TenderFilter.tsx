@@ -93,11 +93,15 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                                 Pengajuan
                                             </Radio>
                                             <Radio value={'Diterima'}>
-                                                Diterima
+                                                Menang
                                             </Radio>
                                             <Radio value={'Ditolak'}>
-                                                Ditolak
+                                                Kalah
                                             </Radio>
+                                            <Radio value={'Diproses'}>
+                                                Diproses
+                                            </Radio>
+                                            <Radio value={'Batal'}>Batal</Radio>
                                         </Radio.Group>
                                     )}
                                 </Field>

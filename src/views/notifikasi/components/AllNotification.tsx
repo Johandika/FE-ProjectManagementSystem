@@ -202,6 +202,7 @@ export default function AllNotification() {
         }
     }, [dataNotification, dispatch])
 
+    console.log('dataNotification', dataNotification)
     return (
         <>
             <Loading loading={loading}>
