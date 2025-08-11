@@ -44,6 +44,7 @@ type Proyek = {
     realisasi: number
     progress: number
     status: string
+    keterangan_status: string
     idKlien: string
     Lokasis?: Array<{
         lokasi: string
@@ -438,7 +439,7 @@ const ProyekTable = () => {
                                 </span>
                             ) : row.status === 'Dalam Proses' ? (
                                 <span className="capitalize text-blue-600">
-                                    {row.status}
+                                    {row.status}, {row.keterangan_status}
                                 </span>
                             ) : (
                                 <span className="capitalize">{row.status}</span>

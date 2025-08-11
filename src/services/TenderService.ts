@@ -13,6 +13,7 @@ export async function apiGetTenders<T, U extends Record<string, unknown>>(
             page: data.page,
             status: data?.filterData?.status || null,
             idDivisi: data?.filterData?.idDivisi || null,
+            filteruser: data?.filterData?.filteruser || null,
             search: data.query || null,
         },
     })

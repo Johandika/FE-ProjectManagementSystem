@@ -22,6 +22,7 @@ type GetMasterTenderResponse = {
 
 type FilterQueries = {
     status: string
+    filteruser: string
     idDivisi?: string
 }
 

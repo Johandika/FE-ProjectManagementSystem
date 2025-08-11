@@ -24,6 +24,7 @@ import {
 } from '@/services/LokasiService'
 import { apiCreateAdendumLokasi } from '@/services/AdendumService'
 import { setUnreadNotification } from '@/views/notifikasi/store'
+import { HiOutlineTrash } from 'react-icons/hi'
 
 export interface SetSubmitting {
     (isSubmitting: boolean): void
@@ -344,6 +345,12 @@ export default function Lokasi() {
                         }
                     }
 
+                    // Fungsi untuk membuka dialog konfirmasi delete
+                    const handleConfirmDelete = (index: number) => {
+                        setDeleteIndex(index)
+                        setDialogOpen(true)
+                    }
+
                     // Function to close confirmation dialog
                     const handleCancelDelete = () => {
                         setDialogOpen(false)
@@ -585,34 +592,55 @@ export default function Lokasi() {
                                                             </div>
                                                         </a>
 
-                                                        {user.authority !==
-                                                            'Owner' && (
-                                                            <div className="flex space-x-2">
-                                                                {hasPendingAdendum ===
-                                                                true ? (
-                                                                    <div className="bg-indigo-600 opacity-50 text-white px-4 py-2 rounded-md">
-                                                                        Menunggu
-                                                                        Konfirmasi
-                                                                    </div>
-                                                                ) : (
-                                                                    <Button
-                                                                        type="button"
-                                                                        variant="solid"
-                                                                        size="sm"
-                                                                        onClick={() =>
-                                                                            !hasPendingAdendum &&
-                                                                            handleAdendum(
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        {hasPendingAdendum
-                                                                            ? 'Menunggu Konfirmasi'
-                                                                            : 'Adendum Lokasi'}
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                        <div className="flex flex-row">
+                                                            {user.authority !==
+                                                                'Owner' && (
+                                                                <div className="flex space-x-2">
+                                                                    {hasPendingAdendum ===
+                                                                    true ? (
+                                                                        <div className="bg-indigo-600 opacity-50 text-white px-4 py-2 rounded-md">
+                                                                            Menunggu
+                                                                            Konfirmasi
+                                                                        </div>
+                                                                    ) : (
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="solid"
+                                                                            size="sm"
+                                                                            onClick={() =>
+                                                                                !hasPendingAdendum &&
+                                                                                handleAdendum(
+                                                                                    index
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            {hasPendingAdendum
+                                                                                ? 'Menunggu Konfirmasi'
+                                                                                : 'Adendum Lokasi'}
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+                                                            )}
+
+                                                            {user.authority ===
+                                                                'Super Admin' && (
+                                                                <Button
+                                                                    type="button"
+                                                                    shape="circle"
+                                                                    variant="plain"
+                                                                    size="sm"
+                                                                    className="text-red-500 ml-3"
+                                                                    icon={
+                                                                        <HiOutlineTrash />
+                                                                    }
+                                                                    onClick={() => {
+                                                                        handleConfirmDelete(
+                                                                            index
+                                                                        )
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 )
                                             }

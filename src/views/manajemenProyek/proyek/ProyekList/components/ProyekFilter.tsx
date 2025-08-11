@@ -27,6 +27,7 @@ type FilterFormProps = {
 type DrawerFooterProps = {
     onSaveClick: (event: MouseEvent<HTMLButtonElement>) => void
     onCancel: (event: MouseEvent<HTMLButtonElement>) => void
+    onReset: (event: MouseEvent<HTMLButtonElement>) => void
 }
 
 const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
@@ -235,21 +236,32 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
     }
 )
 
-const DrawerFooter = ({ onSaveClick, onCancel }: DrawerFooterProps) => {
+const DrawerFooter = ({
+    onSaveClick,
+    onCancel,
+    onReset,
+}: DrawerFooterProps) => {
     return (
-        <div className="text-right w-full">
-            <Button size="sm" className="mr-2" onClick={onCancel}>
-                Cancel
+        <div className="text-right w-full flex flex-row justify-between">
+            {/* inidia */}
+            <Button size="sm" className="mr-2" onClick={onReset}>
+                Reset
             </Button>
-            <Button size="sm" variant="solid" onClick={onSaveClick}>
-                Terapkkan
-            </Button>
+            <div>
+                <Button size="sm" className="mr-2" onClick={onCancel}>
+                    Cancel
+                </Button>
+                <Button size="sm" variant="solid" onClick={onSaveClick}>
+                    Terapkan
+                </Button>
+            </div>
         </div>
     )
 }
 
 const ProyekFilter = () => {
     const formikRef = useRef<FormikProps<FormModel>>(null)
+    const dispatch = useAppDispatch()
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -263,6 +275,23 @@ const ProyekFilter = () => {
 
     const formSubmit = () => {
         formikRef.current?.submitForm()
+    }
+
+    const onReset = () => {
+        // Reset form Formik ke nilai awal
+        formikRef.current?.resetForm()
+
+        // Buat data filter awal untuk Redux store
+        const initialFilterData = {
+            idClient: '',
+            idDivisi: '',
+        }
+
+        // Perbarui Redux store dengan data filter awal
+        dispatch(setFilterData(initialFilterData))
+
+        // Tutup drawer setelah reset
+        onDrawerClose()
     }
 
     return (
@@ -282,6 +311,7 @@ const ProyekFilter = () => {
                     <DrawerFooter
                         onCancel={onDrawerClose}
                         onSaveClick={formSubmit}
+                        onReset={onReset} //inidia
                     />
                 }
                 onClose={onDrawerClose}
