@@ -8,7 +8,7 @@ import reducer, {
     useAppDispatch,
     getOnePengguna,
 } from './store'
-import { injectReducer } from '@/store'
+import { getSelectDivisi, injectReducer } from '@/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import PenggunaForm, {
@@ -26,6 +26,10 @@ const PenggunaEdit = () => {
 
     const location = useLocation()
     const navigate = useNavigate()
+
+    const { selectDivisi, loadingSelectDivisi } = useAppSelector(
+        (state: RootState) => state.base.common
+    )
 
     const { onePenggunaData } = useAppSelector(
         (state) => state.penggunaEdit.data
@@ -65,7 +69,6 @@ const PenggunaEdit = () => {
             if (result.data.statusCode === 200) {
                 popNotification('updated')
             } else {
-                // Menampilkan notifikasi error
                 toast.push(
                     <Notification
                         title={'Gagal menambahkan'}
@@ -121,12 +124,17 @@ const PenggunaEdit = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
+    useEffect(() => {
+        dispatch(getSelectDivisi())
+    }, [])
+
     return (
         <>
-            <Loading loading={loadingOnePengguna}>
+            <Loading loading={loadingOnePengguna || loadingSelectDivisi}>
                 {!isEmpty(onePenggunaData) && (
                     <>
                         <PenggunaForm
+                            divisiData={selectDivisi.data}
                             type="edit"
                             initialData={onePenggunaData}
                             onFormSubmit={handleFormSubmit}

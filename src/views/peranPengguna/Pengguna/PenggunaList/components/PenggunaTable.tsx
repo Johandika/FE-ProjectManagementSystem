@@ -186,7 +186,15 @@ const PenggunaTable = () => {
                 accessorKey: 'divisi',
                 cell: (props) => {
                     const row = props.row.original
-                    return <span>{row.Divisi?.name}</span>
+                    if (!row.DivisiUsers || row.DivisiUsers.length === 0) {
+                        return <span>-</span>
+                    }
+
+                    const divisiNames = row.DivisiUsers.map(
+                        (divisiUser) => divisiUser.Divisi.name
+                    )
+
+                    return <span>{divisiNames.join(', ')}</span>
                 },
             },
             {

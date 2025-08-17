@@ -20,6 +20,7 @@ type FormModel = {
     category: string[]
     status: number[]
     penggunaStatus: number
+    idDivisi: string
 }
 
 type FilterFormProps = {
@@ -46,6 +47,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
 
         const handleSubmit = (values: FormModel) => {
             onSubmitComplete?.()
+
             dispatch(setFilterData(values))
             // dispatch(getPenggunas(initialTableData))
         }
@@ -80,37 +82,49 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                     <Form>
                         <FormContainer>
                             {/* Filter Divisi */}
+                            {/* Filter Divisi */}
                             <FormItem
-                                label="Klien"
-                                invalid={errors.idDivisi && touched.idDivisi}
+                                label="Divisi"
+                                invalid={
+                                    (errors.idDivisi &&
+                                        touched.idDivisi) as boolean
+                                }
                                 errorMessage={errors.idDivisi}
                             >
                                 <Field name="idDivisi">
                                     {({ field, form }: FieldProps) => {
-                                        const selectedDivisi = field.value
-                                            ? divisiOptions.find(
-                                                  (divisi: any) =>
-                                                      divisi.value ===
-                                                      field.value
-                                              )
-                                            : null
+                                        // PERBAIKAN: Pisahkan string ke array untuk ditampilkan
+                                        const selectedValues = (
+                                            field.value || ''
+                                        )
+                                            .split(',')
+                                            .filter(Boolean)
+                                        const selectedOptions = (
+                                            divisiOptions || []
+                                        ).filter((option) =>
+                                            selectedValues.includes(
+                                                option.value
+                                            )
+                                        )
 
                                         return (
                                             <Select
-                                                field={field}
-                                                form={form}
+                                                isMulti
                                                 options={divisiOptions}
                                                 isLoading={loadingSelectDivisi}
-                                                value={
-                                                    selectedDivisi
-                                                        ? selectedDivisi
-                                                        : null
-                                                }
+                                                value={selectedOptions}
                                                 placeholder="Pilih divisi"
-                                                onChange={(option) => {
+                                                onChange={(selected) => {
+                                                    // PERBAIKAN: Ubah array yang dipilih menjadi string yang dipisah koma
+                                                    const values = selected
+                                                        ? selected.map(
+                                                              (option) =>
+                                                                  option.value
+                                                          )
+                                                        : []
                                                     form.setFieldValue(
                                                         field.name,
-                                                        option?.value
+                                                        values.join(',')
                                                     )
                                                 }}
                                             />
@@ -118,6 +132,7 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                     }}
                                 </Field>
                             </FormItem>
+
                             {/* Filter Status */}
                             <FormItem
                                 invalid={

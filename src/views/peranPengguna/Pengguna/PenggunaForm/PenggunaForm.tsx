@@ -22,6 +22,7 @@ type InitialData = {
     password: string
     idRole: string
     idDivisi: string
+    DivisiUsers?: any[]
 }
 
 export type FormModel = InitialData
@@ -104,6 +105,12 @@ const PenggunaForm = forwardRef<FormikRef, PenggunaForm>((props, ref) => {
         divisiData,
     } = props
 
+    // Proses data DivisiUsers dari API menjadi string yang dipisah koma
+    const formattedDivisiIds =
+        initialData?.DivisiUsers?.map(
+            (divisiUser: any) => divisiUser.idDivisi
+        ).join(',') || ''
+
     const formInitialValues = {
         id: '',
         nama: '',
@@ -113,6 +120,7 @@ const PenggunaForm = forwardRef<FormikRef, PenggunaForm>((props, ref) => {
         idDivisi: '',
         password: '',
         ...initialData,
+        idDivisi: formattedDivisiIds, // <-- Pastikan ini menimpa idDivisi
     }
 
     return (

@@ -51,7 +51,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
             <h5>Informasi Dasar</h5>
             <p className="mb-6">Sesi untuk mengatur informasi dasar pengguna</p>
             <FormItem
-                label="Pengguna"
+                label="Nama"
                 invalid={(errors.nama && touched.nama) as boolean}
                 errorMessage={errors.nama}
             >
@@ -139,41 +139,49 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                             )}
                         </Field>
                     </FormItem>
-                    <FormItem
-                        label="Divisi"
-                        invalid={
-                            (errors.idDivisi && touched.idDivisi) as boolean
-                        }
-                        errorMessage={errors.idDivisi}
-                    >
-                        <Field name="idDivisi">
-                            {({ field, form }: FieldProps) => (
-                                <Select
-                                    placeholder="Pilih divisi"
-                                    options={divisiData?.map((role) => ({
-                                        label: role.name,
-                                        value: role.id,
-                                    }))}
-                                    value={divisiData
-                                        ?.map((role) => ({
-                                            label: role.name,
-                                            value: role.id,
-                                        }))
-                                        .find(
-                                            (opt) => opt.value === field.value
-                                        )}
-                                    onChange={(selected) => {
-                                        form.setFieldValue(
-                                            field.name,
-                                            selected?.value || ''
-                                        )
-                                    }}
-                                />
-                            )}
-                        </Field>
-                    </FormItem>
                 </>
             )}
+            {/* Divisi */}
+            <FormItem
+                label="Divisi"
+                invalid={(errors.idDivisi && touched.idDivisi) as boolean}
+                errorMessage={errors.idDivisi}
+            >
+                <Field name="idDivisi">
+                    {({ field, form }: FieldProps) => {
+                        const options = divisiData?.map((divisi) => ({
+                            label: divisi.name,
+                            value: divisi.id,
+                        }))
+
+                        const selectedValues = (field.value || '')
+                            .split(',')
+                            .filter(Boolean)
+
+                        return (
+                            <Select
+                                isMulti
+                                placeholder="Pilih divisi"
+                                options={options}
+                                value={options?.filter((option) =>
+                                    selectedValues.includes(option.value)
+                                )}
+                                onChange={(selectedOptions) => {
+                                    const values = selectedOptions
+                                        ? selectedOptions.map(
+                                              (option) => option.value
+                                          )
+                                        : []
+                                    form.setFieldValue(
+                                        field.name,
+                                        values.join(',')
+                                    )
+                                }}
+                            />
+                        )
+                    }}
+                </Field>
+            </FormItem>
         </AdaptableCard>
     )
 }
