@@ -82,7 +82,6 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                     <Form>
                         <FormContainer>
                             {/* Filter Divisi */}
-                            {/* Filter Divisi */}
                             <FormItem
                                 label="Divisi"
                                 invalid={

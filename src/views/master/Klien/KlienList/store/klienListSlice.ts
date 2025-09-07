@@ -30,6 +30,7 @@ type GetMasterKlienResponse = {
 
 type FilterQueries = {
     klienStatus: string
+    idDivisi?: string
 }
 
 export type MasterKlienListSlice = {

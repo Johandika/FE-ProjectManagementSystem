@@ -24,6 +24,7 @@ type FilterQueries = {
     status: string
     filteruser: string
     idDivisi?: string
+    idClient?: string
 }
 
 export type MasterTenderListSlice = {

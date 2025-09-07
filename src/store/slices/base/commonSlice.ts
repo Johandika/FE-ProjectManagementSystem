@@ -1,16 +1,22 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SLICE_BASE_NAME } from './constants'
 import { apiGetDashboard } from '@/services/DashboardService'
-import { apiSelectClient, apiSelectDivisi } from '@/services/SelectService'
+import {
+    apiSelectClient,
+    apiSelectClientCreate,
+    apiSelectDivisi,
+} from '@/services/SelectService'
 
 export type CommonState = {
     currentRouteKey: string
     dataDashboard: any
     loadingDashboard: boolean
     loadingSelectClient: boolean
+    loadingSelectClientCreate: boolean
     loadingSelectDivisi: boolean
     deletePasswordConfirmation: boolean
     selectClient: any
+    selectClientCreate: any
     selectDivisi: any
     errorDashboard: string | null
 }
@@ -19,10 +25,12 @@ export const initialState: CommonState = {
     currentRouteKey: '',
     dataDashboard: [],
     selectClient: [],
+    selectClientCreate: [],
     selectDivisi: [],
     deletePasswordConfirmation: false,
     loadingDashboard: false,
     loadingSelectClient: false,
+    loadingSelectClientCreate: false,
     loadingSelectDivisi: false,
     errorDashboard: null,
 }
@@ -47,6 +55,21 @@ export const getSelectClient = createAsyncThunk(
     async () => {
         try {
             const response = await apiSelectClient<any, any>()
+
+            return response.data
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(
+                error.message || 'Failed to fetch data'
+            )
+        }
+    }
+)
+
+export const getSelectClientCreate = createAsyncThunk(
+    `${SLICE_BASE_NAME}/common/getSelectClientsCreate`,
+    async () => {
+        try {
+            const response = await apiSelectClientCreate<any, any>()
 
             return response.data
         } catch (error: any) {
@@ -99,6 +122,13 @@ export const commonSlice = createSlice({
             .addCase(getSelectClient.fulfilled, (state, action) => {
                 state.loadingSelectClient = false
                 state.selectClient = action.payload
+            })
+            .addCase(getSelectClientCreate.pending, (state) => {
+                state.loadingSelectClientCreate = true
+            })
+            .addCase(getSelectClientCreate.fulfilled, (state, action) => {
+                state.loadingSelectClientCreate = false
+                state.selectClientCreate = action.payload
             })
             .addCase(getSelectDivisi.pending, (state) => {
                 state.loadingSelectDivisi = true

@@ -5,7 +5,12 @@ import { Field, FieldProps, FormikErrors, FormikTouched } from 'formik'
 import { NumericFormat } from 'react-number-format'
 import { DatePicker, Select } from '@/components/ui'
 import dayjs from 'dayjs'
-import { getSelectClient, useAppDispatch, useAppSelector } from '@/store'
+import {
+    getSelectClient,
+    getSelectClientCreate,
+    useAppDispatch,
+    useAppSelector,
+} from '@/store'
 import { useEffect } from 'react'
 
 type FormFieldsName = {
@@ -28,7 +33,7 @@ type BasicInformationFields = {
 const BasicInformationFields = (props: BasicInformationFields) => {
     const dispatch = useAppDispatch()
 
-    const { selectClient, loadingSelectClient } = useAppSelector(
+    const { selectClientCreate, loadingSelectClientCreate } = useAppSelector(
         (state) => state.base.common
     )
 
@@ -40,7 +45,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
     ]
 
     useEffect(() => {
-        dispatch(getSelectClient())
+        dispatch(getSelectClientCreate())
     }, [])
 
     return (
@@ -120,7 +125,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                 <Field name="idClient">
                     {({ field, form }: FieldProps) => {
                         // Gunakan `selectClient` bukan `kliensList`
-                        const clientOptions = selectClient.data?.map(
+                        const clientOptions = selectClientCreate.data?.map(
                             (client) => ({
                                 value: client.id,
                                 label: client.nama,
@@ -137,7 +142,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                             <Select
                                 field={field}
                                 form={form}
-                                isLoading={loadingSelectClient}
+                                isLoading={loadingSelectClientCreate}
                                 options={clientOptions}
                                 value={selectedValue}
                                 placeholder="Pilih klien"

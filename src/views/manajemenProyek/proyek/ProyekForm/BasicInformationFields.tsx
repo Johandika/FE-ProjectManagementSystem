@@ -7,7 +7,12 @@ import { Checkbox, DatePicker, Select } from '@/components/ui'
 import dayjs from 'dayjs'
 import reducer from '@/views/master/Satuan/SatuanList/store'
 import { useEffect, useState } from 'react'
-import { getSelectClient, useAppDispatch, useAppSelector } from '@/store'
+import {
+    getCreate,
+    getSelectClientCreate,
+    useAppDispatch,
+    useAppSelector,
+} from '@/store'
 
 interface Termin {
     keterangan: string
@@ -78,7 +83,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
     const [disabledState, setDisabledState] = useState(false)
     const user = useAppSelector((state) => state.auth.user)
 
-    const { selectClient, loadingSelectClient } = useAppSelector(
+    const { selectClientCreate, loadingSelectClientCreate } = useAppSelector(
         (state) => state.base.common
     )
 
@@ -86,7 +91,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
         setCheckRetensi(value)
         form.setFieldValue('is_retensi', value)
 
-        // Reset field retensi jika unchecked
         if (!value) {
             form.setFieldValue('persen_retensi', 0)
             form.setFieldValue('jatuh_tempo_retensi', null)
@@ -100,7 +104,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
     }, [initialData])
 
     useEffect(() => {
-        dispatch(getSelectClient())
+        dispatch(getSelectClientCreate())
     }, [])
 
     return (
@@ -126,7 +130,6 @@ const BasicInformationFields = (props: BasicInformationFields) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
                 {/* Client Select Field */}
-                {/* anchor */}
                 <div className="col-span-1">
                     <FormItem
                         label="Klien"
@@ -137,13 +140,12 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                     >
                         <Field name="idClient">
                             {({ field, form }: FieldProps) => {
-                                // Gunakan `selectClient` bukan `kliensList`
-                                const clientOptions = selectClient.data?.map(
-                                    (client) => ({
+                                // Gunakan `Create` bukan `kliensList`
+                                const clientOptions =
+                                    selectClientCreate.data?.map((client) => ({
                                         value: client.id,
                                         label: client.nama,
-                                    })
-                                )
+                                    }))
 
                                 const selectedValue = clientOptions?.find(
                                     (option) => option.value === field.value
@@ -155,7 +157,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
                                         form={form}
                                         isDisabled={disabledState}
                                         // Tambahkan isLoading untuk UX yang lebih baik
-                                        isLoading={loadingSelectClient}
+                                        isLoading={loadingSelectClientCreate}
                                         options={clientOptions}
                                         value={selectedValue}
                                         placeholder="Pilih klien"

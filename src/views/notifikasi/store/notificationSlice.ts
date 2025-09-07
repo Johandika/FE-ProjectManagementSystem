@@ -1,5 +1,6 @@
 import {
     apiGetAllNotification,
+    apiGetAllNotificationFakturPajak,
     apiGetOneAndReadNotification,
     apiGetUnreadNotification,
 } from '@/services/NotificationService'
@@ -15,6 +16,28 @@ type GetAllNotifications = {
     updatedAt: string
 }
 
+type GetAllNotificationsFakturPajak = {
+    id: string
+    type: string
+    pesan: string
+    status_baca: boolean
+    waktu_baca: string | null
+    idUser: string | null
+    idFakturPajak: string | null
+    idAdendum: string | null
+    User: { id: string; nama: string }
+    Adendum: string
+    FakturPajak: {
+        id: string
+        nomor: string
+        nominal: number
+        status: string
+        Project: { id: string; pekerjaan: string; idUser: string }
+    }
+    createdAt: string
+    updatedAt: string
+}
+
 export type NotificationState = {
     loading: boolean
     unreadNotification: boolean
@@ -23,6 +46,7 @@ export type NotificationState = {
     dataUnreadsNotification: GetAllNotifications[]
     loadingUnreadNotification: boolean
     dataNotification: GetAllNotifications[]
+    dataNotificationFakturPajak: GetAllNotificationsFakturPajak[]
     error?: string | null
 }
 
@@ -32,6 +56,15 @@ export const getAllNotification = createAsyncThunk(
     SLICE_NAME + '/getAllNotification',
     async () => {
         const response = await apiGetAllNotification()
+
+        return response.data
+    }
+)
+
+export const getAllNotificationFakturPajak = createAsyncThunk(
+    SLICE_NAME + '/getAllNotificationFakturPajak',
+    async () => {
+        const response = await apiGetAllNotificationFakturPajak()
 
         return response.data
     }
@@ -89,6 +122,25 @@ const notificationSlice = createSlice({
                 state.error =
                     action.error.message || 'Failed to fetch notifications'
             })
+            .addCase(
+                getAllNotificationFakturPajak.fulfilled,
+                (state, action) => {
+                    state.dataNotificationFakturPajak = action.payload
+                    state.loadingFakturPajak = false
+                }
+            )
+            .addCase(getAllNotificationFakturPajak.pending, (state) => {
+                state.loadingFakturPajak = true
+                state.error = null
+            })
+            .addCase(
+                getAllNotificationFakturPajak.rejected,
+                (state, action) => {
+                    state.loadingFakturPajak = false
+                    state.error =
+                        action.error.message || 'Failed to fetch notifications'
+                }
+            )
             .addCase(getOneNotificationAndRead.fulfilled, (state, action) => {
                 state.dataOneNotification = action.payload
                 state.loadingGetOne = false

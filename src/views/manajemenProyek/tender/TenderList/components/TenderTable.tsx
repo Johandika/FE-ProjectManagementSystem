@@ -144,16 +144,7 @@ const ActionColumn = ({ row }: { row: Product }) => {
                             <HiOutlineDocumentAdd />
                         </span>
                     </Tooltip>
-                    <span
-                        className={`cursor-pointer p-2 hover:${textTheme}`}
-                        onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            onEdit()
-                        }}
-                    >
-                        <HiOutlinePencil />
-                    </span>
+
                     <span
                         className="cursor-pointer p-2 hover:text-red-500"
                         onClick={(e) => {

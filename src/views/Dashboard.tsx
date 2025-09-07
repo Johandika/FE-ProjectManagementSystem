@@ -219,6 +219,7 @@ const Dashboard = () => {
                 >
                     {({ errors, touched }) => (
                         <Form id="filter-form" className="flex flex-col gap-4">
+                            {/* Filter Klien */}
                             <FormItem
                                 label="Klien"
                                 invalid={
@@ -227,31 +228,47 @@ const Dashboard = () => {
                                 errorMessage={errors.idClient}
                             >
                                 <Field name="idClient">
-                                    {({ field, form }: FieldProps) => (
-                                        <Select
-                                            isClearable
-                                            placeholder="Semua Klien"
-                                            options={clientOptions}
-                                            isLoading={loadingSelectClient}
-                                            value={
-                                                clientOptions.find(
-                                                    (opt: any) =>
-                                                        opt.value ===
-                                                        field.value
-                                                ) || null
-                                            }
-                                            onChange={(option) => {
-                                                // Cukup panggil setFieldValue dari Formik
-                                                form.setFieldValue(
-                                                    field.name,
-                                                    option ? option.value : ''
-                                                )
-                                            }}
-                                        />
-                                    )}
+                                    {({ field, form }: FieldProps) => {
+                                        const selectedValues = (
+                                            field.value || ''
+                                        )
+                                            .split(',')
+                                            .filter(Boolean)
+                                        const selectedOptions = (
+                                            clientOptions || []
+                                        ).filter((option) =>
+                                            selectedValues.includes(
+                                                option.value
+                                            )
+                                        )
+
+                                        return (
+                                            <Select
+                                                isMulti // Tambahkan prop ini
+                                                isClearable
+                                                placeholder="Semua Klien"
+                                                options={clientOptions}
+                                                isLoading={loadingSelectClient}
+                                                value={selectedOptions}
+                                                onChange={(selected) => {
+                                                    const values = selected
+                                                        ? selected.map(
+                                                              (option: any) =>
+                                                                  option.value
+                                                          )
+                                                        : []
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        values.join(',')
+                                                    )
+                                                }}
+                                            />
+                                        )
+                                    }}
                                 </Field>
                             </FormItem>
 
+                            {/* Filter Divisi */}
                             <FormItem
                                 label="Divisi"
                                 invalid={
@@ -260,28 +277,43 @@ const Dashboard = () => {
                                 errorMessage={errors.idDivisi}
                             >
                                 <Field name="idDivisi">
-                                    {({ field, form }: FieldProps) => (
-                                        <Select
-                                            isClearable
-                                            placeholder="Semua Divisi"
-                                            options={divisiOptions}
-                                            isLoading={loadingSelectDivisi}
-                                            value={
-                                                divisiOptions.find(
-                                                    (opt: any) =>
-                                                        opt.value ===
-                                                        field.value
-                                                ) || null
-                                            }
-                                            onChange={(option) => {
-                                                // Cukup panggil setFieldValue dari Formik
-                                                form.setFieldValue(
-                                                    field.name,
-                                                    option ? option.value : ''
-                                                )
-                                            }}
-                                        />
-                                    )}
+                                    {({ field, form }: FieldProps) => {
+                                        const selectedValues = (
+                                            field.value || ''
+                                        )
+                                            .split(',')
+                                            .filter(Boolean)
+                                        const selectedOptions = (
+                                            divisiOptions || []
+                                        ).filter((option) =>
+                                            selectedValues.includes(
+                                                option.value
+                                            )
+                                        )
+
+                                        return (
+                                            <Select
+                                                isMulti // Tambahkan prop ini
+                                                isClearable
+                                                placeholder="Semua Divisi"
+                                                options={divisiOptions}
+                                                isLoading={loadingSelectDivisi}
+                                                value={selectedOptions}
+                                                onChange={(selected) => {
+                                                    const values = selected
+                                                        ? selected.map(
+                                                              (option: any) =>
+                                                                  option.value
+                                                          )
+                                                        : []
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        values.join(',')
+                                                    )
+                                                }}
+                                            />
+                                        )
+                                    }}
                                 </Field>
                             </FormItem>
 

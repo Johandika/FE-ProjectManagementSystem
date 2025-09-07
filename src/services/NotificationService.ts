@@ -16,6 +16,25 @@ export async function apiGetAllNotification() {
     })
 }
 
+// get all notifications faktur pajak
+export async function apiGetAllNotificationFakturPajak() {
+    return ApiService.fetchData<
+        {
+            id: string
+            type: string
+            status_baca: boolean
+            waktu_baca: string
+            idUser: string
+            idFakturPajak: string
+            idAdendum: string
+            pesan: string
+        }[]
+    >({
+        url: '/notification/fakturpajak',
+        method: 'get',
+    })
+}
+
 // get total unread notifications
 export async function apiGetUnreadNotification() {
     return ApiService.fetchData<

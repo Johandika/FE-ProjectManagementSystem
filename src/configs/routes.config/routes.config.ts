@@ -135,6 +135,15 @@ export const protectedRoutes = [
         ),
         authority: [SUPER_ADMIN, OWNER, DEVELOPER],
     },
+    // Faktur Pajak
+    {
+        key: 'apps.fakturPajak',
+        path: '/manajemen-proyek/faktur-pajak',
+        component: lazy(
+            () => import('@/views/manajemenProyek/fakturPajak/FakturPajakList')
+        ),
+        authority: [SUPER_ADMIN, OWNER, DEVELOPER],
+    },
     // Adendum
     {
         key: 'apps.adendum',

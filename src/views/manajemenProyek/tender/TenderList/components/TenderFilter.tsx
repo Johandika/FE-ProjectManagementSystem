@@ -7,13 +7,14 @@ import Radio from '@/components/ui/Radio'
 import Drawer from '@/components/ui/Drawer'
 import { Field, Form, Formik, FormikProps, FieldProps } from 'formik'
 import type { MouseEvent } from 'react'
-import { getSelectDivisi } from '@/store'
+import { getSelectClient, getSelectDivisi } from '@/store'
 import { Select } from '@/components/ui'
 
 type FormModel = {
     status: string
     idDivisi: string
     filteruser: string
+    idClient: string
 }
 
 type FilterFormProps = {
@@ -30,9 +31,12 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
     ({ onSubmitComplete }, ref) => {
         const dispatch = useAppDispatch()
 
-        const { selectDivisi, loadingSelectDivisi } = useAppSelector(
-            (state) => state.base.common
-        )
+        const {
+            selectDivisi,
+            selectClient,
+            loadingSelectDivisi,
+            loadingSelectClient,
+        } = useAppSelector((state) => state.base.common)
 
         const filterData = useAppSelector(
             (state) => state.tenderList.data.filterData
@@ -56,8 +60,22 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
             // dispatch(getTenders(initialTableData))
         }
 
+        // PERBAIKAN: Memformat data klien untuk Select
+        const clientOptions = useMemo(() => {
+            if (!selectClient?.data) {
+                return []
+            }
+            return selectClient.data.map(
+                (client: { id: string; nama: string }) => ({
+                    value: client.id,
+                    label: client.nama,
+                })
+            )
+        }, [selectClient])
+
         useEffect(() => {
             dispatch(getSelectDivisi())
+            dispatch(getSelectClient())
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [])
 
@@ -109,38 +127,95 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                                 </Field>
                             </FormItem>
 
+                            {/* Filter Klien multi-select */}
+                            <FormItem
+                                label="Klien"
+                                invalid={
+                                    (errors.idClient &&
+                                        touched.idClient) as boolean
+                                }
+                                errorMessage={errors.idClient}
+                            >
+                                <Field name="idClient">
+                                    {({ field, form }: FieldProps) => {
+                                        const selectedValues = (
+                                            field.value || ''
+                                        )
+                                            .split(',')
+                                            .filter(Boolean)
+                                        const selectedOptions = (
+                                            clientOptions || []
+                                        ).filter((option) =>
+                                            selectedValues.includes(
+                                                option.value
+                                            )
+                                        )
+
+                                        return (
+                                            <Select
+                                                isMulti
+                                                options={clientOptions}
+                                                value={selectedOptions}
+                                                placeholder="Pilih klien"
+                                                onChange={(selected) => {
+                                                    const values = selected
+                                                        ? selected.map(
+                                                              (option) =>
+                                                                  option.value
+                                                          )
+                                                        : []
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        values.join(',')
+                                                    )
+                                                }}
+                                            />
+                                        )
+                                    }}
+                                </Field>
+                            </FormItem>
+
                             {/* Filter Divisi */}
                             <FormItem
                                 label="Divisi"
-                                invalid={errors.idDivisi && touched.idDivisi}
+                                invalid={
+                                    (errors.idDivisi &&
+                                        touched.idDivisi) as boolean
+                                }
                                 errorMessage={errors.idDivisi}
                             >
                                 <Field name="idDivisi">
                                     {({ field, form }: FieldProps) => {
-                                        const selectedDivisi = field.value
-                                            ? divisiOptions.find(
-                                                  (divisi: any) =>
-                                                      divisi.value ===
-                                                      field.value
-                                              )
-                                            : null
+                                        const selectedValues = (
+                                            field.value || ''
+                                        )
+                                            .split(',')
+                                            .filter(Boolean)
+                                        const selectedOptions = (
+                                            divisiOptions || []
+                                        ).filter((option) =>
+                                            selectedValues.includes(
+                                                option.value
+                                            )
+                                        )
 
                                         return (
                                             <Select
-                                                field={field}
-                                                form={form}
+                                                isMulti
                                                 options={divisiOptions}
                                                 isLoading={loadingSelectDivisi}
-                                                value={
-                                                    selectedDivisi
-                                                        ? selectedDivisi
-                                                        : null
-                                                }
+                                                value={selectedOptions}
                                                 placeholder="Pilih divisi"
-                                                onChange={(option) => {
+                                                onChange={(selected) => {
+                                                    const values = selected
+                                                        ? selected.map(
+                                                              (option) =>
+                                                                  option.value
+                                                          )
+                                                        : []
                                                     form.setFieldValue(
                                                         field.name,
-                                                        option?.value
+                                                        values.join(',')
                                                     )
                                                 }}
                                             />
@@ -235,7 +310,7 @@ const TenderFilter = () => {
 
         // Buat data filter awal untuk Redux store
         const initialFilterData = {
-            // idClient: '',
+            idClient: '',
             idDivisi: '',
             status: '',
         }
