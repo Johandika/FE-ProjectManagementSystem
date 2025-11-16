@@ -46,6 +46,19 @@ export async function apiGetAdendum<T, U extends Record<string, unknown>>(
     return res.data
 }
 
+// get one adendum
+export async function apiUpdateIsRetensi<T, U extends Record<string, unknown>>(
+    data: U
+) {
+    const res = await ApiService.fetchData<T>({
+        url: `/project/isretensi/${data.id}`,
+        method: 'patch',
+        data,
+    })
+
+    return res.data
+}
+
 // create adendum timeline
 export async function apiCreateAdendumTimeline<
     T,

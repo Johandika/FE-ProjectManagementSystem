@@ -103,24 +103,29 @@ function useAuth() {
     }
 
     const signOut = async () => {
-        const authObject = { authorization: user.authorization }
+        try {
+            const authObject = { authorization: user.authorization }
+            await apiSignOut(authObject)
+        } catch (error) {
+            // Handle or log the error if needed, but don't rethrow
+            console.error('Error during sign out:', error)
+        } finally {
+            // Hapus token dari Redux store
+            dispatch(signOutSuccess())
 
-        await apiSignOut(authObject)
-        // Hapus token dari Redux store
-        dispatch(signOutSuccess())
-
-        // Hapus data user dari Redux store
-        dispatch(
-            setUser({
-                id: '',
-                avatar: '',
-                username: '',
-                email: '',
-                authority: [],
-            })
-        )
-        // handleSignOut()
-        navigate(appConfig.unAuthenticatedEntryPath)
+            // Hapus data user dari Redux store
+            dispatch(
+                setUser({
+                    id: '',
+                    avatar: '',
+                    username: '',
+                    email: '',
+                    authority: [],
+                })
+            )
+            // handleSignOut()
+            navigate(appConfig.unAuthenticatedEntryPath)
+        }
     }
 
     return {
